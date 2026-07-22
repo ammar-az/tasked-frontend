@@ -1,4 +1,4 @@
-// src/App.tsx
+// app/root.tsx
 
 import "./App.css";
 

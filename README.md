@@ -79,9 +79,3 @@ Monitor your workers:
 ```bash
 npx wrangler tail
 ```
-
-## Additional Resources
-
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Vite Documentation](https://vitejs.dev/guide/)
-- [React Documentation](https://reactjs.org/)
