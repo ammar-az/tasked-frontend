@@ -9,7 +9,7 @@ import {
 import type { Route } from "./+types/root";
 
 import Navbar from "./components/Navbar";
-import "./app.css";
+import "./App.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
