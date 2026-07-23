@@ -1,7 +1,8 @@
 import type { Route } from "./+types/project";
-import "./project.css";
 import { getProjectEndpoint } from "../api/projects";
 import { ProjectDto } from "../types/project-types";
+
+import "./project.css";
 
 export async function clientLoader({params,}: Route.ClientLoaderArgs) {
     if (!params.projectId) {
@@ -11,14 +12,6 @@ export async function clientLoader({params,}: Route.ClientLoaderArgs) {
     }
 
     return getProjectEndpoint(params.projectId);
-}
-
-export function HydrateFallback() {
-    return (
-        <main className="project-page">
-            <p>Loading project...</p>
-        </main>
-    );
 }
 
 export default function ProjectPage({
