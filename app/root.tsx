@@ -6,6 +6,8 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import {AuthProvider} from "./auth/AuthContext"
+
 import type { Route } from "./+types/root";
 
 import Navbar from "./components/Navbar";
@@ -20,11 +22,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
 
       <body>
-        <Navbar />
+        <AuthProvider>
+          <Navbar />
 
-        <main>
-          {children}
-        </main>
+          <main>
+            {children}
+          </main>
+        </AuthProvider>
 
         <ScrollRestoration />
         <Scripts />
@@ -51,5 +55,7 @@ export function HydrateFallback() {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+      <Outlet />
+  );
 }
