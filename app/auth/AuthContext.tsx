@@ -1,27 +1,20 @@
 import {
     createContext,
     useContext,
+    useEffect,
     useState,
     type ReactNode,
 } from "react";
 
-import {
-    clearName,
-    clearToken,
-    getName,
-    getToken,
-    saveName,
-    saveToken,
-} from "./authStorage";
-
-import { login } from "../api/auth";
+import { loginUser, logoutUser, registerUser, refreshSession } from "../api/auth";
 
 type AuthContextType = {
     token: string | null;
     username: string | null;
     isAuthenticated: boolean;
 
-    handleLogin: (email: string, password: string) => void;
+    register: (username:string, email: string, password: string) => void;
+    login: (email: string, password: string) => void;
     logout: () => void;
 };
 
@@ -44,31 +37,64 @@ export function useAuth() {
 }
 
 export function AuthProvider({children}: Props){
-    const [token, setToken] = useState<string | null>(() => getToken());
-    const [username, setUsername] = useState<string | null>(() => getName());
+    const [token, setToken] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
+    const [initialized, setInitialized] = useState<boolean>(false);
 
-    async function handleLogin(email: string, password: string) {
-        const res = await login({email, password});
-        saveToken(res.token);
+    async function login(email: string, password: string) {
+        const res = await loginUser({email, password});
+
         setToken(res.token);
-        saveName(res.username);
         setUsername(res.username);
     }
 
-    function logout() {
-        clearToken();
-        clearName();
-        setToken(null);
-        setUsername(null);
+    async function register(username: string, email: string, password: string){
+        const res = await registerUser({username, email, password});
+
+        setToken(res.token);
+        setUsername(res.username);
     }
 
+    async function logout() {
+        try {
+            await logoutUser();
+        } finally {
+            setToken(null);
+            setUsername(null);
+        }
+    }
+
+    async function restoreSession(){
+        console.log("Auth initialization started");
+        try {
+            const res = await refreshSession();
+            console.log("Refresh succeeded", res);
+            setToken(res.token);
+            setUsername(res.username);
+        } catch (error){
+            console.error("Refresh failed", error);
+            setToken(null);
+            setUsername(null);
+        } finally {
+            console.log("Auth initialization finished");
+            setInitialized(true);
+        }
+    }
+
+    useEffect(() => {
+        restoreSession();
+    }, [])
+
+    if(!initialized) return <div>Loading...</div>;
+    
     return(
         <AuthContext.Provider
             value ={{
                 token,
                 username,
                 isAuthenticated: token !== null,
-                handleLogin,
+                register,
+                login,
                 logout
             }}
         >

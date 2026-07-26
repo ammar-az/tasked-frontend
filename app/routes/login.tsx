@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
 
 export default function LoginPage({}: Route.ComponentProps) {
-    const {handleLogin, isAuthenticated} = useAuth();
+    const {login, isAuthenticated} = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     
@@ -13,7 +13,7 @@ export default function LoginPage({}: Route.ComponentProps) {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        handleLogin(username, password);
+        login(username, password);
         navigate("/");
     }
 
