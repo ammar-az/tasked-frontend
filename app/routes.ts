@@ -14,7 +14,7 @@ export default [
 
     route(
         "projects/:projectId/task/:issueNo",
-        "routes/todo.tsx",
+        "routes/task.tsx",
     ),
 
     route(
