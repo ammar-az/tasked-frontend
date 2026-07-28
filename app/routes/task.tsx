@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
-import { getTodoEndpoint } from "../api/todos";
+import { getTodoByNoEndpoint } from "../api/todos";
 import type { TodoDto } from "../types/todo-types";
 
 import "./task.css";
@@ -10,28 +10,26 @@ import "./task.css";
 export async function clientLoader({
     params,
 }: Route.ClientLoaderArgs) {
-    // if (!params.projectId) {
-    //     throw new Response("Project ID is required", {
-    //         status: 400,
-    //     });
-    // }
+    if (!params.projectId) {
+        throw new Response("Project ID is required", {
+            status: 400,
+        });
+    }
 
-    // if (!params.issueNo) {
-    //     throw new Response("Task issue number is required", {
-    //         status: 400,
-    //     });
-    // }
+    if (!params.issueNo) {
+        throw new Response("Task issue number is required", {
+            status: 400,
+        });
+    }
 
-    // const issueNo = Number(params.issueNo);
+    const issueNo = Number(params.issueNo);
 
-    // if (!Number.isInteger(issueNo)) {
-    //     throw new Response("Invalid task issue number", {
-    //         status: 400,
-    //     });
-    // }
-    // //endpoint is todo id, maybe use pid + issueno
-    // return getTodoEndpoint(params.projectId);
-    return getTodoEndpoint(params.issueNo);
+    if (!Number.isInteger(issueNo)) {
+        throw new Response("Invalid task issue number", {
+            status: 400,
+        });
+    }
+    return getTodoByNoEndpoint(params.projectId, issueNo);
 }
 
 // type TaskPageDto = TodoDto & {

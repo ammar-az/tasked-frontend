@@ -13,8 +13,13 @@ export default [
     ),
 
     route(
-        "projects/:projectId/task/:issueNo",
+        "projects/:projectId/tasks/:issueNo",
         "routes/task.tsx",
+    ),
+
+    route(
+        "projects/:projectId/tasks/new",
+        "routes/todo.tsx",
     ),
 
     route(

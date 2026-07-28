@@ -2,8 +2,13 @@ import type { MemberOverviewDto, MemberOverviewRequest } from "../types/membersh
 import type { UserDto, UserUpdateRequest } from "../types/user-types";
 import api from "./client";
 
-export async function getUserByIdEndpoint(userId: string): Promise<UserDto> {
-    const response = await api.get<UserDto>(`/users/${userId}`);
+// export async function getUserByIdEndpoint(userId: string): Promise<UserDto> {
+//     const response = await api.get<UserDto>(`/users/${userId}`);
+//     return response.data;
+// }
+
+export async function getUserByNameEndpoint(username: string): Promise<UserDto> {
+    const response = await api.get<UserDto>(`/users/${username}`);
     return response.data;
 }
 
