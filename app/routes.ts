@@ -18,6 +18,11 @@ export default [
     ),
 
     route(
+        "projects/:projectId/members/",
+        "routes/members.tsx",
+    ),
+
+    route(
         "users/:username",
         "routes/user.tsx",
     ),
@@ -35,6 +40,11 @@ export default [
     route(
         "myaccount",
         "routes/account.tsx",
+    ),
+
+    route(
+        "create",
+        "routes/create.tsx",
     ),
 
     route("*", "./routes/not-found.tsx")

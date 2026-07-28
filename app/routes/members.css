@@ -1,0 +1,342 @@
+.members-page {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 2rem auto;
+}
+
+.members-page > h1 {
+    margin: 0 0 1.25rem;
+    text-align: center;
+}
+
+.members-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.members-back-link:hover {
+    text-decoration: underline;
+}
+
+.members-back-link span {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.members-panel {
+    border: 1px solid;
+}
+
+.members-toolbar {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid;
+}
+
+.members-search {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    padding: 0 0.75rem;
+    border: 1px solid;
+}
+
+.members-search span {
+    font-size: 1.7rem;
+}
+
+.members-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.75rem 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    outline: none;
+}
+
+.members-toolbar select {
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+}
+
+.members-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid;
+}
+
+.members-tab {
+    min-height: 3rem;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-right: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.members-tab:hover {
+    background: color-mix(
+        in srgb,
+        CanvasText 7%,
+        Canvas
+    );
+}
+
+.members-tab.active {
+    font-weight: bold;
+    box-shadow: inset 0 -3px CanvasText;
+}
+
+.member-list {
+    min-height: 400px;
+}
+
+.member-row {
+    display: grid;
+    grid-template-columns:
+        minmax(150px, 1.15fr)
+        minmax(130px, 0.9fr)
+        minmax(150px, 1fr)
+        minmax(100px, 0.65fr)
+        auto;
+    gap: 1rem;
+    align-items: center;
+    min-height: 90px;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid;
+}
+
+.member-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.member-name {
+    color: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.member-name:hover {
+    text-decoration: underline;
+}
+
+.member-joined {
+    font-size: 0.85rem;
+}
+
+.member-org-badge {
+    display: inline-block;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.member-org-badge.external {
+    border-style: dashed;
+}
+
+.assigned-tasks-link {
+    color: inherit;
+}
+
+.member-role {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.member-role span {
+    font-size: 0.8rem;
+}
+
+.member-action-menu {
+    position: relative;
+}
+
+.member-action-menu summary {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid;
+    font-size: 1.5rem;
+    list-style: none;
+    cursor: pointer;
+}
+
+.member-action-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.member-action-options {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 0.3rem);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 190px;
+    border: 1px solid;
+    background: Canvas;
+}
+
+.member-action-options button {
+    padding: 0.7rem;
+    border: none;
+    border-bottom: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.member-action-options button:last-child {
+    border-bottom: none;
+}
+
+.member-action-options button:hover {
+    background: color-mix(
+        in srgb,
+        CanvasText 8%,
+        Canvas
+    );
+}
+
+.banned-member-row,
+.invite-row {
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(160px, 1fr)
+        auto;
+}
+
+.member-secondary-action {
+    min-height: 2.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.members-empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+    text-align: center;
+}
+
+.members-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    min-height: 4.5rem;
+    padding: 0.75rem;
+    border-top: 1px solid;
+}
+
+.members-pagination button {
+    min-height: 2.25rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.members-pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media (max-width: 850px) {
+    .member-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .member-org-status,
+    .assigned-tasks-link {
+        grid-column: 1;
+    }
+
+    .member-role,
+    .member-action-menu {
+        grid-column: 2;
+    }
+
+    .member-role {
+        grid-row: 1;
+    }
+
+    .member-action-menu {
+        grid-row: 2 / 4;
+        align-self: center;
+    }
+
+    .banned-member-row,
+    .invite-row {
+        grid-template-columns: 1fr auto;
+    }
+}
+
+@media (max-width: 550px) {
+    .members-page {
+        width: calc(100% - 1rem);
+        margin-top: 1rem;
+    }
+
+    .members-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .member-row,
+    .banned-member-row,
+    .invite-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .member-role,
+    .member-action-menu,
+    .member-org-status,
+    .assigned-tasks-link {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .member-action-menu {
+        justify-self: end;
+    }
+
+    .member-secondary-action {
+        width: 100%;
+    }
+}
