@@ -246,3 +246,36 @@
         width: 100%;
     }
 }
+
+.new-task-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.new-task-field + .new-task-checkbox {
+    margin-top: 1.25rem;
+}
+
+.new-task-field span {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.new-task-field select {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem;
+}
+
+.new-task-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+}
+
+.new-task-checkbox input {
+    width: 1rem;
+    height: 1rem;
+}

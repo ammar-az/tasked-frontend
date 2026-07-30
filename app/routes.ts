@@ -19,7 +19,7 @@ export default [
 
     route(
         "projects/:projectId/tasks/new",
-        "routes/todo.tsx",
+        "routes/new-task.tsx",
     ),
 
     route(
