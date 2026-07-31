@@ -1,42 +1,31 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-//import type { JoinPolicy } from "../types/project-types";
+import { JoinPolicy, ProjectRequest } from "../types/project-types";
+import { createProjectEndpoint } from "../api/projects";
 
 import "./create.css";
 
-type Visibility = "Public" | "Private";
+// type JoinPolicy =
+//     | "Open"
+//     | "Viewer"
+//     | "InviteOnly"
+//     | "Closed";
 
-type JoinPolicy =
-    | "Open"
-    | "Viewer"
-    | "InviteOnly"
-    | "Closed";
-
-interface CreateProjectRequest {
-    name: string;
-    description: string;
-    createForOrganization: boolean;
-    visibility: Visibility;
-    joinPolicy: JoinPolicy;
-}
 
 export default function CreateProjectPage() {
     const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [createForOrganization, setCreateForOrganization] =
-        useState(false);
-    const [visibility, setVisibility] =
-        useState<Visibility>("Public");
-    const [joinPolicy, setJoinPolicy] =
-        useState<JoinPolicy>("Open");
+    const [createForOrganization, setCreateForOrganization] = useState(false);
+    const [visibility, setVisibility] = useState(true);
+    const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>(JoinPolicy.Open);
 
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Replace this with a value from the current user/auth data.
-    const canCreateOrganizationProject = true;
+    const canCreateOrganizationProject = false;
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -49,25 +38,23 @@ export default function CreateProjectPage() {
             return;
         }
 
-        const request: CreateProjectRequest = {
+        const request: ProjectRequest = {
             name: trimmedName,
             description: trimmedDescription,
-            createForOrganization,
-            visibility,
-            joinPolicy,
+            org: createForOrganization,
+            visible: visibility,
+            joinPolicy: joinPolicy,
         };
+        
+        console.log
 
         try {
             setIsSubmitting(true);
             setError(null);
-
-            /*
-             * Replace this placeholder with your endpoint:
-             *
-             * const project = await createProjectEndpoint(request);
-             * navigate(`/projects/${project.id}`);
-             */
-
+        
+            const project = await createProjectEndpoint(request);
+            navigate(`/projects/${project.id}`);
+            
             console.log("Create project:", request);
         } catch {
             setError("The project could not be created.");
@@ -148,9 +135,9 @@ export default function CreateProjectPage() {
                             <input
                                 type="radio"
                                 name="visibility"
-                                checked={visibility === "Public"}
+                                checked={visibility === true}
                                 onChange={() =>
-                                    setVisibility("Public")
+                                    setVisibility(true)
                                 }
                             />
 
@@ -161,9 +148,9 @@ export default function CreateProjectPage() {
                             <input
                                 type="radio"
                                 name="visibility"
-                                checked={visibility === "Private"}
+                                checked={visibility === false}
                                 onChange={() =>
-                                    setVisibility("Private")
+                                    setVisibility(false)
                                 }
                             />
 
@@ -179,9 +166,9 @@ export default function CreateProjectPage() {
                         <input
                             type="radio"
                             name="join-policy"
-                            checked={joinPolicy === "Open"}
+                            checked={joinPolicy === JoinPolicy.Open}
                             onChange={() =>
-                                setJoinPolicy("Open")
+                                setJoinPolicy(JoinPolicy.Open)
                             }
                         />
 
@@ -192,9 +179,9 @@ export default function CreateProjectPage() {
                         <input
                             type="radio"
                             name="join-policy"
-                            checked={joinPolicy === "Viewer"}
+                            checked={joinPolicy === JoinPolicy.ViewOnly}
                             onChange={() =>
-                                setJoinPolicy("Viewer")
+                                setJoinPolicy(JoinPolicy.ViewOnly)
                             }
                         />
 
@@ -205,9 +192,9 @@ export default function CreateProjectPage() {
                         <input
                             type="radio"
                             name="join-policy"
-                            checked={joinPolicy === "InviteOnly"}
+                            checked={joinPolicy === JoinPolicy.InviteOnly}
                             onChange={() =>
-                                setJoinPolicy("InviteOnly")
+                                setJoinPolicy(JoinPolicy.InviteOnly)
                             }
                         />
 
@@ -218,9 +205,9 @@ export default function CreateProjectPage() {
                         <input
                             type="radio"
                             name="join-policy"
-                            checked={joinPolicy === "Closed"}
+                            checked={joinPolicy === JoinPolicy.Closed}
                             onChange={() =>
-                                setJoinPolicy("Closed")
+                                setJoinPolicy(JoinPolicy.Closed)
                             }
                         />
 
