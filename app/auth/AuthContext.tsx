@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { loginUser, logoutUser, registerUser, refreshSession } from "../api/auth";
+import { setAccessToken } from "./tokenStore";
 
 type AuthContextType = {
     token: string | null;
@@ -45,6 +46,7 @@ export function AuthProvider({children}: Props){
         const res = await loginUser({email, password});
 
         setToken(res.token);
+        setAccessToken(res.token);
         setUsername(res.username);
     }
 
@@ -52,6 +54,7 @@ export function AuthProvider({children}: Props){
         const res = await registerUser({username, email, password});
 
         setToken(res.token);
+        setAccessToken(res.token);
         setUsername(res.username);
     }
 
@@ -60,6 +63,7 @@ export function AuthProvider({children}: Props){
             await logoutUser();
         } finally {
             setToken(null);
+            setAccessToken(null);
             setUsername(null);
         }
     }
@@ -70,10 +74,12 @@ export function AuthProvider({children}: Props){
             const res = await refreshSession();
             console.log("Refresh succeeded", res);
             setToken(res.token);
+            setAccessToken(res.token);
             setUsername(res.username);
         } catch (error){
             console.error("Refresh failed", error);
             setToken(null);
+            setAccessToken(null);
             setUsername(null);
         } finally {
             console.log("Auth initialization finished");
