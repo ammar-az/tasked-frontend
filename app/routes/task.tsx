@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
-import { getTodoByNoEndpoint } from "../api/todos";
-import type { TodoDto } from "../types/todo-types";
+import { getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
+import type { TodoDto, TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
 
@@ -93,32 +93,38 @@ export default function TaskPage({
         setIsEditing(false);
     }
 
-    function saveChanges() {
+    async function saveChanges() {
         const title = draft.title.trim();
+        const description = draft.description.trim();
 
         if (!title) {
             setError("A task title is required.");
             return;
         }
 
-        const updatedTask = {
-            ...task,
-            title,
-            description: draft.description.trim(),
-        };
+        try {
+            setError(null);
 
-        // Replace this local update with your API request:
-        //
-        // await updateTodoEndpoint(task.id, {
-        //     title: updatedTask.title,
-        //     description: updatedTask.description,
-        // });
-        //
-        // You can then use the response from the endpoint instead.
+            const request: TodoUpdateRequest = {
+                title,
+                description,
+                status: undefined,
+                assigned: undefined,
+                unassign: false
+            };
+            
+            const updatedTodo = await updateTodoEndpoint(
+                task.id,
+                request,
+            );
 
-        setTask(updatedTask);
-        setError(null);
-        setIsEditing(false);
+            setTask(updatedTodo);
+            
+        } catch {
+            setError("The task could not be created.");
+        } finally {
+            setIsEditing(false);
+        }
     }
 
     const projectName = task.projectName ?? "Project";

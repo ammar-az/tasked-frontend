@@ -72,27 +72,38 @@ export function AuthProvider({children}: Props){
         }
     }
 
-    async function restoreSession(){
-        console.log("Auth initialization started");
-        try {
-            const res = await refreshSession();
-            console.log("Refresh succeeded", res);
-            setToken(res.token);
-            setAccessToken(res.token);
-            setUser(res.user);
-        } catch (error){
-            console.error("Refresh failed", error);
-            setToken(null);
-            setAccessToken(null);
-            setUser(null);
-        } finally {
-            console.log("Auth initialization finished");
-            setInitialized(true);
-        }
-    }
-
     useEffect(() => {
+        let cancelled = false;
+
+        async function restoreSession(){
+            console.log("Auth initialization started");
+
+            try {
+                const res = await refreshSession();
+                if(!cancelled){
+                    console.log("Refresh succeeded", res);
+                    setToken(res.token);
+                    setAccessToken(res.token);
+                    setUser(res.user);
+                }
+            } catch (error){
+                console.error("Refresh failed", error);
+                if(!cancelled){
+                                setToken(null);
+                    setAccessToken(null);
+                    setUser(null);
+                }
+            } finally {
+                console.log("Auth initialization finished");
+                if(!cancelled) setInitialized(true);
+            }
+        }
+
         restoreSession();
+
+        return () => {
+            cancelled = true;
+        };
     }, [])
 
     if(!initialized) return <div>Loading...</div>;

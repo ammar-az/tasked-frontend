@@ -2,16 +2,10 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 
 import type { Route } from "./+types/new-task";
-import { TodoStatus } from "../types/todo-types";
+import { TodoStatus, TodoRequest } from "../types/todo-types";
+import { createTodoEndpoint } from "../api/todos";
 
 import "./task.css";
-
-interface CreateTodoRequest {
-    title: string;
-    description?: string;
-    status: TodoStatus;
-    assignToSelf: boolean;
-}
 
 export default function NewTaskPage({
     params,
@@ -20,9 +14,7 @@ export default function NewTaskPage({
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [status, setStatus] = useState<TodoStatus>(
-        TodoStatus.Backlog,
-    );
+    const [status, setStatus] = useState<TodoStatus>(TodoStatus.Backlog);
     const [assignToSelf, setAssignToSelf] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
@@ -41,31 +33,24 @@ export default function NewTaskPage({
             return;
         }
 
-        const request: CreateTodoRequest = {
+        const request: TodoRequest = {
             title: trimmedTitle,
-            description:
-                trimmedDescription || undefined,
+            description: trimmedDescription || undefined,
             status,
-            assignToSelf,
+            selfAssign: assignToSelf
         };
-
+        
         try {
             setIsSubmitting(true);
             setError(null);
+            
+            const createdTodo = await createTodoEndpoint(
+                params.projectId!,
+                request,
+            );
 
-            /*
-             * Replace with your endpoint:
-             *
-             * const createdTodo = await createTodoEndpoint(
-             *     params.projectId!,
-             *     request,
-             * );
-             *
-             * navigate(
-             *     `/projects/${params.projectId}/tasks/${createdTodo.issueNo}`,
-             * );
-             */
-
+            navigate(`/projects/${params.projectId}/tasks/${createdTodo.issueNo}`);
+            
             console.log("Create task:", request);
         } catch {
             setError("The task could not be created.");
