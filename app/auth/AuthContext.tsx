@@ -8,12 +8,14 @@ import {
 
 import { loginUser, logoutUser, registerUser, refreshSession } from "../api/auth";
 import { setAccessToken } from "./tokenStore";
+import { UserDto } from "../types/user-types";
 
 type AuthContextType = {
     token: string | null;
-    username: string | null;
     isAuthenticated: boolean;
 
+    user: UserDto | null;
+    
     register: (username:string, email: string, password: string) => void;
     login: (email: string, password: string) => void;
     logout: () => void;
@@ -39,15 +41,17 @@ export function useAuth() {
 
 export function AuthProvider({children}: Props){
     const [token, setToken] = useState<string | null>(null);
-    const [username, setUsername] = useState<string | null>(null);
     const [initialized, setInitialized] = useState<boolean>(false);
+
+    const [user, setUser] = useState<UserDto | null>(null);
 
     async function login(email: string, password: string) {
         const res = await loginUser({email, password});
 
         setToken(res.token);
         setAccessToken(res.token);
-        setUsername(res.username);
+        setUser(res.user);
+        console.log(user);
     }
 
     async function register(username: string, email: string, password: string){
@@ -55,7 +59,7 @@ export function AuthProvider({children}: Props){
 
         setToken(res.token);
         setAccessToken(res.token);
-        setUsername(res.username);
+        setUser(res.user);
     }
 
     async function logout() {
@@ -64,7 +68,7 @@ export function AuthProvider({children}: Props){
         } finally {
             setToken(null);
             setAccessToken(null);
-            setUsername(null);
+            setUser(null);
         }
     }
 
@@ -75,12 +79,12 @@ export function AuthProvider({children}: Props){
             console.log("Refresh succeeded", res);
             setToken(res.token);
             setAccessToken(res.token);
-            setUsername(res.username);
+            setUser(res.user);
         } catch (error){
             console.error("Refresh failed", error);
             setToken(null);
             setAccessToken(null);
-            setUsername(null);
+            setUser(null);
         } finally {
             console.log("Auth initialization finished");
             setInitialized(true);
@@ -97,8 +101,8 @@ export function AuthProvider({children}: Props){
         <AuthContext.Provider
             value ={{
                 token,
-                username,
                 isAuthenticated: token !== null,
+                user,
                 register,
                 login,
                 logout

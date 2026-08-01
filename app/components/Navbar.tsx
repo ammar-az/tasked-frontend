@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import "./Navbar.css";
 
 export default function Navbar() {
-    const { isAuthenticated, username, logout } = useAuth();
+    const { isAuthenticated, user, logout } = useAuth();
     const navigate = useNavigate();
 
     function handleLogout() {
@@ -26,7 +26,7 @@ export default function Navbar() {
             {(!isAuthenticated) 
             ? <Link to="/login" className="navbar-button">Login</Link>
             : ( <div>
-                    <button onClick={handleLogout}>Logout {username}</button>
+                    <button onClick={handleLogout}>Logout {user!.username}</button>
             </div>)
             }
             </div>
