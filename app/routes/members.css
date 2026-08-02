@@ -300,11 +300,6 @@
         grid-row: 2 / 4;
         align-self: center;
     }
-
-    .banned-member-row,
-    .invite-row {
-        grid-template-columns: 1fr auto;
-    }
 }
 
 @media (max-width: 550px) {

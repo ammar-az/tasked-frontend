@@ -5,13 +5,6 @@ import { createProjectEndpoint } from "../api/projects";
 
 import "./create.css";
 
-// type JoinPolicy =
-//     | "Open"
-//     | "Viewer"
-//     | "InviteOnly"
-//     | "Closed";
-
-
 export default function CreateProjectPage() {
     const navigate = useNavigate();
 
@@ -42,7 +35,7 @@ export default function CreateProjectPage() {
             name: trimmedName,
             description: trimmedDescription,
             org: createForOrganization,
-            visible: visibility,
+            isVisible: visibility,
             joinPolicy: joinPolicy,
         };
         

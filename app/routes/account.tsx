@@ -4,65 +4,98 @@ import ProfilePage, {
     type ProfilePageData,
 } from "../components/profile-page";
 
-export async function clientLoader(): Promise<ProfilePageData> {
-    /*
-     * Replace this return value with:
-     *
-     * const user = await getMeEndpoint();
-     * const ownedProjects = await ...;
-     * const memberships = await ...;
-     * const assignedTasks = await ...;
-     * const invites = await ...;
-     */
+import { getMe } from "../api/auth";
+import {
+    getUserProjectsEndpoint,
+    getUserTodosEndpoint,
+} from "../api/users";
 
-    return {
+import { MemberRole } from "../types/membership-types";
+
+import { createMemberRequest, createTodoRequest, getAccountProfileView } from "../utils/profile-loader-helpers";
+
+export async function clientLoader({
+    request,
+}: Route.ClientLoaderArgs): Promise<ProfilePageData> {
+    const url = new URL(request.url);
+    const activeView = getAccountProfileView(url);
+
+    /*
+     * Assigned tasks do not need the user ID, so these
+     * requests can run together.
+     */
+    if (activeView === "tasks") {
+        const todoRequest = createTodoRequest(url);
+
+        const [user, todos] = await Promise.all([
+            getMe(),
+            getUserTodosEndpoint(todoRequest),
+        ]);
+
+        return {
+            user: {
+                username: user.username,
+                organizationName: user.orgName,
+            },
+
+            ownedProjects: [],
+            memberships: [],
+            assignedTasks: todos,
+            invites: [],
+        };
+    }
+
+    const user = await getMe();
+
+    const requestedRole =
+        activeView === "owned"
+            ? MemberRole.Owner
+            : activeView === "invites"
+              ? MemberRole.Invited
+              : undefined;
+
+    const memberRequest = createMemberRequest(
+        url,
+        requestedRole,
+    );
+
+    const projects = await getUserProjectsEndpoint(
+        user.id,
+        memberRequest,
+    );
+
+    const baseData = {
         user: {
-            username: "Current user",
-            organizationName: "Organization name",
+            username: user.username,
+            organizationName: user.orgName,
         },
 
-        ownedProjects: [
-            {
-                id: "placeholder-owned-project",
-                name: "Owned project",
-                description:
-                    "A placeholder owned project shown until the endpoint is connected.",
-                organizationName: "Organization name",
-                role: "Owner",
-            },
-        ],
+        ownedProjects: [],
+        memberships: [],
+        assignedTasks: [],
+        invites: [],
+    } satisfies ProfilePageData;
 
-        memberships: [
-            {
-                id: "placeholder-membership",
-                name: "Project membership",
-                description:
-                    "A placeholder project membership shown until the endpoint is connected.",
-                organizationName: "Organization name",
-                role: "Contributor",
-            },
-        ],
+    switch (activeView) {
+        case "memberships":
+            return {
+                ...baseData,
+                 memberships: projects,
+            };
 
-        assignedTasks: [
-            {
-                id: "placeholder-task",
-                projectId: "placeholder-project",
-                projectName: "Project name",
-                issueNo: 12,
-                title: "Placeholder assigned task",
-                status: "In Progress",
-            },
-        ],
+        case "invites":
+            return {
+                ...baseData,
+                invites: projects,
+            };
 
-        invites: [
-            {
-                id: "placeholder-invite",
-                projectId: "placeholder-invited-project",
-                projectName: "Invited project",
-                invitedByUsername: "another-user",
-            },
-        ],
-    };
+        case "owned":
+        default:
+            return {
+                ...baseData,
+                ownedProjects: projects,
+            };
+    }
 }
 
 export default function AccountPage({

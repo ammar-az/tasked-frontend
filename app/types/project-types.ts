@@ -22,7 +22,7 @@ export interface ProjectRequest{
     name: string;
     description: string | undefined;
     org: boolean;
-    visible: boolean;
+    isVisible: boolean;
     joinPolicy: JoinPolicy;
 }
 

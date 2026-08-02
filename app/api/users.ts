@@ -1,4 +1,5 @@
 import type { MemberOverviewDto, MemberOverviewRequest } from "../types/membership-types";
+import { MultiTodoRequest, TodoDto } from "../types/todo-types";
 import type { UserDto, UserUpdateRequest } from "../types/user-types";
 import api from "./client";
 
@@ -25,5 +26,10 @@ export async function updateUserEndpoint(request: UserUpdateRequest): Promise<Us
 
 export async function getUserProjectsEndpoint(userId: string, request: MemberOverviewRequest): Promise<Array<MemberOverviewDto>>{
     const response = await api.get<Array<MemberOverviewDto>>(`/users/${userId}/projects/`, {params: request});
+    return response.data;
+}
+
+export async function getUserTodosEndpoint(request: MultiTodoRequest): Promise<Array<TodoDto>>{
+    const response = await api.get<Array<TodoDto>>("/users/todos/", {params: request});
     return response.data;
 }

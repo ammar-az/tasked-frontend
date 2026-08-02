@@ -4,57 +4,57 @@ import ProfilePage, {
     type ProfilePageData,
 } from "../components/profile-page";
 
+import {
+    getUserByNameEndpoint,
+    getUserProjectsEndpoint,
+} from "../api/users";
+
+import { MemberRole } from "../types/membership-types";
+
+import { createMemberRequest, getPublicProfileView } from "../utils/profile-loader-helpers";
+
 export async function clientLoader({
     params,
+    request,
 }: Route.ClientLoaderArgs): Promise<ProfilePageData> {
     if (!params.username) {
-        throw new Response("Username is required", {
+        throw new Response("User ID is required", {
             status: 400,
         });
     }
 
-    /*
-     * Replace this return value with:
-     *
-     * const user = await getUserByUsernameEndpoint(params.username);
-     * const ownedProjects = await ...;
-     * const memberships = await ...;
-     *
-     * Keep the returned shape matching ProfilePageData.
-     */
+    const url = new URL(request.url);
+    const activeView = getPublicProfileView(url);
 
+    const user = await getUserByNameEndpoint(
+        params.username,
+    );
+
+    const memberRequest = createMemberRequest(
+        url,
+        activeView === "owned"
+            ? MemberRole.Owner
+            : undefined,
+    );
+
+    const projects = await getUserProjectsEndpoint(
+        user.id,
+        memberRequest,
+    );
     return {
         user: {
-            username: params.username,
-            organizationName: "Organization name",
+            username: user.username,
+            organizationName: user.orgName,
         },
 
-        ownedProjects: [
-            {
-                id: "placeholder-owned-project",
-                name: "Owned project",
-                description:
-                    "A placeholder project description shown until the project endpoint is connected.",
-                organizationName: "Organization name",
-                role: "Owner",
-            },
-        ],
+        ownedProjects: projects,
 
-        memberships: [
-            {
-                id: "placeholder-membership",
-                name: "Project membership",
-                description:
-                    "A placeholder membership shown until the project endpoint is connected.",
-                organizationName: "Organization name",
-                role: "Contributor",
-            },
-        ],
+        memberships: projects,
 
         assignedTasks: [],
         invites: [],
 
-        // Replace this with a real permission check.
+        // Replace with the real permission check later.
         canInviteToProject: true,
     };
 }

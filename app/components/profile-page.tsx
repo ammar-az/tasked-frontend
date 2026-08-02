@@ -1,42 +1,21 @@
 import { Link, useNavigate, useSearchParams } from "react-router";
 
 import "./profile.css";
+import { MemberOverviewDto } from "../types/membership-types";
+import { TodoDto } from "../types/todo-types";
+import { getMemberRoleLabel, getTodoStatusLabel } from "../utils/enum-helpers";
 
 export interface ProfileUserSummary {
     username: string;
     organizationName?: string | null;
 }
 
-export interface ProfileProjectSummary {
-    id: string;
-    name: string;
-    description?: string | null;
-    organizationName?: string | null;
-    role: string;
-}
-
-export interface AssignedTaskSummary {
-    id: string;
-    projectId: string;
-    projectName: string;
-    issueNo: number;
-    title: string;
-    status: string;
-}
-
-export interface ProjectInviteSummary {
-    id: string;
-    projectId: string;
-    projectName: string;
-    invitedByUsername: string;
-}
-
 export interface ProfilePageData {
     user: ProfileUserSummary;
-    ownedProjects: ProfileProjectSummary[];
-    memberships: ProfileProjectSummary[];
-    assignedTasks: AssignedTaskSummary[];
-    invites: ProjectInviteSummary[];
+    ownedProjects: MemberOverviewDto[];
+    memberships: MemberOverviewDto[];
+    assignedTasks: TodoDto[];
+    invites: MemberOverviewDto[];
     canInviteToProject?: boolean;
 }
 
@@ -214,15 +193,13 @@ export default function ProfilePage({
     );
 }
 
-interface ProjectListProps {
-    projects: ProfileProjectSummary[];
-    emptyMessage: string;
-}
-
 function ProjectList({
     projects,
     emptyMessage,
-}: ProjectListProps) {
+}: {
+    projects: MemberOverviewDto[];
+    emptyMessage: string;
+}) {
     if (projects.length === 0) {
         return (
             <div className="profile-empty-state">
@@ -235,33 +212,33 @@ function ProjectList({
         <div className="profile-project-list">
             {projects.map((project) => (
                 <article
-                    key={project.id}
+                    key={project.projectId}
                     className="profile-project-card"
                 >
                     <div className="profile-project-heading">
                         <div>
                             <Link
-                                to={`/projects/${project.id}`}
+                                to={`/projects/${project.projectId}`}
                                 className="profile-project-name"
                             >
-                                {project.name}
+                                {project.projectName}
                             </Link>
 
-                            {project.organizationName && (
+                            {project.orgname && (
                                 <span className="profile-project-org">
                                     <span aria-hidden="true">♧</span>
-                                    {project.organizationName}
+                                    {project.orgname}
                                 </span>
                             )}
                         </div>
 
                         <span className="profile-project-role">
-                            {project.role}
+                            {getMemberRoleLabel(project.role)}
                         </span>
                     </div>
 
                     <p className="profile-project-description">
-                        {project.description ||
+                        {project.description ??
                             "No project description."}
                     </p>
                 </article>
@@ -273,7 +250,7 @@ function ProjectList({
 function AssignedTaskList({
     tasks,
 }: {
-    tasks: AssignedTaskSummary[];
+    tasks: TodoDto[];
 }) {
     if (tasks.length === 0) {
         return (
@@ -296,7 +273,9 @@ function AssignedTaskList({
                             #{task.issueNo} {task.title}
                         </span>
 
-                        <span>{task.status}</span>
+                        <span>
+                            {getTodoStatusLabel(task.status)}
+                        </span>
                     </div>
 
                     <span className="profile-task-project">
@@ -311,7 +290,7 @@ function AssignedTaskList({
 function InviteList({
     invites,
 }: {
-    invites: ProjectInviteSummary[];
+    invites: MemberOverviewDto[];
 }) {
     if (invites.length === 0) {
         return (
@@ -325,7 +304,7 @@ function InviteList({
         <div className="profile-invite-list">
             {invites.map((invite) => (
                 <article
-                    key={invite.id}
+                    key={invite.projectId}
                     className="profile-invite-card"
                 >
                     <div>
@@ -336,18 +315,12 @@ function InviteList({
                             {invite.projectName}
                         </Link>
 
-                        <p>
-                            Invited by{" "}
-                            <Link
-                                to={`/users/${invite.invitedByUsername}`}
-                            >
-                                {invite.invitedByUsername}
-                            </Link>
-                        </p>
+                        {invite.orgname && (
+                            <p>{invite.orgname}</p>
+                        )}
                     </div>
 
                     <div className="profile-invite-actions">
-                        {/* Replace these with the invite endpoints later. */}
                         <button type="button">
                             Decline
                         </button>

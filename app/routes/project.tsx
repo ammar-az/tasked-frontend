@@ -15,35 +15,9 @@ import {
 } from "../types/todo-types";
 
 import "./project.css";
+import { getTodoStatusLabel, parseTodoStatus } from "../utils/enum-helpers";
 
-function parseTodoStatus(value: string | null): TodoStatus | undefined {
-    if (value === null) return undefined;
-    
-    const parsed = Number(value);
 
-    return Object.values(TodoStatus).includes(parsed)
-        ? (parsed as TodoStatus)
-        : undefined;
-}
-
-function getTodoStatusLabel(status: TodoStatus) {
-    switch (status) {
-        case TodoStatus.Backlog:
-            return "Backlog";
-
-        case TodoStatus.InProgress:
-            return "In Progress";
-
-        case TodoStatus.Completed:
-            return "Completed";
-
-        case TodoStatus.Archived:
-            return "Archived";
-
-        default:
-            return "Unknown";
-    }
-}
 
 export async function clientLoader({
     params,
