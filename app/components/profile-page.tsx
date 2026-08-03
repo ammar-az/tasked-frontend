@@ -238,7 +238,7 @@ function ProjectList({
                     </div>
 
                     <p className="profile-project-description">
-                        {project.description ??
+                        {project.projectDesc ??
                             "No project description."}
                     </p>
                 </article>

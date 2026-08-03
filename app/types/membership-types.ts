@@ -21,8 +21,8 @@ export interface MemberDto{
 export interface MemberOverviewDto{
     projectId: string;
     projectName: string;
+    projectDesc: string | undefined;
     role: MemberRole;
-    description: string | undefined;
     orgId: string | undefined;
     orgname: string | undefined;
 }

@@ -25,8 +25,9 @@ export default function Navbar() {
             <div className="navbar-right">
             {(!isAuthenticated) 
             ? <Link to="/login" className="navbar-button">Login</Link>
-            : ( <div>
-                    <button onClick={handleLogout}>Logout {user!.username}</button>
+            : (<div>
+                    <Link to="/myaccount" className="navbar-button">{user!.username}</Link>
+                    <button onClick={handleLogout}>Logout</button>
             </div>)
             }
             </div>

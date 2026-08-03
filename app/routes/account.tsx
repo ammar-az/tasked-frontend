@@ -80,7 +80,7 @@ export async function clientLoader({
         case "memberships":
             return {
                 ...baseData,
-                 memberships: projects,
+                memberships: projects,
             };
 
         case "invites":
