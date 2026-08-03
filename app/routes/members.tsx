@@ -1,0 +1,706 @@
+import {
+    useEffect,
+    useState,
+    type ReactNode,
+} from "react";
+import {
+    Link,
+    useSearchParams,
+} from "react-router";
+
+import type { Route } from "./+types/members";
+
+import { getProjectEndpoint } from "../api/projects";
+import { getMembersEndpoint } from "../api/projects";
+
+import type { ProjectDto } from "../types/project-types";
+import {
+    MemberRole,
+    type MemberDto,
+    type MemberOverviewRequest,
+} from "../types/membership-types";
+
+
+import "./members.css";
+import { getMemberRoleLabel, parseMemberRole } from "../utils/enum-helpers";
+
+type MemberView = "members" | "banned" | "invited";
+
+type MemberPageDto = MemberDto & {
+    userId: string;
+    username: string;
+    joinedAt?: string;
+    orgId?: string | null;
+};
+
+function getActiveView(
+    role: MemberRole | undefined,
+): MemberView {
+    if (role === MemberRole.Banned) {
+        return "banned";
+    }
+
+    if (role === MemberRole.Invited) {
+        return "invited";
+    }
+
+    return "members";
+}
+
+function isActiveMemberRole(
+    role: MemberRole | undefined,
+) {
+    return (
+        role === MemberRole.Owner ||
+        role === MemberRole.Admin ||
+        role === MemberRole.Contributor ||
+        role === MemberRole.Viewer
+    );
+}
+
+function formatDate(value?: string) {
+    if (!value) {
+        return null;
+    }
+
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime())
+        ? null
+        : date.toLocaleDateString();
+}
+
+export async function clientLoader({
+    params,
+    request,
+}: Route.ClientLoaderArgs): Promise<{
+    project: ProjectDto;
+    members: MemberDto[];
+    memberRequest: MemberOverviewRequest;
+}> {
+    if (!params.projectId) {
+        throw new Response("Project ID is required", {
+            status: 400,
+        });
+    }
+
+    const url = new URL(request.url);
+
+    const memberRequest: MemberOverviewRequest = {
+        search: url.searchParams.get("search")?.trim() || undefined,
+
+        role: parseMemberRole(url.searchParams.get("role"),),
+        
+        owner: false,
+
+        sort: url.searchParams.get("sort") ?? "role",
+
+        descending: url.searchParams.get("descending") !== "false",
+
+        page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
+        pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
+    };
+
+    const [project, members] = await Promise.all([
+        getProjectEndpoint(params.projectId),
+
+        getMembersEndpoint(
+            params.projectId,
+            memberRequest,
+        ),
+    ]);
+
+    return {
+        project,
+        members,
+        memberRequest,
+    };
+}
+
+export default function MembersPage({
+    loaderData,
+}: Route.ComponentProps) {
+    const {
+        project,
+        memberRequest,
+    } = loaderData;
+
+    const members =
+        loaderData.members as MemberPageDto[];
+
+    const [_, setSearchParams] =
+        useSearchParams();
+
+    const [searchInput, setSearchInput] = useState(
+        memberRequest.search ?? "",
+    );
+
+    const activeView = getActiveView(
+        memberRequest.role,
+    );
+
+    // Replace this with your current membership permissions.
+    const canManageMembers = true;
+
+    useEffect(() => {
+        setSearchInput(memberRequest.search ?? "");
+    }, [memberRequest.search]);
+
+    function updateQueryParameter(
+        name: string,
+        value: string | undefined,
+        resetPage = true,
+    ) {
+        setSearchParams((current) => {
+            const next = new URLSearchParams(current);
+
+            if (
+                value === undefined ||
+                value === ""
+            ) {
+                next.delete(name);
+            } else {
+                next.set(name, value);
+            }
+
+            if (resetPage) {
+                next.set("page", "1");
+            }
+
+            return next;
+        });
+    }
+
+    function submitSearch() {
+        updateQueryParameter(
+            "search",
+            searchInput.trim() || undefined,
+        );
+    }
+
+    function changeView(view: MemberView) {
+        setSearchParams((current) => {
+            const next = new URLSearchParams(current);
+
+            switch (view) {
+                case "banned":
+                    next.set(
+                        "role",
+                        String(MemberRole.Banned),
+                    );
+                    break;
+
+                case "invited":
+                    next.set(
+                        "role",
+                        String(MemberRole.Invited),
+                    );
+                    break;
+
+                case "members":
+                default:
+                    next.delete("role");
+                    break;
+            }
+
+            next.set("page", "1");
+
+            return next;
+        });
+    }
+
+    function changeRoleFilter(value: string) {
+        updateQueryParameter(
+            "role",
+            value || undefined,
+        );
+    }
+
+    function changeSort(value: string) {
+        updateQueryParameter("sort", value);
+    }
+
+    function changeDescending(
+        descending: boolean,
+    ) {
+        updateQueryParameter(
+            "descending",
+            String(descending),
+        );
+    }
+
+    function changePage(page: number) {
+        updateQueryParameter(
+            "page",
+            String(page),
+            false,
+        );
+    }
+
+    function handleMemberAction(
+        action: string,
+        member: MemberPageDto,
+    ) {
+        /*
+         * Replace this with the appropriate endpoint
+         * or confirmation dialog.
+         */
+        console.log(action, member);
+    }
+
+    return (
+        <main className="members-page">
+            <Link
+                to={`/projects/${project.id}`}
+                className="members-back-link"
+            >
+                <span aria-hidden="true">←</span>
+                Back to project
+            </Link>
+
+            <h1>{project.name}</h1>
+
+            <section className="members-panel">
+                <div className="members-toolbar">
+                    <form
+                        className="members-search"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            submitSearch();
+                        }}
+                    >
+                        <span aria-hidden="true">
+                            ⌕
+                        </span>
+
+                        <input
+                            type="search"
+                            value={searchInput}
+                            onChange={(event) =>
+                                setSearchInput(
+                                    event.target.value,
+                                )
+                            }
+                            placeholder="Search users"
+                        />
+
+                        <button type="submit">
+                            Search
+                        </button>
+                    </form>
+
+                    {activeView === "members" && (
+                        <select
+                            value={
+                                isActiveMemberRole(
+                                    memberRequest.role,
+                                )
+                                    ? memberRequest.role
+                                    : ""
+                            }
+                            onChange={(event) =>
+                                changeRoleFilter(
+                                    event.target.value,
+                                )
+                            }
+                            aria-label="Filter by role"
+                        >
+                            <option value="">
+                                All active roles
+                            </option>
+
+                            <option
+                                value={MemberRole.Owner}
+                            >
+                                Owner
+                            </option>
+
+                            <option
+                                value={MemberRole.Admin}
+                            >
+                                Admin
+                            </option>
+
+                            <option
+                                value={
+                                    MemberRole.Contributor
+                                }
+                            >
+                                Contributor
+                            </option>
+
+                            <option
+                                value={MemberRole.Viewer}
+                            >
+                                Viewer
+                            </option>
+                        </select>
+                    )}
+
+                    <select
+                        value={memberRequest.sort}
+                        onChange={(event) =>
+                            changeSort(
+                                event.target.value,
+                            )
+                        }
+                        aria-label="Sort members"
+                    >
+                        <option value="role">
+                            Role
+                        </option>
+
+                        <option value="username">
+                            Username
+                        </option>
+
+                        <option value="joinedAt">
+                            Date joined
+                        </option>
+                    </select>
+
+                    <select
+                        value={
+                            memberRequest.descending
+                                ? "descending"
+                                : "ascending"
+                        }
+                        onChange={(event) =>
+                            changeDescending(
+                                event.target.value ===
+                                    "descending",
+                            )
+                        }
+                        aria-label="Sort direction"
+                    >
+                        <option value="ascending">
+                            Ascending
+                        </option>
+
+                        <option value="descending">
+                            Descending
+                        </option>
+                    </select>
+                </div>
+
+                <nav
+                    className="members-tabs"
+                    aria-label="Project member sections"
+                >
+                    <TabButton
+                        active={
+                            activeView === "members"
+                        }
+                        onClick={() =>
+                            changeView("members")
+                        }
+                    >
+                        Members
+                    </TabButton>
+
+                    {canManageMembers && (
+                        <>
+                            <TabButton
+                                active={
+                                    activeView ===
+                                    "banned"
+                                }
+                                onClick={() =>
+                                    changeView("banned")
+                                }
+                            >
+                                Banned
+                            </TabButton>
+
+                            <TabButton
+                                active={
+                                    activeView ===
+                                    "invited"
+                                }
+                                onClick={() =>
+                                    changeView("invited")
+                                }
+                            >
+                                Invites
+                            </TabButton>
+                        </>
+                    )}
+                </nav>
+
+                <div className="member-list">
+                    {members.length > 0 ? (
+                        members.map((member) => (
+                            <MemberRow
+                                key={member.userId}
+                                project={project}
+                                member={member}
+                                activeView={activeView}
+                                canManageMembers={
+                                    canManageMembers
+                                }
+                                onAction={
+                                    handleMemberAction
+                                }
+                            />
+                        ))
+                    ) : (
+                        <div className="members-empty-state">
+                            {activeView === "banned"
+                                ? "No banned users found."
+                                : activeView ===
+                                    "invited"
+                                  ? "No pending invites found."
+                                  : "No matching members found."}
+                        </div>
+                    )}
+                </div>
+
+                <footer className="members-pagination">
+                    <button
+                        type="button"
+                        disabled={
+                            memberRequest.page <= 1
+                        }
+                        onClick={() =>
+                            changePage(
+                                memberRequest.page - 1,
+                            )
+                        }
+                    >
+                        Previous
+                    </button>
+
+                    <span>
+                        Page {memberRequest.page}
+                    </span>
+
+                    <button
+                        type="button"
+                        disabled={
+                            members.length <
+                            memberRequest.pageSize
+                        }
+                        onClick={() =>
+                            changePage(
+                                memberRequest.page + 1,
+                            )
+                        }
+                    >
+                        Next
+                    </button>
+                </footer>
+            </section>
+        </main>
+    );
+}
+
+function MemberRow({
+    project,
+    member,
+    activeView,
+    canManageMembers,
+    onAction,
+}: {
+    project: ProjectDto;
+    member: MemberPageDto;
+    activeView: MemberView;
+    canManageMembers: boolean;
+    onAction: (
+        action: string,
+        member: MemberPageDto,
+    ) => void;
+}) {
+    const memberDate = formatDate(
+        member.joinedAt,
+    );
+
+    return (
+        <article className="member-row">
+            <div className="member-identity">
+                <Link
+                    to={`/users/${member.username}`}
+                    className="member-name"
+                >
+                    {member.username}
+                </Link>
+
+                {memberDate && (
+                    <span className="member-joined">
+                        {activeView === "banned"
+                            ? "Banned"
+                            : activeView ===
+                                "invited"
+                              ? "Invited"
+                              : "Joined"}{" "}
+                        {memberDate}
+                    </span>
+                )}
+            </div>
+
+            {activeView === "members" && (
+                <>
+                {project.orgId != null && (
+                        <>
+                        <div className="member-org-status">
+                            <span
+                                className={
+                                    member.orgId === project.orgId
+                                        ? "member-org-badge"
+                                        : "member-org-badge external"
+                                }
+                            >
+                                {member.orgId === project.orgId
+                                    ? "Organization member"
+                                    : "External member"}
+                            </span>
+                        </div>
+                    </>
+                )}
+
+                    <Link
+                        to={`/projects/${project.id}?assigned=${encodeURIComponent(member.userId)}`}
+                        className="assigned-tasks-link"
+                    >
+                        View assigned tasks
+                    </Link>
+                </>
+            )}
+
+            <div className="member-role">
+                <span>Role</span>
+
+                <strong>
+                    {getMemberRoleLabel(
+                        member.role,
+                    )}
+                </strong>
+            </div>
+
+            {canManageMembers &&
+                member.role !== MemberRole.Owner && (
+                    <MemberActionMenu
+                        member={member}
+                        activeView={activeView}
+                        onAction={onAction}
+                    />
+                )}
+        </article>
+    );
+}
+
+function MemberActionMenu({
+    member,
+    activeView,
+    onAction,
+}: {
+    member: MemberPageDto;
+    activeView: MemberView;
+    onAction: (
+        action: string,
+        member: MemberPageDto,
+    ) => void;
+}) {
+    return (
+        <details className="member-action-menu">
+            <summary
+                aria-label={`Manage ${member.username}`}
+            >
+                ⋮
+            </summary>
+
+            <div className="member-action-options">
+                {activeView === "members" && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() =>
+                                onAction(
+                                    "change-role",
+                                    member,
+                                )
+                            }
+                        >
+                            Change Role
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                onAction(
+                                    "remove",
+                                    member,
+                                )
+                            }
+                        >
+                            Remove from Project
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                onAction(
+                                    "ban",
+                                    member,
+                                )
+                            }
+                        >
+                            Ban User
+                        </button>
+                    </>
+                )}
+
+                {activeView === "banned" && (
+                    <button
+                        type="button"
+                        onClick={() =>
+                            onAction(
+                                "unban",
+                                member,
+                            )
+                        }
+                    >
+                        Unban User
+                    </button>
+                )}
+
+                {activeView === "invited" && (
+                    <button
+                        type="button"
+                        onClick={() =>
+                            onAction(
+                                "cancel-invite",
+                                member,
+                            )
+                        }
+                    >
+                        Cancel Invite
+                    </button>
+                )}
+            </div>
+        </details>
+    );
+}
+
+function TabButton({
+    active,
+    onClick,
+    children,
+}: {
+    active: boolean;
+    onClick: () => void;
+    children: ReactNode;
+}) {
+    return (
+        <button
+            type="button"
+            className={
+                active
+                    ? "members-tab active"
+                    : "members-tab"
+            }
+            onClick={onClick}
+        >
+            {children}
+        </button>
+    );
+}

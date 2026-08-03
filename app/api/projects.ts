@@ -6,7 +6,6 @@ import api from "./client";
 //endpoint actually returns CreatedAtAction
 export async function createProjectEndpoint(request: ProjectRequest): Promise<ProjectDto>{
   const response = await api.post<ProjectDto>("/projects", request);
-  console.log(response.headers);
   return response.data;
 }
 

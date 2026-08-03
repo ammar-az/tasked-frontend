@@ -13,6 +13,11 @@ export async function getTodoEndpoint(todoId: string): Promise<TodoDto>{
   return response.data;
 }
 
+export async function getTodoByNoEndpoint(projectId: string, issueNo: number): Promise<TodoDto>{
+  const response = await api.get<TodoDto>(`/todos/project/${projectId}/${issueNo}`);
+  return response.data;
+}
+
 export async function deleteTodoEndpoint(todoId: string): Promise<void>{
   await api.delete(`/todos/${todoId}`);
 }

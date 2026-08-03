@@ -1,30 +1,23 @@
 import axios from "axios";
 import type { AxiosInstance } from "axios";
+import { getAccessToken } from "../auth/tokenStore";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const api: AxiosInstance = axios.create({
     baseURL: apiUrl,
     timeout: 5000,
+    withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    config.headers.set("Authorization", `Bearer ${token}`);
-  }
-  return config;
-});
+    const token = getAccessToken();
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("access_token");
+    if (token) {
+        config.headers.set("Authorization", `Bearer ${token}`);
     }
 
-    return Promise.reject(error);
-  },
-);
+    return config;
+});
 
 export default api;

@@ -24,7 +24,7 @@ export interface TodoRequest{
     title: string;
     description: string | undefined;
     status: TodoStatus;
-    assigned: string;
+    selfAssign: boolean;
 }
 
 export interface TodoUpdateRequest{

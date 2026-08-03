@@ -1,0 +1,281 @@
+.task-page {
+    width: min(1200px, calc(100% - 2rem));
+    margin: 2rem auto;
+}
+
+.task-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    color: inherit;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+.task-back-link:hover {
+    text-decoration: underline;
+}
+
+.task-back-link span {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.task-page-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.task-card,
+.task-sidebar {
+    border: 1px solid;
+}
+
+.task-card {
+    min-height: 650px;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid;
+}
+
+.task-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.task-heading h1 {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.task-issue-number {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.task-edit-button {
+    border: none;
+    background: none;
+    color: inherit;
+    padding: 0.25rem;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.task-edit-button:hover {
+    transform: scale(1.08);
+}
+
+.task-title-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 2rem;
+}
+
+.task-description-section {
+    flex: 1;
+    padding: 1.5rem;
+}
+
+.task-description-section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.task-description {
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.task-description-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 430px;
+    padding: 0.75rem;
+    resize: vertical;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    line-height: 1.5;
+}
+
+.task-edit-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid;
+}
+
+.task-edit-error {
+    margin: 0 0 0.75rem;
+}
+
+.task-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.primary-button,
+.secondary-button,
+.task-sidebar-actions button {
+    min-height: 2.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.primary-button {
+    font-weight: bold;
+}
+
+.task-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-sidebar-section {
+    padding: 1.25rem;
+}
+
+.task-sidebar-section + .task-sidebar-section {
+    border-top: 1px solid;
+}
+
+.task-sidebar-section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.task-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin: 0;
+}
+
+.task-metadata div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.task-metadata dt {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.task-metadata dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.task-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.task-sidebar-actions button {
+    width: 100%;
+}
+
+@media (max-width: 800px) {
+    .task-page-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .task-sidebar {
+        order: -1;
+    }
+
+    .task-card {
+        min-height: 500px;
+    }
+
+    .task-description-input {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 500px) {
+    .task-page {
+        width: calc(100% - 1rem);
+        margin-top: 1rem;
+    }
+
+    .task-heading {
+        align-items: flex-start;
+    }
+
+    .task-title-input {
+        font-size: 1.4rem;
+    }
+
+    .task-edit-actions {
+        flex-direction: column-reverse;
+    }
+
+    .task-edit-actions button {
+        width: 100%;
+    }
+}
+
+.new-task-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.new-task-field + .new-task-checkbox {
+    margin-top: 1.25rem;
+}
+
+.new-task-field span {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.new-task-field select {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem;
+}
+
+.new-task-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+}
+
+.new-task-checkbox input {
+    width: 1rem;
+    height: 1rem;
+}

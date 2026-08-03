@@ -13,8 +13,18 @@ export default [
     ),
 
     route(
-        "projects/:projectId/task/:issueNo",
-        "routes/todo.tsx",
+        "projects/:projectId/tasks/:issueNo",
+        "routes/task.tsx",
+    ),
+
+    route(
+        "projects/:projectId/tasks/new",
+        "routes/new-task.tsx",
+    ),
+
+    route(
+        "projects/:projectId/members/",
+        "routes/members.tsx",
     ),
 
     route(
@@ -35,6 +45,11 @@ export default [
     route(
         "myaccount",
         "routes/account.tsx",
+    ),
+
+    route(
+        "create",
+        "routes/create.tsx",
     ),
 
     route("*", "./routes/not-found.tsx")
