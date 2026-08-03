@@ -3,9 +3,10 @@ import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
 import { getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
-import type { TodoDto, TodoUpdateRequest } from "../types/todo-types";
+import { TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
+import { getTodoStatusLabel } from "../utils/enum-helpers";
 
 export async function clientLoader({
     params,
@@ -32,17 +33,6 @@ export async function clientLoader({
     return getTodoByNoEndpoint(params.projectId, issueNo);
 }
 
-// type TaskPageDto = TodoDto & {
-//     projectName?: string;
-//     createdByUsername?: string;
-//     assignedUsername?: string | null;
-// };
-
-interface TaskDraft {
-    title: string;
-    description: string;
-}
-
 export default function TaskPage({
     loaderData,
     params,
@@ -53,9 +43,12 @@ export default function TaskPage({
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const [draft, setDraft] = useState<TaskDraft>({
+    const [draft, setDraft] = useState<TodoUpdateRequest>({
         title: loadedTask.title,
         description: loadedTask.description ?? "",
+        status: loadedTask.status,
+        assigned: loadedTask.assigned,
+        unassign: false
     });
 
     // Replace these with permissions from your auth or membership state.
@@ -68,6 +61,9 @@ export default function TaskPage({
         setDraft({
             title: loadedTask.title,
             description: loadedTask.description ?? "",
+            status: loadedTask.status,
+            assigned: undefined,
+            unassign: false
         });
         setIsEditing(false);
         setError(null);
@@ -75,8 +71,11 @@ export default function TaskPage({
 
     function beginEditing() {
         setDraft({
-            title: task.title,
-            description: task.description ?? "",
+            title: loadedTask.title,
+            description: loadedTask.description ?? "",
+            status: loadedTask.status,
+            assigned: undefined,
+            unassign: false
         });
 
         setError(null);
@@ -85,8 +84,11 @@ export default function TaskPage({
 
     function cancelEditing() {
         setDraft({
-            title: task.title,
-            description: task.description ?? "",
+            title: loadedTask.title,
+            description: loadedTask.description ?? "",
+            status: loadedTask.status,
+            assigned: undefined,
+            unassign: false
         });
 
         setError(null);
@@ -94,28 +96,23 @@ export default function TaskPage({
     }
 
     async function saveChanges() {
-        const title = draft.title.trim();
-        const description = draft.description.trim();
+        setDraft(current => ({
+            ...current,
+            title: current.title?.trim(),
+            description: current.description?.trim(),
+        }))
 
-        if (!title) {
-            setError("A task title is required.");
-            return;
-        }
+        // if (!title) {
+        //     setError("A task title is required.");
+        //     return;
+        // }
 
         try {
             setError(null);
-
-            const request: TodoUpdateRequest = {
-                title,
-                description,
-                status: undefined,
-                assigned: undefined,
-                unassign: false
-            };
             
             const updatedTodo = await updateTodoEndpoint(
                 task.id,
-                request,
+                draft,
             );
 
             setTask(updatedTodo);
@@ -183,21 +180,83 @@ export default function TaskPage({
                         <h2>Description</h2>
 
                         {isEditing ? (
-                            <textarea
-                                className="task-description-input"
-                                value={draft.description}
-                                onChange={(event) =>
-                                    setDraft((current) => ({
-                                        ...current,
-                                        description: event.target.value,
-                                    }))
-                                }
-                                placeholder="Enter a task description"
-                            />
+                            <div>
+                                <textarea
+                                    className="task-description-input"
+                                    value={draft.description}
+                                    onChange={(event) =>
+                                        setDraft((current) => ({
+                                            ...current,
+                                            description: event.target.value,
+                                        }))
+                                    }
+                                    placeholder="Enter a task description"
+                                />
+
+                                    <fieldset className="">
+                                    <legend>Status</legend>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.Backlog}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.Backlog
+                                                }))
+                                            }
+                                        />
+
+                                        Backlog
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.InProgress}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.InProgress
+                                                }))
+                                            }
+                                        />
+
+                                        In Progress
+                                    </label>
+
+                                                            <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.Completed}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.Completed,
+                                                    unassign: true
+                                                }))
+                                            }
+                                        />
+
+                                        Completed
+                                    </label>
+                                </fieldset>
+
+                            </div>
                         ) : (
                             <p className="task-description">
                                 {task.description || "No description provided."}
                             </p>
+                        
+                        
+                        
                         )}
                     </section>
 
@@ -260,7 +319,7 @@ export default function TaskPage({
 
                             <div>
                                 <dt>Status</dt>
-                                <dd>{String(task.status)}</dd>
+                                <dd>{getTodoStatusLabel(task.status)}</dd>
                             </div>
                         </dl>
                     </section>

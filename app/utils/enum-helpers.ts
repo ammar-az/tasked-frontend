@@ -68,3 +68,15 @@ export function getMemberRoleLabel(role: MemberRole) {
             return "Unknown";
     }
 }
+
+export function isMember(role: MemberRole): boolean{
+    return(role !== undefined && role !== MemberRole.Banned && role !== MemberRole.Invited);
+}
+
+export function isAdmin(role: MemberRole): boolean{
+        return(role === MemberRole.Owner || role === MemberRole.Admin);
+}
+
+export function canContribute(role: MemberRole): boolean{
+        return(role === MemberRole.Owner || role === MemberRole.Admin || role === MemberRole.Contributor);
+}

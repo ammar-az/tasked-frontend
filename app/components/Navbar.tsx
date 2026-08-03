@@ -16,7 +16,7 @@ export default function Navbar() {
     return (
         <header className="navbar">
             <div className="navbar-left">
-                <button onClick={()=> navigate("/create")}>Create Project</button>
+                {(isAuthenticated && <button onClick={()=> navigate("/create")}>Create Project</button>)}
             </div>
             <Link to="/" className="navbar-title">
                 Tasked

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import {
     Link,
+    useNavigate,
     useSearchParams,
 } from "react-router";
 
 import type { Route } from "./+types/project";
 
-import { getProjectEndpoint, getProjectTodosEndpoint } from "../api/projects";
+import { getMemberEndpoint, getProjectEndpoint, getProjectTodosEndpoint, joinEndpoint, leaveEndpoint } from "../api/projects";
 
 import type { MultiTodoRequest } from "../types/todo-types";
 import {
@@ -15,9 +16,7 @@ import {
 } from "../types/todo-types";
 
 import "./project.css";
-import { getTodoStatusLabel, parseTodoStatus } from "../utils/enum-helpers";
-
-
+import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin } from "../utils/enum-helpers";
 
 export async function clientLoader({
     params,
@@ -41,18 +40,20 @@ export async function clientLoader({
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    const [project, todos] = await Promise.all([
+    const [project, todos, member] = await Promise.all([
         getProjectEndpoint(params.projectId),
 
         getProjectTodosEndpoint(
             params.projectId,
             todoRequest,
         ),
+        getMemberEndpoint(params.projectId),
     ]);
 
     return {
         project,
         todos,
+        member,
         todoRequest,
     };
 }
@@ -64,9 +65,12 @@ export default function ProjectPage({
     const {
         project,
         todos,
+        member,
         todoRequest,
     } = loaderData;
 
+    const navigate = useNavigate();
+    
     const [_, setSearchParams] =
         useSearchParams();
 
@@ -101,6 +105,8 @@ export default function ProjectPage({
             (todo: TodoDto) =>
                 todo.id === selectedTodoId,
         ) ?? null;
+
+    const role = member?.role;
 
     function updateQueryParameter(
         name: string,
@@ -171,6 +177,16 @@ export default function ProjectPage({
         );
     }
 
+    async function handleJoin(){
+        await joinEndpoint(project.id);
+        navigate(0); 
+    }
+
+    async function handleLeave(){
+        await leaveEndpoint(project.id);
+        navigate(0); 
+    }
+
     return (
         <main className="project-page">
             <section className="project-summary">
@@ -195,6 +211,19 @@ export default function ProjectPage({
                     >
                         New Task
                     </Link>
+                    
+                    {isAdmin(role) && (
+                        <Link to={`/projects/${project.id}/settings`}>
+                            Settings
+                        </Link>
+                    )}
+
+                    {isMember(role) ? (
+                        <button onClick={handleLeave}>Leave Project</button>
+                    ) : (
+                        <button onClick={handleJoin}>Join Project</button>
+                    )}
+                    
                 </div>
             </section>
 
