@@ -28,6 +28,11 @@ export default [
     ),
 
     route(
+        "projects/:projectId/settings/",
+        "routes/settings.tsx",
+    ),
+
+    route(
         "users/:username",
         "routes/user.tsx",
     ),

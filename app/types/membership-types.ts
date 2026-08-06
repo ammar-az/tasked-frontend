@@ -38,6 +38,6 @@ export interface MemberOverviewRequest{
 }
 
 export interface MemberRoleChangeRequest{
-    userId: string;
+    user: string;
     role: MemberRole;
 }

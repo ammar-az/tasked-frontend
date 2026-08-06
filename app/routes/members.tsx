@@ -5,12 +5,13 @@ import {
 } from "react";
 import {
     Link,
+    useRevalidator,
     useSearchParams,
 } from "react-router";
 
 import type { Route } from "./+types/members";
 
-import { getProjectEndpoint } from "../api/projects";
+import { banEndpoint, getProjectEndpoint, roleChangeEndpoint, transferEndpoint } from "../api/projects";
 import { getMembersEndpoint } from "../api/projects";
 
 import type { ProjectDto } from "../types/project-types";
@@ -237,15 +238,39 @@ export default function MembersPage({
         );
     }
 
-    function handleMemberAction(
+    const revalidator = useRevalidator();
+
+    async function handleMemberAction(
         action: string,
         member: MemberPageDto,
     ) {
-        /*
-         * Replace this with the appropriate endpoint
-         * or confirmation dialog.
-         */
+        
+        switch (action){
+            case "admin":
+                //check if owner
+                await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Admin});
+                break;
+            case "contributor":
+                await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Contributor});
+                break;
+            case "viewer":
+                await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Viewer});
+                break;
+            case "ban":
+                await banEndpoint(member.projectId, member.userId);
+                break
+            case "unban":
+                await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Viewer});
+                break;
+            case "transfer":
+                await transferEndpoint(member.projectId, member.userId);
+                break;
+            default:
+                break;
+        }
+
         console.log(action, member);
+        await revalidator.revalidate();
     }
 
     return (
@@ -611,29 +636,53 @@ function MemberActionMenu({
             <div className="member-action-options">
                 {activeView === "members" && (
                     <>
-                        <button
+                        {member.role == MemberRole.Admin /*Also check if owner here*/ && (<button
                             type="button"
                             onClick={() =>
                                 onAction(
-                                    "change-role",
+                                    "transfer",
                                     member,
                                 )
                             }
                         >
-                            Change Role
-                        </button>
+                            Transfer Project Ownership
+                        </button>)}
 
-                        <button
+                        {member.role != MemberRole.Admin /*Actually check if owner here*/ && (<button
                             type="button"
                             onClick={() =>
                                 onAction(
-                                    "remove",
+                                    "admin",
                                     member,
                                 )
                             }
                         >
-                            Remove from Project
-                        </button>
+                            Promote to Admin
+                        </button>)}
+
+                        {member.role != MemberRole.Contributor && (<button
+                            type="button"
+                            onClick={() =>
+                                onAction(
+                                    "contributor",
+                                    member,
+                                )
+                            }
+                        >
+                            Promote to Contributor
+                        </button>)}
+
+                        {member.role != MemberRole.Viewer && (<button
+                            type="button"
+                            onClick={() =>
+                                onAction(
+                                    "viewer",
+                                    member,
+                                )
+                            }
+                        >
+                            Demote to Viewer
+                        </button>)}
 
                         <button
                             type="button"

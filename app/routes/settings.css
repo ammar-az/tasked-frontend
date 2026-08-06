@@ -1,0 +1,117 @@
+.project-settings-role {
+    margin: -0.5rem 0 0;
+    text-align: center;
+    color: var(--muted-text);
+}
+
+.project-settings-visibility {
+    align-self: flex-start;
+}
+
+.project-settings-message,
+.project-settings-error {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+}
+
+.project-settings-message {
+    background: var(--surface);
+}
+
+.project-settings-error {
+    border-color: #c94b4b;
+}
+
+.project-owner-settings,
+.project-danger-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+}
+
+.project-owner-settings h2,
+.project-danger-zone h2,
+.project-organization-setting h3 {
+    margin: 0;
+}
+
+.project-organization-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.project-organization-setting p,
+.project-danger-zone p {
+    margin: 0.4rem 0 0;
+    color: var(--muted-text);
+}
+
+.project-organization-setting button {
+    flex-shrink: 0;
+}
+
+.project-danger-zone {
+    border-color: #b44747;
+}
+
+.danger-button {
+    align-self: flex-start;
+    border-color: #c94b4b;
+}
+
+.danger-button:hover:not(:disabled) {
+    border-color: #e15b5b;
+}
+
+.project-delete-confirmation {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.project-delete-confirmation label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.project-delete-confirmation input {
+    min-height: 2.75rem;
+    padding: 0.6rem 0.75rem;
+}
+
+.project-delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.project-delete-actions .danger-button {
+    align-self: auto;
+}
+
+@media (max-width: 600px) {
+    .project-organization-setting {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .project-organization-setting button,
+    .danger-button {
+        width: 100%;
+    }
+
+    .project-delete-actions {
+        flex-direction: column-reverse;
+    }
+
+    .project-delete-actions button {
+        width: 100%;
+    }
+}

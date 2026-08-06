@@ -59,7 +59,7 @@ export async function roleChangeEndpoint(projectId:string, request: MemberRoleCh
 }
 
 export async function banEndpoint(projectId: string, userId: string): Promise<MemberDto>{
-  const response = await api.delete<MemberDto>(`/projects/${projectId}/ban/${userId}`);
+  const response = await api.patch<MemberDto>(`/projects/${projectId}/ban/${userId}`);
   return response.data;
 }
 
