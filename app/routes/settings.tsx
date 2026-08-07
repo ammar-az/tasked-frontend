@@ -33,6 +33,7 @@ import {
 
 import "./create.css";
 import "./settings.css";
+import { isAdmin } from "../utils/enum-helpers";
 
 export async function clientLoader({
     params,
@@ -46,25 +47,29 @@ export async function clientLoader({
         });
     }
 
-    const [project, member] = await Promise.all([
-        getProjectEndpoint(params.projectId),
-        getMemberEndpoint(params.projectId),
-    ]);
+    try{
+        const [project, member] = await Promise.all([
+            getProjectEndpoint(params.projectId),
+            getMemberEndpoint(params.projectId),
+        ]);
 
-    const canEditProject =
-        member.role === MemberRole.Owner ||
-        member.role === MemberRole.Admin;
+        const canEditProject = isAdmin(member.role);
 
-    if (!canEditProject) {
-        throw new Response("You cannot edit this project.", {
-            status: 403,
+        if (!canEditProject) {
+            throw new Response("You cannot edit this project.", {
+                status: 403,
+            });
+        }
+
+        return {
+            project,
+            member,
+        };
+    }catch{
+        throw new Response("This project doesn't exist or you don't have permission to view it.", {
+            status: 404,
         });
     }
-
-    return {
-        project,
-        member,
-    };
 }
 
 export default function ProjectSettingsPage({

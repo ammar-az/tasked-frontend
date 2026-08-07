@@ -13,6 +13,7 @@ import {
 import { MemberRole } from "../types/membership-types";
 
 import { createMemberRequest, createTodoRequest, getAccountProfileView } from "../utils/profile-loader-helpers";
+import { redirect } from "react-router";
 
 export async function clientLoader({
     request,
@@ -25,9 +26,7 @@ export async function clientLoader({
     try{
         user = await getMe();
     }catch{
-        throw new Response("Must be logged in", {
-            status: 401,
-        });
+        throw redirect("/login");
     }
 
     if (activeView === "tasks") {

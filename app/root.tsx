@@ -7,6 +7,7 @@ import {
 } from "react-router";
 
 import {AuthProvider} from "./auth/AuthContext"
+import { isRouteErrorResponse } from "react-router";
 
 import type { Route } from "./+types/root";
 
@@ -35,6 +36,70 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+function ErrorPage({
+    title,
+    message,
+}: {
+    title: string;
+    message: string;
+}) {
+    return (
+        <main className="error-page">
+            <h1>{title}</h1>
+            <p>{message}</p>
+
+            <a href="/">Return Home</a>
+        </main>
+    );
+}
+
+export function ErrorBoundary({
+    error,
+}: Route.ErrorBoundaryProps) {
+    if (isRouteErrorResponse(error)) {
+        switch (error.status) {
+            case 401:
+                return (
+                    <ErrorPage
+                        title="Unauthorized"
+                        message="You need to log in to view this page."
+                    />
+                );
+
+            case 403:
+                return (
+                    <ErrorPage
+                        title="Forbidden"
+                        message="You don't have permission to view this page."
+                    />
+                );
+
+            case 404:
+                return (
+                    <ErrorPage
+                        title="Not Found"
+                        message="The page or resource could not be found."
+                    />
+                );
+
+            default:
+                return (
+                    <ErrorPage
+                        title={`Error ${error.status}`}
+                        message="Something went wrong."
+                    />
+                );
+        }
+    }
+
+    return (
+        <ErrorPage
+            title="Something went wrong"
+            message="An unexpected error occurred."
+        />
+    );
 }
 
 export const links: Route.LinksFunction = () => [

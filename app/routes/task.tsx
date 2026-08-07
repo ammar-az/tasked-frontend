@@ -35,15 +35,20 @@ export async function clientLoader({
             status: 400,
         });
     }
+    try{
+        const [todo, member] = await Promise.all([
+            getTodoByNoEndpoint(params.projectId, issueNo),
+            getMemberEndpoint(params.projectId)
+        ]); 
 
-    const [todo, member] = await Promise.all([
-        getTodoByNoEndpoint(params.projectId, issueNo),
-        getMemberEndpoint(params.projectId)
-    ]); 
-
-    return{
-        todo,
-        member
+        return{
+            todo,
+            member
+        }
+    }catch{
+        throw new Response("This task doesn't exist or you don't have permission to view it.", {
+            status: 404,
+        });
     }
 }
 

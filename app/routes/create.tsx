@@ -20,7 +20,7 @@ export default function CreateProjectPage() {
 
     const {user, isAuthenticated} = useAuth();
 
-    if(!isAuthenticated) navigate("/");
+    if(!isAuthenticated) navigate("/login");
 
     const canCreateOrganizationProject = user?.orgId != null;
 

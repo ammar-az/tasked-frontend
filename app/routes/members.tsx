@@ -86,21 +86,26 @@ export async function clientLoader({
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    const [project, member, members] = await Promise.all([
-        getProjectEndpoint(params.projectId),
-        getMemberEndpoint(params.projectId),
-        getMembersEndpoint(
-            params.projectId,
+    try{
+        const [project, member, members] = await Promise.all([
+            getProjectEndpoint(params.projectId),
+            getMemberEndpoint(params.projectId),
+            getMembersEndpoint(
+                params.projectId,
+                memberRequest,
+            ),
+        ]);
+        return {
+            project,
+            member,
+            members,
             memberRequest,
-        ),
-    ]);
-
-    return {
-        project,
-        member,
-        members,
-        memberRequest,
-    };
+        };
+    }catch{
+        throw new Response("This project doesn't exist or you don't have permission to view it.", {
+            status: 404,
+        });
+    }
 }
 
 export default function MembersPage({
