@@ -11,11 +11,12 @@ import {
 
 import type { Route } from "./+types/members";
 
-import { banEndpoint, getProjectEndpoint, roleChangeEndpoint, transferEndpoint } from "../api/projects";
+import { banEndpoint, getMemberEndpoint, getProjectEndpoint, roleChangeEndpoint, transferEndpoint } from "../api/projects";
 import { getMembersEndpoint } from "../api/projects";
 
 import type { ProjectDto } from "../types/project-types";
 import {
+    MemberOverviewDto,
     MemberRole,
     type MemberDto,
     type MemberOverviewRequest,
@@ -23,16 +24,9 @@ import {
 
 
 import "./members.css";
-import { getMemberRoleLabel, parseMemberRole } from "../utils/enum-helpers";
+import { getMemberRoleLabel, isAdmin, isMember, parseMemberRole } from "../utils/enum-helpers";
 
 type MemberView = "members" | "banned" | "invited";
-
-type MemberPageDto = MemberDto & {
-    userId: string;
-    username: string;
-    joinedAt?: string;
-    orgId?: string | null;
-};
 
 function getActiveView(
     role: MemberRole | undefined,
@@ -46,17 +40,6 @@ function getActiveView(
     }
 
     return "members";
-}
-
-function isActiveMemberRole(
-    role: MemberRole | undefined,
-) {
-    return (
-        role === MemberRole.Owner ||
-        role === MemberRole.Admin ||
-        role === MemberRole.Contributor ||
-        role === MemberRole.Viewer
-    );
 }
 
 function formatDate(value?: string) {
@@ -76,6 +59,7 @@ export async function clientLoader({
     request,
 }: Route.ClientLoaderArgs): Promise<{
     project: ProjectDto;
+    member: MemberOverviewDto;
     members: MemberDto[];
     memberRequest: MemberOverviewRequest;
 }> {
@@ -102,9 +86,9 @@ export async function clientLoader({
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    const [project, members] = await Promise.all([
+    const [project, member, members] = await Promise.all([
         getProjectEndpoint(params.projectId),
-
+        getMemberEndpoint(params.projectId),
         getMembersEndpoint(
             params.projectId,
             memberRequest,
@@ -113,6 +97,7 @@ export async function clientLoader({
 
     return {
         project,
+        member,
         members,
         memberRequest,
     };
@@ -123,11 +108,10 @@ export default function MembersPage({
 }: Route.ComponentProps) {
     const {
         project,
+        member,
+        members,
         memberRequest,
     } = loaderData;
-
-    const members =
-        loaderData.members as MemberPageDto[];
 
     const [_, setSearchParams] =
         useSearchParams();
@@ -140,8 +124,7 @@ export default function MembersPage({
         memberRequest.role,
     );
 
-    // Replace this with your current membership permissions.
-    const canManageMembers = true;
+    const canManageMembers = isAdmin(member?.role);
 
     useEffect(() => {
         setSearchInput(memberRequest.search ?? "");
@@ -242,7 +225,7 @@ export default function MembersPage({
 
     async function handleMemberAction(
         action: string,
-        member: MemberPageDto,
+        member: MemberDto,
     ) {
         
         switch (action){
@@ -317,7 +300,7 @@ export default function MembersPage({
                     {activeView === "members" && (
                         <select
                             value={
-                                isActiveMemberRole(
+                                isMember(
                                     memberRequest.role,
                                 )
                                     ? memberRequest.role
@@ -408,7 +391,7 @@ export default function MembersPage({
                     </select>
                 </div>
 
-                <nav
+                {canManageMembers && (<nav
                     className="members-tabs"
                     aria-label="Project member sections"
                 >
@@ -423,7 +406,7 @@ export default function MembersPage({
                         Members
                     </TabButton>
 
-                    {canManageMembers && (
+                    
                         <>
                             <TabButton
                                 active={
@@ -449,8 +432,7 @@ export default function MembersPage({
                                 Invites
                             </TabButton>
                         </>
-                    )}
-                </nav>
+                </nav>)}
 
                 <div className="member-list">
                     {members.length > 0 ? (
@@ -527,16 +509,16 @@ function MemberRow({
     onAction,
 }: {
     project: ProjectDto;
-    member: MemberPageDto;
+    member: MemberDto;
     activeView: MemberView;
     canManageMembers: boolean;
     onAction: (
         action: string,
-        member: MemberPageDto,
+        member: MemberDto,
     ) => void;
 }) {
     const memberDate = formatDate(
-        member.joinedAt,
+        member.joinTime,
     );
 
     return (
@@ -618,11 +600,11 @@ function MemberActionMenu({
     activeView,
     onAction,
 }: {
-    member: MemberPageDto;
+    member: MemberDto;
     activeView: MemberView;
     onAction: (
         action: string,
-        member: MemberPageDto,
+        member: MemberDto,
     ) => void;
 }) {
     return (

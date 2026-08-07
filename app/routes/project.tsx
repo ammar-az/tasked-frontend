@@ -16,7 +16,7 @@ import {
 } from "../types/todo-types";
 
 import "./project.css";
-import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin } from "../utils/enum-helpers";
+import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin, canContribute } from "../utils/enum-helpers";
 import { JoinPolicy } from "../types/project-types";
 
 export async function clientLoader({
@@ -207,11 +207,11 @@ export default function ProjectPage({
                         Member List
                     </Link>
 
-                    <Link
+                   {canContribute(role) && ( <Link
                         to={`/projects/${params.projectId}/tasks/new`}
                     >
                         New Task
-                    </Link>
+                    </Link>)}
                     
                     {isAdmin(role) && (
                         <Link to={`/projects/${project.id}/settings`}>

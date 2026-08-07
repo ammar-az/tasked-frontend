@@ -28,7 +28,7 @@ export default function OrgPage({
     loaderData,
     //params,
 }: Route.ComponentProps) {
-    const {user} = useAuth();
+    const {user, isAuthenticated} = useAuth();
     const {org} = loaderData;
 
     const navigate = useNavigate();
@@ -68,7 +68,7 @@ export default function OrgPage({
                     </p>
                 </div>
 
-                <div className="org-actions">
+                {isAuthenticated && (<div className="org-actions">
                     {isMember ? (
                         <button onClick={handleLeave} type="button">
                             Leave Organization
@@ -78,7 +78,7 @@ export default function OrgPage({
                             Join Organization
                         </button>
                     )}
-                </div>
+                </div>)}
             </section>
 
             <section className="org-projects">

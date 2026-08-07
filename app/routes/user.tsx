@@ -54,7 +54,7 @@ export async function clientLoader({
         assignedTasks: [],
         invites: [],
 
-        // Replace with the real permission check later.
+        // Check for admin of project, create dropdown etc?
         canInviteToProject: true,
     };
 }

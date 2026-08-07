@@ -6,11 +6,16 @@ import { getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
 import { TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
-import { getTodoStatusLabel } from "../utils/enum-helpers";
+import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helpers";
+import { getMemberEndpoint } from "../api/projects";
+import { MemberOverviewDto } from "../types/membership-types";
 
 export async function clientLoader({
     params,
-}: Route.ClientLoaderArgs) {
+}: Route.ClientLoaderArgs): Promise<{
+    todo: TodoDto;
+    member: MemberOverviewDto;
+}> {
     if (!params.projectId) {
         throw new Response("Project ID is required", {
             status: 400,
@@ -30,50 +35,57 @@ export async function clientLoader({
             status: 400,
         });
     }
-    return getTodoByNoEndpoint(params.projectId, issueNo);
+
+    const [todo, member] = await Promise.all([
+        getTodoByNoEndpoint(params.projectId, issueNo),
+        getMemberEndpoint(params.projectId)
+    ]); 
+
+    return{
+        todo,
+        member
+    }
 }
 
 export default function TaskPage({
     loaderData,
     params,
 }: Route.ComponentProps) {
-    const loadedTask = loaderData as TodoDto;
+    const {todo, member} = loaderData;
 
-    const [task, setTask] = useState(loadedTask);
+    const [task, setTask] = useState(todo);
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const [draft, setDraft] = useState<TodoUpdateRequest>({
-        title: loadedTask.title,
-        description: loadedTask.description ?? "",
-        status: loadedTask.status,
-        assigned: loadedTask.assigned,
+        title: todo.title,
+        description: todo.description ?? "",
+        status: todo.status,
+        assigned: todo.assigned,
         unassign: false
     });
 
-    // Replace these with permissions from your auth or membership state.
-    const canEditTask = true;
-    const canAssignToOthers = true;
-    const canChangeStatus = true;
+    const canEditTask = canContribute(member?.role);
+    const canAssignToOthers = isAdmin(member?.role);
 
     useEffect(() => {
-        setTask(loadedTask);
+        setTask(todo);
         setDraft({
-            title: loadedTask.title,
-            description: loadedTask.description ?? "",
-            status: loadedTask.status,
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
             assigned: undefined,
             unassign: false
         });
         setIsEditing(false);
         setError(null);
-    }, [loadedTask]);
+    }, [todo]);
 
     function beginEditing() {
         setDraft({
-            title: loadedTask.title,
-            description: loadedTask.description ?? "",
-            status: loadedTask.status,
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
             assigned: undefined,
             unassign: false
         });
@@ -84,9 +96,9 @@ export default function TaskPage({
 
     function cancelEditing() {
         setDraft({
-            title: loadedTask.title,
-            description: loadedTask.description ?? "",
-            status: loadedTask.status,
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
             assigned: undefined,
             unassign: false
         });
@@ -323,8 +335,8 @@ export default function TaskPage({
                             </div>
                         </dl>
                     </section>
-
-                    <section className="task-sidebar-section">
+                    
+                    {canEditTask && (<section className="task-sidebar-section">
                         <h2>Actions</h2>
 
                         <div className="task-sidebar-actions">
@@ -338,13 +350,13 @@ export default function TaskPage({
                                 </button>
                             )}
 
-                            {canChangeStatus && (
+                            {canEditTask && (
                                 <button type="button">
                                     Change Status
                                 </button>
                             )}
                         </div>
-                    </section>
+                    </section>)}
                 </aside>
             </div>
         </main>

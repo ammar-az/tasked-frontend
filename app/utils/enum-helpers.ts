@@ -69,7 +69,7 @@ export function getMemberRoleLabel(role: MemberRole) {
     }
 }
 
-export function isMember(role: MemberRole): boolean{
+export function isMember(role: MemberRole | undefined): boolean{
     return(role !== undefined && role !== MemberRole.Banned && role !== MemberRole.Invited);
 }
 

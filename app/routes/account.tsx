@@ -20,10 +20,16 @@ export async function clientLoader({
     const url = new URL(request.url);
     const activeView = getAccountProfileView(url);
 
-    /*
-     * Assigned tasks do not need the user ID, so these
-     * requests can run together.
-     */
+    var user = null;
+    
+    try{
+        user = await getMe();
+    }catch{
+        throw new Response("Must be logged in", {
+            status: 401,
+        });
+    }
+
     if (activeView === "tasks") {
         const todoRequest = createTodoRequest(url);
 
@@ -45,7 +51,7 @@ export async function clientLoader({
         };
     }
 
-    const user = await getMe();
+    //const user = await getMe();
 
     const requestedRole =
         activeView === "owned"
