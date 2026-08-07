@@ -1,0 +1,105 @@
+.org-page {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 2rem auto;
+}
+
+.org-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.org-back-button {
+    align-self: start;
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 4rem;
+    line-height: 1;
+}
+
+.org-info h1 {
+    margin: 0 0 0.5rem;
+}
+
+.org-info p {
+    margin: 0;
+    color: var(--muted-text);
+}
+
+.org-actions {
+    align-self: start;
+}
+
+.org-projects {
+    border: 1px solid var(--border);
+}
+
+.org-projects-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.org-projects-header h2 {
+    margin: 0;
+}
+
+.org-project-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.org-project-card {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.org-project-card:last-child {
+    border-bottom: none;
+}
+
+.org-project-name {
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+.org-project-card p {
+    margin: 0.75rem 0 0;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.org-empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    padding: 2rem;
+    color: var(--muted-text);
+    text-align: center;
+}
+
+@media (max-width: 650px) {
+    .org-page {
+        width: calc(100% - 1rem);
+        margin-top: 1rem;
+    }
+
+    .org-header {
+        grid-template-columns: auto 1fr;
+    }
+
+    .org-back-button {
+        font-size: 3rem;
+    }
+
+    .org-actions {
+        grid-column: 2;
+    }
+
+    .org-actions button {
+        width: 100%;
+    }
+}

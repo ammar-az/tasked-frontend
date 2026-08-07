@@ -17,6 +17,7 @@ import {
 
 import "./project.css";
 import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin } from "../utils/enum-helpers";
+import { JoinPolicy } from "../types/project-types";
 
 export async function clientLoader({
     params,
@@ -220,9 +221,9 @@ export default function ProjectPage({
 
                     {isMember(role) ? (
                         <button onClick={handleLeave}>Leave Project</button>
-                    ) : (
+                    ) : (project.joinPolicy != JoinPolicy.Closed && (
                         <button onClick={handleJoin}>Join Project</button>
-                    )}
+                    ))}
                     
                 </div>
             </section>

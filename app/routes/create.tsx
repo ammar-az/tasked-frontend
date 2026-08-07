@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { JoinPolicy, ProjectRequest } from "../types/project-types";
 import { createProjectEndpoint } from "../api/projects";
+import { useAuth } from "../auth/AuthContext";
 
 import "./create.css";
 
@@ -17,8 +18,11 @@ export default function CreateProjectPage() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Replace this with a value from the current user/auth data.
-    const canCreateOrganizationProject = false;
+    const {user, isAuthenticated} = useAuth();
+
+    if(!isAuthenticated) navigate("/");
+
+    const canCreateOrganizationProject = user?.orgId != null;
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -39,8 +43,6 @@ export default function CreateProjectPage() {
             joinPolicy: joinPolicy,
         };
         
-        console.log
-
         try {
             setIsSubmitting(true);
             setError(null);

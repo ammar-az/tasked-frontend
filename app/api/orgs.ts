@@ -15,3 +15,8 @@ export async function joinOrgEndpoint(orgId: string): Promise<void>{
 export async function leaveOrgEndpoint(orgId: string): Promise<void>{
   await api.patch<OrgDto>(`/orgs/${orgId}/leave`);
 }
+
+export async function getOrgEndpoint(orgId:string): Promise<OrgDto>{
+  const response = await api.get<OrgDto>(`/orgs/${orgId}/`);
+  return response.data;
+}

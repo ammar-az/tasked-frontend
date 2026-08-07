@@ -38,6 +38,11 @@ export default [
     ),
 
     route(
+        "orgs/:orgId",
+        "routes/org.tsx",
+    ),
+
+    route(
         "login",
         "routes/login.tsx",
     ),
