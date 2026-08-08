@@ -264,7 +264,7 @@ export default function MembersPage({
     return (
         <main className="members-page">
             <Link
-                to={`/projects/${project.id}`}
+                to={`/projects/${project.slug}`}
                 className="members-back-link"
             >
                 <span aria-hidden="true">←</span>
@@ -570,7 +570,7 @@ function MemberRow({
                 )}
 
                     <Link
-                        to={`/projects/${project.id}?assigned=${encodeURIComponent(member.userId)}`}
+                        to={`/projects/${project.slug}?assigned=${encodeURIComponent(member.userId)}`}
                         className="assigned-tasks-link"
                     >
                         View assigned tasks

@@ -227,7 +227,7 @@ export default function ProjectSettingsPage({
                 type="button"
                 className="create-project-back"
                 onClick={() =>
-                    navigate(`/projects/${project.id}`)
+                    navigate(`/projects/${project.slug}`)
                 }
                 aria-label="Back to project"
             >

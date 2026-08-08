@@ -220,7 +220,7 @@ export default function ProjectPage({
                     </Link>)}
                     
                     {isAdmin(role) && (
-                        <Link to={`/projects/${project.id}/settings`}>
+                        <Link to={`/projects/${project.slug}/settings`}>
                             Settings
                         </Link>
                     )}

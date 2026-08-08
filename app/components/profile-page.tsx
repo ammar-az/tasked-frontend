@@ -218,7 +218,7 @@ function ProjectList({
                     <div className="profile-project-heading">
                         <div>
                             <Link
-                                to={`/projects/${project.projectId}`}
+                                to={`/projects/${project.slug}`}
                                 className="profile-project-name"
                             >
                                 {project.projectName}
