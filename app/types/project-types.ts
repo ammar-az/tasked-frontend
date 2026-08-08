@@ -10,6 +10,7 @@ export interface ProjectDto{
     ownerId: string;
     ownerName: string;
     name: string;
+    slug: string;
     description: string | undefined;
     orgId: string | undefined;
     orgName: string | undefined;

@@ -41,7 +41,7 @@ export async function clientLoader({
     project: ProjectDto;
     member: MemberOverviewDto;
 }> {
-    if (!params.projectId) {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -49,8 +49,8 @@ export async function clientLoader({
 
     try{
         const [project, member] = await Promise.all([
-            getProjectEndpoint(params.projectId),
-            getMemberEndpoint(params.projectId),
+            getProjectEndpoint(params.slug),
+            getMemberEndpoint(params.slug),
         ]);
 
         const canEditProject = isAdmin(member.role);

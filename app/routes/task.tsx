@@ -16,7 +16,7 @@ export async function clientLoader({
     todo: TodoDto;
     member: MemberOverviewDto;
 }> {
-    if (!params.projectId) {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -37,8 +37,8 @@ export async function clientLoader({
     }
     try{
         const [todo, member] = await Promise.all([
-            getTodoByNoEndpoint(params.projectId, issueNo),
-            getMemberEndpoint(params.projectId)
+            getTodoByNoEndpoint(params.slug, issueNo),
+            getMemberEndpoint(params.slug)
         ]); 
 
         return{
@@ -148,7 +148,7 @@ export default function TaskPage({
     return (
         <main className="task-page">
             <Link
-                to={`/projects/${params.projectId}`}
+                to={`/projects/${params.slug}`}
                 className="task-back-link"
             >
                 <span aria-hidden="true">←</span>

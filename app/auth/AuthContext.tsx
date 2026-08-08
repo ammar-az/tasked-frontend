@@ -16,8 +16,8 @@ type AuthContextType = {
 
     user: UserDto | null;
     
-    register: (username:string, email: string, password: string) => void;
-    login: (email: string, password: string) => void;
+    register: (username:string, password: string) => void;
+    login: (username: string, password: string) => void;
     logout: () => void;
 };
 
@@ -45,8 +45,8 @@ export function AuthProvider({children}: Props){
 
     const [user, setUser] = useState<UserDto | null>(null);
 
-    async function login(email: string, password: string) {
-        const res = await loginUser({email, password});
+    async function login(username: string, password: string) {
+        const res = await loginUser({username, password});
 
         setToken(res.token);
         setAccessToken(res.token);
@@ -54,8 +54,8 @@ export function AuthProvider({children}: Props){
         console.log(user);
     }
 
-    async function register(username: string, email: string, password: string){
-        const res = await registerUser({username, email, password});
+    async function register(username: string, password: string){
+        const res = await registerUser({username, password});
 
         setToken(res.token);
         setAccessToken(res.token);

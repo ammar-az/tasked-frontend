@@ -23,7 +23,7 @@ export async function clientLoader({
     params,
     request,
 }: Route.ClientLoaderArgs) {
-    if (!params.projectId) {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -43,13 +43,13 @@ export async function clientLoader({
 
     try
     {    const [project, todos, member] = await Promise.all([
-            getProjectEndpoint(params.projectId),
+            getProjectEndpoint(params.slug),
 
             getProjectTodosEndpoint(
-                params.projectId,
+                params.slug,
                 todoRequest,
             ),
-            getMemberEndpoint(params.projectId),
+            getMemberEndpoint(params.slug),
         ]);
 
         return {
@@ -208,13 +208,13 @@ export default function ProjectPage({
 
                 <div className="project-actions">
                     <Link
-                        to={`/projects/${params.projectId}/members`}
+                        to={`/projects/${params.slug}/members`}
                     >
                         Member List
                     </Link>
 
                    {canContribute(role) && ( <Link
-                        to={`/projects/${params.projectId}/tasks/new`}
+                        to={`/projects/${params.slug}/tasks/new`}
                     >
                         New Task
                     </Link>)}
@@ -468,7 +468,7 @@ export default function ProjectPage({
                                 </div>
 
                                 <Link
-                                    to={`/projects/${params.projectId}/tasks/${selectedTodo.issueNo}`}
+                                    to={`/projects/${params.slug}/tasks/${selectedTodo.issueNo}`}
                                 >
                                     Open Task
                                 </Link>

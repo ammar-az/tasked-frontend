@@ -45,11 +45,11 @@ export default function NewTaskPage({
             setError(null);
             
             const createdTodo = await createTodoEndpoint(
-                params.projectId!,
+                params.slug!,
                 request,
             );
 
-            navigate(`/projects/${params.projectId}/tasks/${createdTodo.issueNo}`);
+            navigate(`/projects/${params.slug}/tasks/${createdTodo.issueNo}`);
             
             console.log("Create task:", request);
         } catch {
@@ -62,7 +62,7 @@ export default function NewTaskPage({
     return (
         <main className="task-page">
             <Link
-                to={`/projects/${params.projectId}`}
+                to={`/projects/${params.slug}`}
                 className="task-back-link"
             >
                 <span aria-hidden="true">←</span>

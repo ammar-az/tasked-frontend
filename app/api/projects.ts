@@ -9,8 +9,8 @@ export async function createProjectEndpoint(request: ProjectRequest): Promise<Pr
   return response.data;
 }
 
-export async function getProjectEndpoint(projectId: string): Promise<ProjectDto> {
-  const response = await api.get<ProjectDto>(`/projects/${projectId}`);
+export async function getProjectEndpoint(projectSlug: string): Promise<ProjectDto> {
+  const response = await api.get<ProjectDto>(`/projects/${projectSlug}`);
   return response.data;
 }
 
@@ -78,7 +78,7 @@ export async function projectLeaveOrgEndpoint(projectId: string): Promise<Projec
   return response.data;
 }
 
-export async function getMemberEndpoint(projectId: string): Promise<MemberOverviewDto>{
-  const response = await api.get<MemberOverviewDto>(`/projects/${projectId}/members/me`);
+export async function getMemberEndpoint(projectSlug: string): Promise<MemberOverviewDto>{
+  const response = await api.get<MemberOverviewDto>(`/projects/${projectSlug}/members/me`);
   return response.data;
 }

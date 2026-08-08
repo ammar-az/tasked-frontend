@@ -63,7 +63,7 @@ export async function clientLoader({
     members: MemberDto[];
     memberRequest: MemberOverviewRequest;
 }> {
-    if (!params.projectId) {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -88,10 +88,10 @@ export async function clientLoader({
 
     try{
         const [project, member, members] = await Promise.all([
-            getProjectEndpoint(params.projectId),
-            getMemberEndpoint(params.projectId),
+            getProjectEndpoint(params.slug),
+            getMemberEndpoint(params.slug),
             getMembersEndpoint(
-                params.projectId,
+                params.slug,
                 memberRequest,
             ),
         ]);
