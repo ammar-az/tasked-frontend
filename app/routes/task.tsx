@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
-import { getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
+import { assignTodoEndpoint, getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
 import { TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
 import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helpers";
 import { getMemberEndpoint } from "../api/projects";
 import { MemberOverviewDto } from "../types/membership-types";
+import AssignTaskModal from "../components/AssignModal";
 
 export async function clientLoader({
     params,
@@ -61,6 +62,7 @@ export default function TaskPage({
     const [task, setTask] = useState(todo);
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showAssign, setShowAssign] = useState(false);
 
     const [draft, setDraft] = useState<TodoUpdateRequest>({
         title: todo.title,
@@ -154,6 +156,20 @@ export default function TaskPage({
                 <span aria-hidden="true">←</span>
                 Back to {projectName}
             </Link>
+
+            {showAssign && (
+                <AssignTaskModal
+                    todoId={task.id}
+                    projectSlug={params.slug}
+                    onClose={() => setShowAssign(false)}
+                    onAssign={async (member) => {
+                        await assignTodoEndpoint(
+                            task.id,
+                            member.userId
+                        );
+                    }}
+                />
+            )}
 
             <div className="task-page-layout">
                 <article className="task-card">
@@ -350,7 +366,7 @@ export default function TaskPage({
                             </button>
 
                             {canAssignToOthers && (
-                                <button type="button">
+                                <button type="button" onClick={() => setShowAssign(true)}>
                                     Change Assignee
                                 </button>
                             )}

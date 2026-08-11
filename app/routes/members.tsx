@@ -64,7 +64,7 @@ export async function clientLoader({
     memberRequest: MemberOverviewRequest;
 }> {
     if (!params.slug) {
-        throw new Response("Project ID is required", {
+        throw new Response("Project slug is required", {
             status: 400,
         });
     }

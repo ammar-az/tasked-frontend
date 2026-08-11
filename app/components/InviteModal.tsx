@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 
-import type { MemberOverviewDto } from "../types/membership-types";
-import { MemberRole } from "../types/membership-types";
-
+import type { MemberOverviewDto, MemberOverviewRequest } from "../types/membership-types";
+import { getMemberRoleLabel} from "../utils/enum-helpers";
 import { getUserProjectsEndpoint } from "../api/users";
 
 import "./selection-modal.css";
@@ -37,7 +36,7 @@ export default function InviteProjectModal({
                 setLoading(true);
                 setError(null);
 
-                const request = {
+                const request: MemberOverviewRequest = {
                     search: search.trim() || undefined,
                     role: undefined,
                     owner: false,
@@ -47,7 +46,7 @@ export default function InviteProjectModal({
                     pageSize: 20,
                 };
 
-                //Need to allow for searching user+admin here or do two at a time
+                //Need to allow for searching owner+admin here or do two at a time
                 const result =
                     await getUserProjectsEndpoint(
                         user!.id,
@@ -177,7 +176,7 @@ export default function InviteProjectModal({
                                     </span>
 
                                     <span className="selection-modal-role">
-                                        {getRoleLabel(
+                                        {getMemberRoleLabel(
                                             project.role,
                                         )}
                                     </span>
@@ -217,17 +216,4 @@ export default function InviteProjectModal({
             </section>
         </div>
     );
-}
-
-function getRoleLabel(role: MemberRole) {
-    switch (role) {
-        case MemberRole.Owner:
-            return "Owner";
-
-        case MemberRole.Admin:
-            return "Admin";
-
-        default:
-            return "Member";
-    }
 }

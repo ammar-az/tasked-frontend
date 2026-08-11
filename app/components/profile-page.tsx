@@ -104,7 +104,7 @@ export default function ProfilePage({
                     );
                 }}
             />
-        )}
+            )}
 
             <section className="profile-header">
                 <button
@@ -324,7 +324,7 @@ function InviteList({
                 >
                     <div>
                         <Link
-                            to={`/projects/${invite.projectId}`}
+                            to={`/projects/${invite.projectSlug}`}
                             className="profile-project-name"
                         >
                             {invite.projectName}
