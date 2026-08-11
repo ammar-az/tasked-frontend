@@ -42,10 +42,7 @@ export async function clientLoader({
         memberRequest,
     );
     return {
-        user: {
-            username: user.username,
-            organizationName: user.orgName,
-        },
+        user,
 
         ownedProjects: projects,
 

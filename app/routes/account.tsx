@@ -38,19 +38,13 @@ export async function clientLoader({
         ]);
 
         return {
-            user: {
-                username: user.username,
-                organizationName: user.orgName,
-            },
-
+            user,
             ownedProjects: [],
             memberships: [],
             assignedTasks: todos,
             invites: [],
         };
     }
-
-    //const user = await getMe();
 
     const requestedRole =
         activeView === "owned"
@@ -70,10 +64,7 @@ export async function clientLoader({
     );
 
     const baseData = {
-        user: {
-            username: user.username,
-            organizationName: user.orgName,
-        },
+        user,
 
         ownedProjects: [],
         memberships: [],

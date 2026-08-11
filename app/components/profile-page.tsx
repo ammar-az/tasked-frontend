@@ -4,14 +4,13 @@ import "./profile.css";
 import { MemberOverviewDto } from "../types/membership-types";
 import { TodoDto } from "../types/todo-types";
 import { getMemberRoleLabel, getTodoStatusLabel } from "../utils/enum-helpers";
-
-export interface ProfileUserSummary {
-    username: string;
-    organizationName?: string | null;
-}
+import { useState } from "react";
+import InviteProjectModal from "./InviteModal";
+import { inviteEndpoint } from "../api/projects";
+import { UserDto } from "../types/user-types";
 
 export interface ProfilePageData {
-    user: ProfileUserSummary;
+    user: UserDto;
     ownedProjects: MemberOverviewDto[];
     memberships: MemberOverviewDto[];
     assignedTasks: TodoDto[];
@@ -65,6 +64,7 @@ export default function ProfilePage({
 }: ProfilePageProps) {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [showInvite, setShowInvite] = useState(false);
 
     const availableTabs = isOwnProfile
         ? accountTabs
@@ -92,6 +92,20 @@ export default function ProfilePage({
 
     return (
         <main className="profile-page">
+
+            {showInvite && (
+            <InviteProjectModal
+                userId={data.user.id}
+                onClose={() => setShowInvite(false)}
+                onInvite={async (project) => {
+                    await inviteEndpoint(
+                        project.projectId,
+                        data.user.id,
+                    );
+                }}
+            />
+        )}
+
             <section className="profile-header">
                 <button
                     type="button"
@@ -116,7 +130,7 @@ export default function ProfilePage({
                         <span aria-hidden="true">♧</span>
 
                         <span>
-                            {data.user.organizationName ??
+                            {data.user.orgName ??
                                 "No organization"}
                         </span>
                     </div>
@@ -133,6 +147,7 @@ export default function ProfilePage({
                     ) : (
                         <button
                             type="button"
+                            onClick={() => setShowInvite(true)}
                             className="profile-action-button"
                             disabled={!data.canInviteToProject}
                         >
