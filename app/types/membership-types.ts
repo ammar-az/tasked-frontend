@@ -7,6 +7,12 @@ export enum MemberRole{
     Invited = 5
 }
 
+export enum MemberSort{
+    Name = 0,
+    Role = 1,
+    Time = 2
+}
+
 export interface MemberDto{
     userId: string;
     username: string;
@@ -31,8 +37,8 @@ export interface MemberOverviewDto{
 export interface MemberOverviewRequest{
     search: string | undefined;
     role: MemberRole | undefined;
-    owner: boolean | undefined;
-    sort: string;
+    roleMin: boolean;
+    sortBy: MemberSort | undefined;
     descending: boolean;
     page: number;
     pageSize: number;

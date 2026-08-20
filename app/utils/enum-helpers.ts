@@ -1,5 +1,5 @@
-import { MemberRole } from "../types/membership-types";
-import { TodoStatus } from "../types/todo-types";
+import { MemberRole, MemberSort } from "../types/membership-types";
+import { TodoSort, TodoStatus } from "../types/todo-types";
 
 export function parseTodoStatus(value: string | null): TodoStatus | undefined {
     if (value === null) return undefined;
@@ -41,6 +41,32 @@ export function parseMemberRole(
 
     return Object.values(MemberRole).includes(parsed as MemberRole)
         ? (parsed as MemberRole)
+        : undefined;
+}
+
+export function parseMemberSort(
+    value: string | null,
+): MemberSort | undefined {
+    if (value === null || value === "") {
+        return undefined;
+    }
+
+    const parsed = Number(value);
+    return Object.values(MemberSort).includes(parsed as MemberSort)
+        ? (parsed as MemberSort)
+        : undefined;
+}
+
+export function parseTodoSort(
+    value: string | null,
+): TodoSort | undefined {
+    if (value === null || value === "") {
+        return undefined;
+    }
+
+    const parsed = Number(value);
+    return Object.values(TodoSort).includes(parsed as TodoSort)
+        ? (parsed as TodoSort)
         : undefined;
 }
 

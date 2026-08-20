@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { MemberOverviewDto, MemberOverviewRequest } from "../types/membership-types";
+import { MemberRole, MemberSort, type MemberOverviewDto, type MemberOverviewRequest } from "../types/membership-types";
 import { getMemberRoleLabel} from "../utils/enum-helpers";
 import { getUserProjectsEndpoint } from "../api/users";
 
@@ -38,15 +38,14 @@ export default function InviteProjectModal({
 
                 const request: MemberOverviewRequest = {
                     search: search.trim() || undefined,
-                    role: undefined,
-                    owner: false,
-                    sort: "projectName",
+                    role: MemberRole.Admin,
+                    roleMin: true,
+                    sortBy: MemberSort.Name,
                     descending: false,
                     page: 1,
                     pageSize: 20,
                 };
 
-                //Need to allow for searching owner+admin here or do two at a time
                 const result =
                     await getUserProjectsEndpoint(
                         user!.id,

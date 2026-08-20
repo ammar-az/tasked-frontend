@@ -18,13 +18,14 @@ import type { ProjectDto } from "../types/project-types";
 import {
     MemberOverviewDto,
     MemberRole,
+    MemberSort,
     type MemberDto,
     type MemberOverviewRequest,
 } from "../types/membership-types";
 
 
 import "./members.css";
-import { getMemberRoleLabel, isAdmin, isMember, parseMemberRole } from "../utils/enum-helpers";
+import { getMemberRoleLabel, isAdmin, isMember, parseMemberRole, parseMemberSort } from "../utils/enum-helpers";
 
 type MemberView = "members" | "banned" | "invited";
 
@@ -76,9 +77,9 @@ export async function clientLoader({
 
         role: parseMemberRole(url.searchParams.get("role"),),
         
-        owner: false,
+        roleMin: false,
 
-        sort: url.searchParams.get("sort") ?? "role",
+        sortBy: parseMemberSort(url.searchParams.get("sort")) ?? MemberSort.Role,
 
         descending: url.searchParams.get("descending") !== "false",
 
@@ -351,7 +352,7 @@ export default function MembersPage({
                     )}
 
                     <select
-                        value={memberRequest.sort}
+                        value={memberRequest.sortBy}
                         onChange={(event) =>
                             changeSort(
                                 event.target.value,
@@ -359,15 +360,15 @@ export default function MembersPage({
                         }
                         aria-label="Sort members"
                     >
-                        <option value="role">
+                        <option value={MemberSort.Role}>
                             Role
                         </option>
 
-                        <option value="username">
+                        <option value={MemberSort.Name}>
                             Username
                         </option>
 
-                        <option value="joinedAt">
+                        <option value={MemberSort.Time}>
                             Date joined
                         </option>
                     </select>

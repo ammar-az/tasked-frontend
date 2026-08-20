@@ -11,12 +11,13 @@ import { getMemberEndpoint, getProjectEndpoint, getProjectTodosEndpoint, joinEnd
 
 import type { MultiTodoRequest } from "../types/todo-types";
 import {
+    TodoSort,
     TodoStatus,
     type TodoDto,
 } from "../types/todo-types";
 
 import "./project.css";
-import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin, canContribute } from "../utils/enum-helpers";
+import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin, canContribute, parseTodoSort } from "../utils/enum-helpers";
 import { JoinPolicy } from "../types/project-types";
 
 export async function clientLoader({
@@ -35,8 +36,8 @@ export async function clientLoader({
         search: url.searchParams.get("search")?.trim() || undefined,
         status: parseTodoStatus(url.searchParams.get("status")),
         assigned:url.searchParams.get("assigned")?.trim() || undefined,
-        sort: url.searchParams.get("sort") ?? "issueNo",
-        descending: url.searchParams.get("descending") !== "false",
+        sortBy: parseTodoSort(url.searchParams.get("sort")) ?? TodoSort.IssueNo,
+        descending: url.searchParams.get("descending") === "true",
         page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
@@ -310,7 +311,7 @@ export default function ProjectPage({
                         </select>
 
                         <select
-                            value={todoRequest.sort}
+                            value={todoRequest.sortBy}
                             onChange={(event) =>
                                 changeSort(
                                     event.target.value,
@@ -318,20 +319,16 @@ export default function ProjectPage({
                             }
                             aria-label="Sort tasks"
                         >
-                            <option value="issueNo">
-                                Issue number
+                            <option value={TodoSort.IssueNo}>
+                                Issue Number
                             </option>
 
-                            <option value="title">
+                            <option value={TodoSort.Title}>
                                 Title
                             </option>
 
-                            <option value="status">
+                            <option value={TodoSort.Status}>
                                 Status
-                            </option>
-
-                            <option value="createdAt">
-                                Creation date
                             </option>
                         </select>
 

@@ -1,8 +1,8 @@
 import type { MemberOverviewRequest} from "../types/membership-types";
 import { MemberRole } from "../types/membership-types";
 
-import type { MultiTodoRequest} from "../types/todo-types";
-import { parseTodoStatus } from "./enum-helpers";
+import { TodoSort, type MultiTodoRequest} from "../types/todo-types";
+import { parseMemberSort, parseTodoSort, parseTodoStatus } from "./enum-helpers";
 
 export type PublicProfileView =
     | "owned"
@@ -45,8 +45,8 @@ export function createMemberRequest(
     return {
         search: url.searchParams.get("search")?.trim() || undefined,
         role,
-        owner: false,
-        sort: url.searchParams.get("sort") ?? "role",
+        roleMin: false,
+        sortBy: parseMemberSort(url.searchParams.get("sort") ?? "name",),
         descending: url.searchParams.get("descending") !== "false",
         page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
@@ -60,7 +60,7 @@ export function createTodoRequest(
         search: url.searchParams.get("search")?.trim() || undefined,
         status: parseTodoStatus(url.searchParams.get("status")),
         assigned: url.searchParams.get("assigned")?.trim() || undefined,
-        sort: url.searchParams.get("sort") ?? "issueNo",
+        sortBy: parseTodoSort(url.searchParams.get("sort")) ?? TodoSort.IssueNo,
         descending: url.searchParams.get("descending") !== "false",
         page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),

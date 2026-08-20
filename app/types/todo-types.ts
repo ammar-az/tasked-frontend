@@ -5,6 +5,12 @@ export enum TodoStatus{
     Archived = 3
 }
 
+export enum TodoSort{
+    IssueNo = 0,
+    Title = 1,
+    Status = 2
+}
+
 export interface TodoDto{
     id: string;
     projectId: string;
@@ -39,7 +45,7 @@ export interface MultiTodoRequest{
     search: string | undefined;
     status: TodoStatus | undefined;
     assigned: string | undefined;
-    sort: string;
+    sortBy: TodoSort;
     descending: boolean;
     page: number;
     pageSize: number;

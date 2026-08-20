@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getMembersEndpoint } from "../api/projects";
 import {
     MemberRole,
+    MemberSort,
     type MemberDto,
     type MemberOverviewRequest,
 } from "../types/membership-types";
@@ -43,14 +44,13 @@ export default function AssignTaskModal({
                     const request: MemberOverviewRequest = {
                         search: search.trim() || undefined,
                         role: MemberRole.Contributor,
-                        owner: false,
-                        sort: "name",
+                        roleMin: true,
+                        sortBy: MemberSort.Name,
                         descending: false,
                         page: 1,
                         pageSize: 20,
                     };
     
-                    //Need to allow for searching owner+admin+contributor here or do multiple
                     const result =
                         await getMembersEndpoint(
                             projectSlug,
