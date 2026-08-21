@@ -15,6 +15,7 @@ export interface TodoDto{
     id: string;
     projectId: string;
     projectName: string;
+    projectSlug: string;
     title: string;
     description: string | undefined;
     status: TodoStatus;

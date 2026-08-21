@@ -1,4 +1,4 @@
-import type { OrgDto } from "../types/org-types";
+import type { OrgDto, OrgsRequest } from "../types/org-types";
 import api from "./client";
 
 //endpoint actually returns CreatedAtAction
@@ -18,5 +18,10 @@ export async function leaveOrgEndpoint(orgId: string): Promise<void>{
 
 export async function getOrgEndpoint(orgId:string): Promise<OrgDto>{
   const response = await api.get<OrgDto>(`/orgs/${orgId}/`);
+  return response.data;
+}
+
+export async function getOrgsEndpoint(request: OrgsRequest): Promise<Array<OrgDto>>{
+  const response = await api.get<Array<OrgDto>>("/orgs", {params: request});
   return response.data;
 }

@@ -38,6 +38,11 @@ export default [
     ),
 
     route(
+        "orgs",
+        "routes/orgs.tsx",
+    ),
+
+    route(
         "orgs/:orgId",
         "routes/org.tsx",
     ),
