@@ -2,8 +2,8 @@ import type { TodoDto, TodoRequest, TodoUpdateRequest } from "../types/todo-type
 import api from "./client";
 
 //endpoint actually returns CreatedAtAction
-export async function createTodoEndpoint(projectId: string, request: TodoRequest): Promise<TodoDto>{
-  const response = await api.post<TodoDto>(`/todos/project/${projectId}`, request);
+export async function createTodoEndpoint(projectSlug: string, request: TodoRequest): Promise<TodoDto>{
+  const response = await api.post<TodoDto>(`/todos/project/${projectSlug}`, request);
   console.log(response.headers);
   return response.data;
 }
@@ -13,8 +13,8 @@ export async function getTodoEndpoint(todoId: string): Promise<TodoDto>{
   return response.data;
 }
 
-export async function getTodoByNoEndpoint(projectId: string, issueNo: number): Promise<TodoDto>{
-  const response = await api.get<TodoDto>(`/todos/project/${projectId}/${issueNo}`);
+export async function getTodoByNoEndpoint(projectSlug: string, issueNo: number): Promise<TodoDto>{
+  const response = await api.get<TodoDto>(`/todos/project/${projectSlug}/${issueNo}`);
   return response.data;
 }
 

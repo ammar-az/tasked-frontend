@@ -8,28 +8,43 @@ export default [
     index("routes/home.tsx"),
 
     route(
-        "projects/:projectId",
+        "projects/:slug",
         "routes/project.tsx",
     ),
 
     route(
-        "projects/:projectId/tasks/:issueNo",
+        "projects/:slug/tasks/:issueNo",
         "routes/task.tsx",
     ),
 
     route(
-        "projects/:projectId/tasks/new",
+        "projects/:slug/tasks/new",
         "routes/new-task.tsx",
     ),
 
     route(
-        "projects/:projectId/members/",
+        "projects/:slug/members/",
         "routes/members.tsx",
+    ),
+
+    route(
+        "projects/:slug/settings/",
+        "routes/settings.tsx",
     ),
 
     route(
         "users/:username",
         "routes/user.tsx",
+    ),
+
+    route(
+        "orgs",
+        "routes/orgs.tsx",
+    ),
+
+    route(
+        "orgs/:orgName",
+        "routes/org.tsx",
     ),
 
     route(

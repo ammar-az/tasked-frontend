@@ -2,20 +2,13 @@ import { UserDto } from "./user-types";
 
 export interface RegisterRequest{
     username: string;
-    email: string;
     password: string;
 }
 
 export interface LoginRequest{
-    email: string,
+    username: string,
     password: string;
 }
-
-// export interface AuthResponse{
-//     token: string;
-//     userId: string;
-//     username: string;
-// }
 
 export interface AuthResponse{
     token: string;

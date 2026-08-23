@@ -13,6 +13,7 @@ import {
 import { MemberRole } from "../types/membership-types";
 
 import { createMemberRequest, createTodoRequest, getAccountProfileView } from "../utils/profile-loader-helpers";
+import { redirect } from "react-router";
 
 export async function clientLoader({
     request,
@@ -20,10 +21,14 @@ export async function clientLoader({
     const url = new URL(request.url);
     const activeView = getAccountProfileView(url);
 
-    /*
-     * Assigned tasks do not need the user ID, so these
-     * requests can run together.
-     */
+    var user = null;
+    
+    try{
+        user = await getMe();
+    }catch{
+        throw redirect("/login");
+    }
+
     if (activeView === "tasks") {
         const todoRequest = createTodoRequest(url);
 
@@ -33,19 +38,13 @@ export async function clientLoader({
         ]);
 
         return {
-            user: {
-                username: user.username,
-                organizationName: user.orgName,
-            },
-
+            user,
             ownedProjects: [],
             memberships: [],
             assignedTasks: todos,
             invites: [],
         };
     }
-
-    const user = await getMe();
 
     const requestedRole =
         activeView === "owned"
@@ -65,10 +64,7 @@ export async function clientLoader({
     );
 
     const baseData = {
-        user: {
-            username: user.username,
-            organizationName: user.orgName,
-        },
+        user,
 
         ownedProjects: [],
         memberships: [],
@@ -80,7 +76,7 @@ export async function clientLoader({
         case "memberships":
             return {
                 ...baseData,
-                 memberships: projects,
+                memberships: projects,
             };
 
         case "invites":

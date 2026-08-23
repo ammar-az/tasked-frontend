@@ -6,14 +6,13 @@ import { useEffect, useState } from "react";
 export default function RegisterPage({}: Route.ComponentProps) {
     const {register, isAuthenticated} = useAuth();
     const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
     const navigate = useNavigate();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        register(username, email, password);
+        register(username, password);
         navigate("/");
     }
 
@@ -47,13 +46,6 @@ export default function RegisterPage({}: Route.ComponentProps) {
                     placeholder="Username"
                     autoComplete="username"
                     onChange={(e) => setUsername(e.target.value)} 
-                />
-
-                <input
-                    type="text"
-                    placeholder="Email"
-                    autoComplete="email"
-                    onChange={(e) => setEmail(e.target.value)} 
                 />
 
                 <input

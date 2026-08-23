@@ -1,4 +1,4 @@
-import type { MemberDto, MemberOverviewRequest, MemberRoleChangeRequest } from "../types/membership-types";
+import type { MemberDto, MemberOverviewDto, MemberOverviewRequest, MemberRoleChangeRequest } from "../types/membership-types";
 import type { ProjectDto, ProjectRequest, ProjectUpdateRequest } from "../types/project-types";
 import type { MultiTodoRequest, TodoDto } from "../types/todo-types";
 import api from "./client";
@@ -9,8 +9,8 @@ export async function createProjectEndpoint(request: ProjectRequest): Promise<Pr
   return response.data;
 }
 
-export async function getProjectEndpoint(projectId: string): Promise<ProjectDto> {
-  const response = await api.get<ProjectDto>(`/projects/${projectId}`);
+export async function getProjectEndpoint(projectSlug: string): Promise<ProjectDto> {
+  const response = await api.get<ProjectDto>(`/projects/${projectSlug}`);
   return response.data;
 }
 
@@ -59,7 +59,7 @@ export async function roleChangeEndpoint(projectId:string, request: MemberRoleCh
 }
 
 export async function banEndpoint(projectId: string, userId: string): Promise<MemberDto>{
-  const response = await api.delete<MemberDto>(`/projects/${projectId}/ban/${userId}`);
+  const response = await api.patch<MemberDto>(`/projects/${projectId}/ban/${userId}`);
   return response.data;
 }
 
@@ -75,5 +75,10 @@ export async function projectToOrgEndpoint(projectId: string): Promise<ProjectDt
 
 export async function projectLeaveOrgEndpoint(projectId: string): Promise<ProjectDto>{
   const response = await api.patch<ProjectDto>(`/projects/${projectId}/org/remove`);
+  return response.data;
+}
+
+export async function getMemberEndpoint(projectSlug: string): Promise<MemberOverviewDto>{
+  const response = await api.get<MemberOverviewDto>(`/projects/${projectSlug}/members/me`);
   return response.data;
 }

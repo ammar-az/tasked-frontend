@@ -10,10 +10,11 @@ export interface ProjectDto{
     ownerId: string;
     ownerName: string;
     name: string;
+    slug: string;
     description: string | undefined;
     orgId: string | undefined;
     orgName: string | undefined;
-    visible: boolean;
+    isVisible: boolean;
     joinPolicy: JoinPolicy;
     createdAt: string;
 }
@@ -29,6 +30,6 @@ export interface ProjectRequest{
 export interface ProjectUpdateRequest{
     name: string | undefined;
     description: string | undefined;
-    visible: boolean | undefined;
+    isVisible: boolean | undefined;
     joinPolicy: JoinPolicy | undefined;
 }

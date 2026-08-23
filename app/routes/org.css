@@ -1,0 +1,80 @@
+.org-page {
+    width: min(1000px, calc(100% - 2rem));
+    margin: 2rem auto;
+}
+
+.org-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+    margin-bottom: 2rem;
+}
+
+.org-back-button {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 2rem;
+}
+
+.org-info h1 {
+    margin: 0 0 0.5rem;
+}
+
+.org-info p {
+    margin: 0;
+}
+
+.org-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.org-tab {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 0.75rem 1.25rem;
+}
+
+.org-tab.active {
+    border-bottom: 2px solid #646cff;
+}
+
+.org-search {
+    margin: 1rem 0;
+}
+
+.org-search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem 0.8rem;
+    font: inherit;
+}
+
+.org-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.org-list-item {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+}
+
+.org-list-item p {
+    margin: 0.5rem 0 0;
+}
+
+.org-project-name,
+.org-member-name {
+    font-weight: 600;
+}
+
+.org-empty {
+    padding: 2rem;
+    text-align: center;
+}

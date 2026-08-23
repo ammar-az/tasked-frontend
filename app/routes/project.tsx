@@ -1,29 +1,30 @@
 import { useEffect, useState } from "react";
 import {
     Link,
+    useNavigate,
     useSearchParams,
 } from "react-router";
 
 import type { Route } from "./+types/project";
 
-import { getProjectEndpoint, getProjectTodosEndpoint } from "../api/projects";
+import { getMemberEndpoint, getProjectEndpoint, getProjectTodosEndpoint, joinEndpoint, leaveEndpoint } from "../api/projects";
 
 import type { MultiTodoRequest } from "../types/todo-types";
 import {
+    TodoSort,
     TodoStatus,
     type TodoDto,
 } from "../types/todo-types";
 
 import "./project.css";
-import { getTodoStatusLabel, parseTodoStatus } from "../utils/enum-helpers";
-
-
+import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin, canContribute, parseTodoSort } from "../utils/enum-helpers";
+import { JoinPolicy } from "../types/project-types";
 
 export async function clientLoader({
     params,
     request,
 }: Route.ClientLoaderArgs) {
-    if (!params.projectId) {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -35,26 +36,34 @@ export async function clientLoader({
         search: url.searchParams.get("search")?.trim() || undefined,
         status: parseTodoStatus(url.searchParams.get("status")),
         assigned:url.searchParams.get("assigned")?.trim() || undefined,
-        sort: url.searchParams.get("sort") ?? "issueNo",
-        descending: url.searchParams.get("descending") !== "false",
+        sortBy: parseTodoSort(url.searchParams.get("sort")) ?? TodoSort.IssueNo,
+        descending: url.searchParams.get("descending") === "true",
         page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    const [project, todos] = await Promise.all([
-        getProjectEndpoint(params.projectId),
+    try
+    {    const [project, todos, member] = await Promise.all([
+            getProjectEndpoint(params.slug),
 
-        getProjectTodosEndpoint(
-            params.projectId,
+            getProjectTodosEndpoint(
+                params.slug,
+                todoRequest,
+            ),
+            getMemberEndpoint(params.slug),
+        ]);
+
+        return {
+            project,
+            todos,
+            member,
             todoRequest,
-        ),
-    ]);
-
-    return {
-        project,
-        todos,
-        todoRequest,
-    };
+        };
+    }catch{
+        throw new Response("This project doesn't exist or you don't have permission to view it.", {
+            status: 404,
+        });
+    }
 }
 
 export default function ProjectPage({
@@ -64,9 +73,12 @@ export default function ProjectPage({
     const {
         project,
         todos,
+        member,
         todoRequest,
     } = loaderData;
 
+    const navigate = useNavigate();
+    
     const [_, setSearchParams] =
         useSearchParams();
 
@@ -101,6 +113,8 @@ export default function ProjectPage({
             (todo: TodoDto) =>
                 todo.id === selectedTodoId,
         ) ?? null;
+
+    const role = member?.role;
 
     function updateQueryParameter(
         name: string,
@@ -171,6 +185,16 @@ export default function ProjectPage({
         );
     }
 
+    async function handleJoin(){
+        await joinEndpoint(project.id);
+        navigate(0); 
+    }
+
+    async function handleLeave(){
+        await leaveEndpoint(project.id);
+        navigate(0); 
+    }
+
     return (
         <main className="project-page">
             <section className="project-summary">
@@ -185,16 +209,29 @@ export default function ProjectPage({
 
                 <div className="project-actions">
                     <Link
-                        to={`/projects/${params.projectId}/members`}
+                        to={`/projects/${params.slug}/members`}
                     >
                         Member List
                     </Link>
 
-                    <Link
-                        to={`/projects/${params.projectId}/tasks/new`}
+                   {canContribute(role) && ( <Link
+                        to={`/projects/${params.slug}/tasks/new`}
                     >
                         New Task
-                    </Link>
+                    </Link>)}
+                    
+                    {isAdmin(role) && (
+                        <Link to={`/projects/${project.slug}/settings`}>
+                            Settings
+                        </Link>
+                    )}
+
+                    {isMember(role) ? (
+                        <button onClick={handleLeave}>Leave Project</button>
+                    ) : (project.joinPolicy != JoinPolicy.Closed && (
+                        <button onClick={handleJoin}>Join Project</button>
+                    ))}
+                    
                 </div>
             </section>
 
@@ -274,7 +311,7 @@ export default function ProjectPage({
                         </select>
 
                         <select
-                            value={todoRequest.sort}
+                            value={todoRequest.sortBy}
                             onChange={(event) =>
                                 changeSort(
                                     event.target.value,
@@ -282,20 +319,16 @@ export default function ProjectPage({
                             }
                             aria-label="Sort tasks"
                         >
-                            <option value="issueNo">
-                                Issue number
+                            <option value={TodoSort.IssueNo}>
+                                Issue Number
                             </option>
 
-                            <option value="title">
+                            <option value={TodoSort.Title}>
                                 Title
                             </option>
 
-                            <option value="status">
+                            <option value={TodoSort.Status}>
                                 Status
-                            </option>
-
-                            <option value="createdAt">
-                                Creation date
                             </option>
                         </select>
 
@@ -432,7 +465,7 @@ export default function ProjectPage({
                                 </div>
 
                                 <Link
-                                    to={`/projects/${params.projectId}/tasks/${selectedTodo.issueNo}`}
+                                    to={`/projects/${params.slug}/tasks/${selectedTodo.issueNo}`}
                                 >
                                     Open Task
                                 </Link>

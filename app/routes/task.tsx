@@ -2,15 +2,22 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
-import { getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
-import type { TodoDto, TodoUpdateRequest } from "../types/todo-types";
+import { assignTodoEndpoint, getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
+import { TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
+import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helpers";
+import { getMemberEndpoint } from "../api/projects";
+import { MemberOverviewDto } from "../types/membership-types";
+import AssignTaskModal from "../components/AssignModal";
 
 export async function clientLoader({
     params,
-}: Route.ClientLoaderArgs) {
-    if (!params.projectId) {
+}: Route.ClientLoaderArgs): Promise<{
+    todo: TodoDto;
+    member: MemberOverviewDto;
+}> {
+    if (!params.slug) {
         throw new Response("Project ID is required", {
             status: 400,
         });
@@ -29,54 +36,65 @@ export async function clientLoader({
             status: 400,
         });
     }
-    return getTodoByNoEndpoint(params.projectId, issueNo);
-}
+    try{
+        const [todo, member] = await Promise.all([
+            getTodoByNoEndpoint(params.slug, issueNo),
+            getMemberEndpoint(params.slug)
+        ]); 
 
-// type TaskPageDto = TodoDto & {
-//     projectName?: string;
-//     createdByUsername?: string;
-//     assignedUsername?: string | null;
-// };
-
-interface TaskDraft {
-    title: string;
-    description: string;
+        return{
+            todo,
+            member
+        }
+    }catch{
+        throw new Response("This task doesn't exist or you don't have permission to view it.", {
+            status: 404,
+        });
+    }
 }
 
 export default function TaskPage({
     loaderData,
     params,
 }: Route.ComponentProps) {
-    const loadedTask = loaderData as TodoDto;
+    const {todo, member} = loaderData;
 
-    const [task, setTask] = useState(loadedTask);
+    const [task, setTask] = useState(todo);
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showAssign, setShowAssign] = useState(false);
 
-    const [draft, setDraft] = useState<TaskDraft>({
-        title: loadedTask.title,
-        description: loadedTask.description ?? "",
+    const [draft, setDraft] = useState<TodoUpdateRequest>({
+        title: todo.title,
+        description: todo.description ?? "",
+        status: todo.status,
+        assigned: todo.assigned,
+        unassign: false
     });
 
-    // Replace these with permissions from your auth or membership state.
-    const canEditTask = true;
-    const canAssignToOthers = true;
-    const canChangeStatus = true;
+    const canEditTask = canContribute(member?.role);
+    const canAssignToOthers = isAdmin(member?.role);
 
     useEffect(() => {
-        setTask(loadedTask);
+        setTask(todo);
         setDraft({
-            title: loadedTask.title,
-            description: loadedTask.description ?? "",
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
+            assigned: undefined,
+            unassign: false
         });
         setIsEditing(false);
         setError(null);
-    }, [loadedTask]);
+    }, [todo]);
 
     function beginEditing() {
         setDraft({
-            title: task.title,
-            description: task.description ?? "",
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
+            assigned: undefined,
+            unassign: false
         });
 
         setError(null);
@@ -85,8 +103,11 @@ export default function TaskPage({
 
     function cancelEditing() {
         setDraft({
-            title: task.title,
-            description: task.description ?? "",
+            title: todo.title,
+            description: todo.description ?? "",
+            status: todo.status,
+            assigned: undefined,
+            unassign: false
         });
 
         setError(null);
@@ -94,28 +115,23 @@ export default function TaskPage({
     }
 
     async function saveChanges() {
-        const title = draft.title.trim();
-        const description = draft.description.trim();
+        setDraft(current => ({
+            ...current,
+            title: current.title?.trim(),
+            description: current.description?.trim(),
+        }))
 
-        if (!title) {
-            setError("A task title is required.");
-            return;
-        }
+        // if (!title) {
+        //     setError("A task title is required.");
+        //     return;
+        // }
 
         try {
             setError(null);
-
-            const request: TodoUpdateRequest = {
-                title,
-                description,
-                status: undefined,
-                assigned: undefined,
-                unassign: false
-            };
             
             const updatedTodo = await updateTodoEndpoint(
                 task.id,
-                request,
+                draft,
             );
 
             setTask(updatedTodo);
@@ -134,12 +150,26 @@ export default function TaskPage({
     return (
         <main className="task-page">
             <Link
-                to={`/projects/${params.projectId}`}
+                to={`/projects/${params.slug}`}
                 className="task-back-link"
             >
                 <span aria-hidden="true">←</span>
                 Back to {projectName}
             </Link>
+
+            {showAssign && (
+                <AssignTaskModal
+                    todoId={task.id}
+                    projectSlug={params.slug}
+                    onClose={() => setShowAssign(false)}
+                    onAssign={async (member) => {
+                        await assignTodoEndpoint(
+                            task.id,
+                            member.userId
+                        );
+                    }}
+                />
+            )}
 
             <div className="task-page-layout">
                 <article className="task-card">
@@ -183,21 +213,83 @@ export default function TaskPage({
                         <h2>Description</h2>
 
                         {isEditing ? (
-                            <textarea
-                                className="task-description-input"
-                                value={draft.description}
-                                onChange={(event) =>
-                                    setDraft((current) => ({
-                                        ...current,
-                                        description: event.target.value,
-                                    }))
-                                }
-                                placeholder="Enter a task description"
-                            />
+                            <div>
+                                <textarea
+                                    className="task-description-input"
+                                    value={draft.description}
+                                    onChange={(event) =>
+                                        setDraft((current) => ({
+                                            ...current,
+                                            description: event.target.value,
+                                        }))
+                                    }
+                                    placeholder="Enter a task description"
+                                />
+
+                                    <fieldset className="">
+                                    <legend>Status</legend>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.Backlog}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.Backlog
+                                                }))
+                                            }
+                                        />
+
+                                        Backlog
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.InProgress}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.InProgress
+                                                }))
+                                            }
+                                        />
+
+                                        In Progress
+                                    </label>
+
+                                                            <label>
+                                        <input
+                                            type="radio"
+                                            name="status-update"
+                                            checked={draft.status == TodoStatus.Completed}
+                                            disabled={!isEditing}
+                                            onChange={() =>
+                                                setDraft(current => ({
+                                                    ...current,
+                                                    status: TodoStatus.Completed,
+                                                    unassign: true
+                                                }))
+                                            }
+                                        />
+
+                                        Completed
+                                    </label>
+                                </fieldset>
+
+                            </div>
                         ) : (
                             <p className="task-description">
                                 {task.description || "No description provided."}
                             </p>
+                        
+                        
+                        
                         )}
                     </section>
 
@@ -260,12 +352,12 @@ export default function TaskPage({
 
                             <div>
                                 <dt>Status</dt>
-                                <dd>{String(task.status)}</dd>
+                                <dd>{getTodoStatusLabel(task.status)}</dd>
                             </div>
                         </dl>
                     </section>
-
-                    <section className="task-sidebar-section">
+                    
+                    {canEditTask && (<section className="task-sidebar-section">
                         <h2>Actions</h2>
 
                         <div className="task-sidebar-actions">
@@ -274,18 +366,18 @@ export default function TaskPage({
                             </button>
 
                             {canAssignToOthers && (
-                                <button type="button">
+                                <button type="button" onClick={() => setShowAssign(true)}>
                                     Change Assignee
                                 </button>
                             )}
 
-                            {canChangeStatus && (
+                            {canEditTask && (
                                 <button type="button">
                                     Change Status
                                 </button>
                             )}
                         </div>
-                    </section>
+                    </section>)}
                 </aside>
             </div>
         </main>

@@ -42,10 +42,7 @@ export async function clientLoader({
         memberRequest,
     );
     return {
-        user: {
-            username: user.username,
-            organizationName: user.orgName,
-        },
+        user,
 
         ownedProjects: projects,
 
@@ -54,7 +51,7 @@ export async function clientLoader({
         assignedTasks: [],
         invites: [],
 
-        // Replace with the real permission check later.
+        // Check for admin of project, create dropdown etc?
         canInviteToProject: true,
     };
 }
