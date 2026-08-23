@@ -128,11 +128,15 @@ export default function ProfilePage({
 
                     <div className="profile-organization">
                         <span aria-hidden="true">♧</span>
-
-                        <span>
-                            {data.user.orgName ??
-                                "No organization"}
-                        </span>
+                        {data.user.orgName !== null 
+                        ?   
+                            <Link
+                                    to={`/orgs/${data.user.orgName}`}
+                                    className="org-name"
+                                >
+                                    {data.user.orgName}
+                            </Link>
+                        : "No organization"}
                     </div>
                 </div>
 

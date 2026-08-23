@@ -72,10 +72,10 @@ export default function OrgsPage({
                     organizations.map((org) => (
                         <div
                             className="org-row"
-                            key={org.id}
+                            key={org.name}
                         >
                             <Link
-                                to={`/orgs/${org.id}`}
+                                to={`/orgs/${org.name}`}
                                 className="org-name"
                             >
                                 {org.name}

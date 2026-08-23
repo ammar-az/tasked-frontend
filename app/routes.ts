@@ -43,7 +43,7 @@ export default [
     ),
 
     route(
-        "orgs/:orgId",
+        "orgs/:orgName",
         "routes/org.tsx",
     ),
 

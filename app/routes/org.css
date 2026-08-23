@@ -1,23 +1,21 @@
 .org-page {
-    width: min(1100px, calc(100% - 2rem));
+    width: min(1000px, calc(100% - 2rem));
     margin: 2rem auto;
 }
 
 .org-header {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto 1fr auto;
     gap: 1.5rem;
-    align-items: center;
+    align-items: start;
     margin-bottom: 2rem;
 }
 
 .org-back-button {
-    align-self: start;
     border: none;
     background: none;
     padding: 0;
-    font-size: 4rem;
-    line-height: 1;
+    font-size: 2rem;
 }
 
 .org-info h1 {
@@ -26,80 +24,57 @@
 
 .org-info p {
     margin: 0;
-    color: var(--muted-text);
 }
 
-.org-actions {
-    align-self: start;
-}
-
-.org-projects {
-    border: 1px solid var(--border);
-}
-
-.org-projects-header {
-    padding: 1rem 1.25rem;
+.org-tabs {
+    display: flex;
+    gap: 0.5rem;
     border-bottom: 1px solid var(--border);
 }
 
-.org-projects-header h2 {
-    margin: 0;
+.org-tab {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 0.75rem 1.25rem;
 }
 
-.org-project-list {
+.org-tab.active {
+    border-bottom: 2px solid #646cff;
+}
+
+.org-search {
+    margin: 1rem 0;
+}
+
+.org-search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem 0.8rem;
+    font: inherit;
+}
+
+.org-list {
     display: flex;
     flex-direction: column;
+    gap: 0.75rem;
 }
 
-.org-project-card {
-    padding: 1.25rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.org-project-card:last-child {
-    border-bottom: none;
-}
-
-.org-project-name {
-    font-size: 1.15rem;
-    font-weight: bold;
-}
-
-.org-project-card p {
-    margin: 0.75rem 0 0;
-    padding: 0.75rem;
+.org-list-item {
+    padding: 1rem 1.25rem;
     border: 1px solid var(--border);
 }
 
-.org-empty-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-    padding: 2rem;
-    color: var(--muted-text);
-    text-align: center;
+.org-list-item p {
+    margin: 0.5rem 0 0;
 }
 
-@media (max-width: 650px) {
-    .org-page {
-        width: calc(100% - 1rem);
-        margin-top: 1rem;
-    }
+.org-project-name,
+.org-member-name {
+    font-weight: 600;
+}
 
-    .org-header {
-        grid-template-columns: auto 1fr;
-    }
-
-    .org-back-button {
-        font-size: 3rem;
-    }
-
-    .org-actions {
-        grid-column: 2;
-    }
-
-    .org-actions button {
-        width: 100%;
-    }
+.org-empty {
+    padding: 2rem;
+    text-align: center;
 }
