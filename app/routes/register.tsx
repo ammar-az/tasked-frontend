@@ -10,10 +10,14 @@ export default function RegisterPage({}: Route.ComponentProps) {
     
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        register(username, password);
-        navigate("/");
+        try{
+            await register(username, password);
+            navigate("/");
+        }catch{
+            console.log("Couldn't register. Make an error UI for this twin.");
+        }
     }
 
     useEffect(() => {

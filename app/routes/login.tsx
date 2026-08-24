@@ -10,11 +10,14 @@ export default function LoginPage({}: Route.ComponentProps) {
     
     const navigate = useNavigate();
 
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        login(username, password);
-        navigate("/");
+        try{
+            await login(username, password);
+            navigate("/");
+        }catch{
+            console.log("Couldn't log in. Make an error UI for this twin.");
+        }
     }
 
     useEffect(() => {
