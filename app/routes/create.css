@@ -121,22 +121,6 @@
     margin: 0;
 }
 
-.create-project-submit {
-    min-height: 4.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 1px solid;
-    background: none;
-    color: inherit;
-    font: inherit;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-.create-project-submit:disabled {
-    cursor: wait;
-    opacity: 0.6;
-}
-
 @media (max-width: 900px) {
     .create-project-back {
         position: static;
@@ -164,7 +148,7 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .create-project-submit {
+    .submit-button {
         min-height: 3.5rem;
         font-size: 1.2rem;
     }

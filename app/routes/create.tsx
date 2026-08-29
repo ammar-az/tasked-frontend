@@ -235,7 +235,7 @@ export default function CreateProjectPage() {
 
                 <button
                     type="submit"
-                    className="create-project-submit"
+                    className="submit-button"
                     disabled={isSubmitting}
                 >
                     {isSubmitting

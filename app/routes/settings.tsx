@@ -31,7 +31,6 @@ import {
     type MemberOverviewDto,
 } from "../types/membership-types";
 
-import "./create.css";
 import "./settings.css";
 import { isAdmin } from "../utils/enum-helpers";
 
@@ -381,20 +380,20 @@ export default function ProjectSettingsPage({
                 </label>
 
                 {error && (
-                    <p className="project-settings-error">
+                    <p className="error">
                         {error}
                     </p>
                 )}
 
                 {message && (
-                    <p className="project-settings-message">
+                    <p className="message">
                         {message}
                     </p>
                 )}
 
                 <button
                     type="submit"
-                    className="create-project-submit"
+                    className="submit-button"
                     disabled={isSaving}
                 >
                     {isSaving
@@ -403,7 +402,7 @@ export default function ProjectSettingsPage({
                 </button>
 
                 {isOwner && (
-                    <section className="project-owner-settings">
+                    <section className="panel">
                         <h2>Owner Settings</h2>
 
                         <div className="project-organization-setting">
@@ -437,7 +436,7 @@ export default function ProjectSettingsPage({
                 )}
 
                 {isOwner && (
-                    <section className="project-danger-zone">
+                    <section className="panel panel-danger">
                         <h2>Danger Zone</h2>
 
                         <p>
