@@ -4,10 +4,6 @@
     color: var(--muted-text);
 }
 
-.project-settings-visibility {
-    align-self: flex-start;
-}
-
 .project-settings-message {
     background: var(--surface);
 }
@@ -52,6 +48,11 @@
 
 .project-delete-actions .danger-button {
     align-self: auto;
+}
+
+.form{
+    width: min(680px, 100%);
+    margin: 0 auto;
 }
 
 @media (max-width: 600px) {

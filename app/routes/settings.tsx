@@ -221,306 +221,311 @@ export default function ProjectSettingsPage({
     }
 
     return (
-        <main className="create-project-page">
-            <button
-                type="button"
-                className="create-project-back"
-                onClick={() =>
-                    navigate(`/projects/${project.slug}`)
-                }
-                aria-label="Back to project"
-            >
-                ←
-            </button>
-
-            <form
-                className="create-project-form"
-                onSubmit={handleSubmit}
-            >
-                <h1>Project Settings</h1>
-
-                <p className="project-settings-role">
-                    Your role:{" "}
-                    <strong>
-                        {isOwner ? "Owner" : "Admin"}
-                    </strong>
-                </p>
-
-                <label className="create-project-name">
-                    <span>Project name</span>
-
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(event) =>
-                            setName(event.target.value)
-                        }
-                        maxLength={100}
-                        required
-                    />
-                </label>
-
-                <fieldset className="create-project-option-group project-settings-visibility">
-                    <legend>Visibility</legend>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="visibility"
-                            checked={isVisible}
-                            onChange={() =>
-                                setIsVisible(true)
-                            }
-                        />
-
-                        Public
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="visibility"
-                            checked={!isVisible}
-                            onChange={() =>
-                                setIsVisible(false)
-                            }
-                        />
-
-                        Private
-                    </label>
-                </fieldset>
-
-                <fieldset className="create-project-join-policy">
-                    <legend>Configure join policy</legend>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={
-                                joinPolicy === JoinPolicy.Open
-                            }
-                            onChange={() =>
-                                setJoinPolicy(
-                                    JoinPolicy.Open,
-                                )
-                            }
-                        />
-
-                        Open
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={
-                                joinPolicy ===
-                                JoinPolicy.ViewOnly
-                            }
-                            onChange={() =>
-                                setJoinPolicy(
-                                    JoinPolicy.ViewOnly,
-                                )
-                            }
-                        />
-
-                        Join as Viewer
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={
-                                joinPolicy ===
-                                JoinPolicy.InviteOnly
-                            }
-                            onChange={() =>
-                                setJoinPolicy(
-                                    JoinPolicy.InviteOnly,
-                                )
-                            }
-                        />
-
-                        Invite Only
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={
-                                joinPolicy === JoinPolicy.Closed
-                            }
-                            onChange={() =>
-                                setJoinPolicy(
-                                    JoinPolicy.Closed,
-                                )
-                            }
-                        />
-
-                        Closed
-                    </label>
-                </fieldset>
-
-                <label className="create-project-description">
-                    <span>Description</span>
-
-                    <textarea
-                        value={description}
-                        onChange={(event) =>
-                            setDescription(
-                                event.target.value,
-                            )
-                        }
-                        placeholder="Describe the project"
-                        maxLength={2000}
-                    />
-                </label>
-
-                {error && (
-                    <p className="error">
-                        {error}
-                    </p>
-                )}
-
-                {message && (
-                    <p className="message">
-                        {message}
-                    </p>
-                )}
-
+        <main className = "page-layout">
+            <div className = "page-side">
                 <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={isSaving}
+                        type="button"
+                        className="back-button"
+                        onClick={() =>
+                            navigate(`/projects/${project.slug}`)
+                        }
+                        aria-label="Back to project"
+                    >
+                        ←
+                    </button>
+            </div>
+                
+            <div className="page-main">
+                <form
+                    className="form"
+                    onSubmit={handleSubmit}
                 >
-                    {isSaving
-                        ? "Saving..."
-                        : "Save Changes"}
-                </button>
+                    <h1>Project Settings</h1>
 
-                {isOwner && (
-                    <section className="panel">
-                        <h2>Owner Settings</h2>
+                    <p className="project-settings-role">
+                        Your role:{" "}
+                        <strong>
+                            {isOwner ? "Owner" : "Admin"}
+                        </strong>
+                    </p>
 
-                        <div className="project-organization-setting">
-                            <div>
-                                <h3>Organization</h3>
+                    <label className="form-name">
+                        <span>Project name</span>
 
-                                <p>
-                                    {isOrganizationProject
-                                        ? "This project currently belongs to an organization."
-                                        : "This project is currently a personal project."}
-                                </p>
-                            </div>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(event) =>
+                                setName(event.target.value)
+                            }
+                            maxLength={100}
+                            required
+                        />
+                    </label>
 
-                            <button
-                                type="button"
-                                onClick={
-                                    handleOrganizationChange
+                    <fieldset className="form-option-group form-option-group-2">
+                        <legend>Visibility</legend>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="visibility"
+                                checked={isVisible}
+                                onChange={() =>
+                                    setIsVisible(true)
                                 }
-                                disabled={
-                                    isUpdatingOrganization
+                            />
+
+                            Public
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="visibility"
+                                checked={!isVisible}
+                                onChange={() =>
+                                    setIsVisible(false)
                                 }
-                            >
-                                {isUpdatingOrganization
-                                    ? "Updating..."
-                                    : isOrganizationProject
-                                      ? "Remove from Organization"
-                                      : "Add to My Organization"}
-                            </button>
-                        </div>
-                    </section>
-                )}
+                            />
 
-                {isOwner && (
-                    <section className="panel panel-danger">
-                        <h2>Danger Zone</h2>
+                            Private
+                        </label>
+                    </fieldset>
 
-                        <p>
-                            Deleting a project permanently
-                            removes the project and its related
-                            data.
-                        </p>
+                    <fieldset className="form-option-group form-option-group-4 ">
+                        <legend>Configure join policy</legend>
 
-                        {!showDeleteConfirmation ? (
-                            <button
-                                type="button"
-                                className="danger-button"
-                                onClick={() =>
-                                    setShowDeleteConfirmation(
-                                        true,
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={
+                                    joinPolicy === JoinPolicy.Open
+                                }
+                                onChange={() =>
+                                    setJoinPolicy(
+                                        JoinPolicy.Open,
                                     )
                                 }
-                            >
-                                Delete Project
-                            </button>
-                        ) : (
-                            <div className="project-delete-confirmation">
-                                <label>
-                                    <span>
-                                        Enter{" "}
-                                        <strong>
-                                            {project.name}
-                                        </strong>{" "}
-                                        to confirm.
-                                    </span>
+                            />
 
-                                    <input
-                                        type="text"
-                                        value={
-                                            deleteConfirmation
-                                        }
-                                        onChange={(event) =>
-                                            setDeleteConfirmation(
-                                                event.target
-                                                    .value,
-                                            )
-                                        }
-                                        autoComplete="off"
-                                    />
-                                </label>
+                            Open
+                        </label>
 
-                                <div className="project-delete-actions">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowDeleteConfirmation(
-                                                false,
-                                            );
-                                            setDeleteConfirmation(
-                                                "",
-                                            );
-                                        }}
-                                        disabled={isDeleting}
-                                    >
-                                        Cancel
-                                    </button>
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={
+                                    joinPolicy ===
+                                    JoinPolicy.ViewOnly
+                                }
+                                onChange={() =>
+                                    setJoinPolicy(
+                                        JoinPolicy.ViewOnly,
+                                    )
+                                }
+                            />
 
-                                    <button
-                                        type="button"
-                                        className="danger-button"
-                                        disabled={
-                                            isDeleting ||
-                                            deleteConfirmation !==
-                                                project.name
-                                        }
-                                        onClick={
-                                            handleDeleteProject
-                                        }
-                                    >
-                                        {isDeleting
-                                            ? "Deleting..."
-                                            : "Permanently Delete Project"}
-                                    </button>
+                            Join as Viewer
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={
+                                    joinPolicy ===
+                                    JoinPolicy.InviteOnly
+                                }
+                                onChange={() =>
+                                    setJoinPolicy(
+                                        JoinPolicy.InviteOnly,
+                                    )
+                                }
+                            />
+
+                            Invite Only
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={
+                                    joinPolicy === JoinPolicy.Closed
+                                }
+                                onChange={() =>
+                                    setJoinPolicy(
+                                        JoinPolicy.Closed,
+                                    )
+                                }
+                            />
+
+                            Closed
+                        </label>
+                    </fieldset>
+
+                    <label className="form-description">
+                        <span>Description</span>
+
+                        <textarea
+                            value={description}
+                            onChange={(event) =>
+                                setDescription(
+                                    event.target.value,
+                                )
+                            }
+                            placeholder="Describe the project"
+                            maxLength={2000}
+                        />
+                    </label>
+
+                    {error && (
+                        <p className="error">
+                            {error}
+                        </p>
+                    )}
+
+                    {message && (
+                        <p className="message">
+                            {message}
+                        </p>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="submit-button"
+                        disabled={isSaving}
+                    >
+                        {isSaving
+                            ? "Saving..."
+                            : "Save Changes"}
+                    </button>
+
+                    {isOwner && (
+                        <section className="panel">
+                            <h2>Owner Settings</h2>
+
+                            <div className="project-organization-setting">
+                                <div>
+                                    <h3>Organization</h3>
+
+                                    <p>
+                                        {isOrganizationProject
+                                            ? "This project currently belongs to an organization."
+                                            : "This project is currently a personal project."}
+                                    </p>
                                 </div>
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        handleOrganizationChange
+                                    }
+                                    disabled={
+                                        isUpdatingOrganization
+                                    }
+                                >
+                                    {isUpdatingOrganization
+                                        ? "Updating..."
+                                        : isOrganizationProject
+                                        ? "Remove from Organization"
+                                        : "Add to My Organization"}
+                                </button>
                             </div>
-                        )}
-                    </section>
-                )}
-            </form>
+                        </section>
+                    )}
+
+                    {isOwner && (
+                        <section className="panel panel-danger">
+                            <h2>Danger Zone</h2>
+
+                            <p>
+                                Deleting a project permanently
+                                removes the project and its related
+                                data.
+                            </p>
+
+                            {!showDeleteConfirmation ? (
+                                <button
+                                    type="button"
+                                    className="danger-button"
+                                    onClick={() =>
+                                        setShowDeleteConfirmation(
+                                            true,
+                                        )
+                                    }
+                                >
+                                    Delete Project
+                                </button>
+                            ) : (
+                                <div className="project-delete-confirmation">
+                                    <label>
+                                        <span>
+                                            Enter{" "}
+                                            <strong>
+                                                {project.name}
+                                            </strong>{" "}
+                                            to confirm.
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            value={
+                                                deleteConfirmation
+                                            }
+                                            onChange={(event) =>
+                                                setDeleteConfirmation(
+                                                    event.target
+                                                        .value,
+                                                )
+                                            }
+                                            autoComplete="off"
+                                        />
+                                    </label>
+
+                                    <div className="project-delete-actions">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowDeleteConfirmation(
+                                                    false,
+                                                );
+                                                setDeleteConfirmation(
+                                                    "",
+                                                );
+                                            }}
+                                            disabled={isDeleting}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="danger-button"
+                                            disabled={
+                                                isDeleting ||
+                                                deleteConfirmation !==
+                                                    project.name
+                                            }
+                                            onClick={
+                                                handleDeleteProject
+                                            }
+                                        >
+                                            {isDeleting
+                                                ? "Deleting..."
+                                                : "Permanently Delete Project"}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </section>
+                    )}
+                </form>
+            </div>
+            <div className = "page-side"></div>
         </main>
     );
 }

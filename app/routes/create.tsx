@@ -63,186 +63,190 @@ export default function CreateProjectPage() {
     }
 
     return (
-        <main className="create-project-page">
-            <button
-                type="button"
-                className="create-project-back"
-                onClick={() => navigate(-1)}
-                aria-label="Go back"
-            >
-                ←
-            </button>
-
-            <form
-                className="create-project-form"
-                onSubmit={handleSubmit}
-            >
-                <h1>Create New Project</h1>
-
-                <label className="create-project-name">
-                    <span>Project name</span>
-
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(event) =>
-                            setName(event.target.value)
-                        }
-                        maxLength={100}
-                        required
-                    />
-                </label>
-
-                <div className="create-project-options-row">
-                    <fieldset className="create-project-option-group">
-                        <legend>Create as organization project?</legend>
-
-                        <label>
-                            <input
-                                type="radio"
-                                name="organization-project"
-                                checked={!createForOrganization}
-                                onChange={() =>
-                                    setCreateForOrganization(false)
-                                }
-                            />
-
-                            No
-                        </label>
-
-                        <label>
-                            <input
-                                type="radio"
-                                name="organization-project"
-                                checked={createForOrganization}
-                                disabled={
-                                    !canCreateOrganizationProject
-                                }
-                                onChange={() =>
-                                    setCreateForOrganization(true)
-                                }
-                            />
-
-                            Yes
-                        </label>
-                    </fieldset>
-
-                    <fieldset className="create-project-option-group">
-                        <legend>Visibility</legend>
-
-                        <label>
-                            <input
-                                type="radio"
-                                name="visibility"
-                                checked={visibility === true}
-                                onChange={() =>
-                                    setVisibility(true)
-                                }
-                            />
-
-                            Public
-                        </label>
-
-                        <label>
-                            <input
-                                type="radio"
-                                name="visibility"
-                                checked={visibility === false}
-                                onChange={() =>
-                                    setVisibility(false)
-                                }
-                            />
-
-                            Private
-                        </label>
-                    </fieldset>
-                </div>
-
-                <fieldset className="create-project-join-policy">
-                    <legend>Configure join policy</legend>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={joinPolicy === JoinPolicy.Open}
-                            onChange={() =>
-                                setJoinPolicy(JoinPolicy.Open)
-                            }
-                        />
-
-                        Open
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={joinPolicy === JoinPolicy.ViewOnly}
-                            onChange={() =>
-                                setJoinPolicy(JoinPolicy.ViewOnly)
-                            }
-                        />
-
-                        Join as Viewer
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={joinPolicy === JoinPolicy.InviteOnly}
-                            onChange={() =>
-                                setJoinPolicy(JoinPolicy.InviteOnly)
-                            }
-                        />
-
-                        Invite Only
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="join-policy"
-                            checked={joinPolicy === JoinPolicy.Closed}
-                            onChange={() =>
-                                setJoinPolicy(JoinPolicy.Closed)
-                            }
-                        />
-
-                        Closed
-                    </label>
-                </fieldset>
-
-                <label className="create-project-description">
-                    <span>Description</span>
-
-                    <textarea
-                        value={description}
-                        onChange={(event) =>
-                            setDescription(event.target.value)
-                        }
-                        placeholder="Describe the project"
-                        maxLength={2000}
-                    />
-                </label>
-
-                {error && (
-                    <p className="create-project-error">
-                        {error}
-                    </p>
-                )}
-
+        <main className="page-layout">
+            <div className = "page-side">
                 <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={isSubmitting}
+                        type="button"
+                        className="back-button"
+                        onClick={() => navigate(-1)}
+                        aria-label="Back to project"
+                    >
+                        ←
+                    </button>
+            </div>
+            <div className="page-main">
+                <form
+                    className="form"
+                    onSubmit={handleSubmit}
                 >
-                    {isSubmitting
-                        ? "Creating..."
-                        : "Create Project"}
-                </button>
-            </form>
+                    <h1>Create New Project</h1>
+
+                    <label className="form-name">
+                        <span>Project name</span>
+
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(event) =>
+                                setName(event.target.value)
+                            }
+                            maxLength={100}
+                            required
+                        />
+                    </label>
+
+                    <div className="create-project-options-row">
+                        <fieldset className="form-option-group form-option-group-2">
+                            <legend>Create as organization project?</legend>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="organization-project"
+                                    checked={!createForOrganization}
+                                    onChange={() =>
+                                        setCreateForOrganization(false)
+                                    }
+                                />
+
+                                No
+                            </label>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="organization-project"
+                                    checked={createForOrganization}
+                                    disabled={
+                                        !canCreateOrganizationProject
+                                    }
+                                    onChange={() =>
+                                        setCreateForOrganization(true)
+                                    }
+                                />
+
+                                Yes
+                            </label>
+                        </fieldset>
+
+                        <fieldset className="form-option-group form-option-group-2">
+                            <legend>Visibility</legend>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="visibility"
+                                    checked={visibility === true}
+                                    onChange={() =>
+                                        setVisibility(true)
+                                    }
+                                />
+
+                                Public
+                            </label>
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="visibility"
+                                    checked={visibility === false}
+                                    onChange={() =>
+                                        setVisibility(false)
+                                    }
+                                />
+
+                                Private
+                            </label>
+                        </fieldset>
+                    </div>
+
+                    <fieldset className="form-option-group form-option-group-4">
+                        <legend>Configure join policy</legend>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={joinPolicy === JoinPolicy.Open}
+                                onChange={() =>
+                                    setJoinPolicy(JoinPolicy.Open)
+                                }
+                            />
+
+                            Open
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={joinPolicy === JoinPolicy.ViewOnly}
+                                onChange={() =>
+                                    setJoinPolicy(JoinPolicy.ViewOnly)
+                                }
+                            />
+
+                            Join as Viewer
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={joinPolicy === JoinPolicy.InviteOnly}
+                                onChange={() =>
+                                    setJoinPolicy(JoinPolicy.InviteOnly)
+                                }
+                            />
+
+                            Invite Only
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="join-policy"
+                                checked={joinPolicy === JoinPolicy.Closed}
+                                onChange={() =>
+                                    setJoinPolicy(JoinPolicy.Closed)
+                                }
+                            />
+
+                            Closed
+                        </label>
+                    </fieldset>
+
+                    <label className="form-description">
+                        <span>Description</span>
+
+                        <textarea
+                            value={description}
+                            onChange={(event) =>
+                                setDescription(event.target.value)
+                            }
+                            placeholder="Describe the project"
+                            maxLength={2000}
+                        />
+                    </label>
+
+                    {error && (
+                        <p className="error">
+                            {error}
+                        </p>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="submit-button"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting
+                            ? "Creating..."
+                            : "Create Project"}
+                    </button>
+                </form>
+            </div>
+            <div className = "page-side"></div>
         </main>
     );
 }
