@@ -284,7 +284,7 @@ function AssignedTaskList({
             {tasks.map((task) => (
                 <Link
                     key={task.id}
-                    to={`/projects/${task.projectId}/tasks/${task.issueNo}`}
+                    to={`/projects/${task.projectSlug}/tasks/${task.issueNo}`}
                     className="profile-task-card"
                 >
                     <div className="profile-task-heading">

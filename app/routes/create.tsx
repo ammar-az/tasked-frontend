@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { JoinPolicy, ProjectRequest } from "../types/project-types";
 import { createProjectEndpoint } from "../api/projects";
@@ -20,7 +20,11 @@ export default function CreateProjectPage() {
 
     const {user, isAuthenticated} = useAuth();
 
-    if(!isAuthenticated) navigate("/login");
+    useEffect(() => {
+        if(!isAuthenticated){
+            navigate("/login");
+        }
+    });
 
     const canCreateOrganizationProject = user?.orgId != null;
 
