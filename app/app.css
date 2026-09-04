@@ -139,6 +139,15 @@ svg {
 
 /* Page layout */
 
+.simple-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 85vh; /* should be same as page layout when navbar done*/
+}
+
 .page-layout {
     display: flex;
     width: 100%;
@@ -154,6 +163,11 @@ svg {
     flex-direction: column;
     width: min(1200px, calc(100% - 2rem));
     margin: 1.5rem auto;
+}
+
+.page-main-narrow{
+    width: max(300px, 15%);
+    align-items: center;
 }
 
 .page-main-wide {

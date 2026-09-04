@@ -7,16 +7,18 @@ export default function LoginPage({}: Route.ComponentProps) {
     const {login, isAuthenticated} = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try{
+            if(username == "" || password == "") throw new Error;
+
             await login(username, password);
             navigate("/");
         }catch{
-            console.log("Couldn't log in. Make an error UI for this twin.");
+            setError("Could not log in. Ensure the username and password are both correct.");
         }
     }
 
@@ -28,44 +30,37 @@ export default function LoginPage({}: Route.ComponentProps) {
 
     return (
         <main
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "100vh",
-            }}
+            className = "simple-layout"
         >
-            <form onSubmit={handleSubmit}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1rem",
-                    width: "300px",
-                }}
-            >
-                <h1>Login</h1>
+            <div className = "page-main-narrow">
+                <form onSubmit={handleSubmit}
+                    className = "form"
+                >
+                    <h1>Login</h1>
 
-                <input
-                    type="text"
-                    placeholder="Username"
-                    autoComplete="username"
-                    onChange={(e) => setUsername(e.target.value)} 
-                />
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        autoComplete="username"
+                        onChange={(e) => setUsername(e.target.value)} 
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    onChange={(e) => setPassword(e.target.value)} 
-                />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        autoComplete="current-password"
+                        onChange={(e) => setPassword(e.target.value)} 
+                    />
+                    {error && (<p className="error">{error}</p>)} 
+                    
+                    <button type="submit">Login</button>
 
-                <button type="submit">Login</button>
-
-                <p>
-                    Don't have an account?{" "}
-                    <Link to="/register">Register here</Link>
-                </p>
-            </form>
+                    <p>
+                        Don't have an account?{" "}
+                        <Link to="/register">Register here</Link>
+                    </p>
+                </form>
+            </div>
         </main>
     );
 }
