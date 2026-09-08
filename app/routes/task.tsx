@@ -63,6 +63,7 @@ export default function TaskPage({
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAssign, setShowAssign] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<TodoStatus>(task.status);
 
     const [draft, setDraft] = useState<TodoUpdateRequest>({
         title: todo.title,
@@ -148,14 +149,16 @@ export default function TaskPage({
     const assignedName = task.assignedName ?? "Unassigned";
 
     return (
-        <main className="task-page">
-            <Link
-                to={`/projects/${params.slug}`}
-                className="task-back-link"
-            >
-                <span aria-hidden="true">←</span>
-                Back to {projectName}
-            </Link>
+        <main className="page-layout task-page">
+            <aside className="page-side">
+                <Link
+                    to={`/projects/${params.slug}`}
+                    className="back-button"
+                >
+                    <span aria-hidden="true">←</span>
+                    Back to {projectName}
+                </Link>
+            </aside>
 
             {showAssign && (
                 <AssignTaskModal
@@ -171,7 +174,7 @@ export default function TaskPage({
                 />
             )}
 
-            <div className="task-page-layout">
+            <div className="page-main-wide task-page-form">
                 <article className="task-card">
                     <header className="task-card-header">
                         <div className="task-heading">
@@ -213,90 +216,110 @@ export default function TaskPage({
                         <h2>Description</h2>
 
                         {isEditing ? (
-                            <div>
-                                <textarea
-                                    className="task-description-input"
-                                    value={draft.description}
-                                    onChange={(event) =>
-                                        setDraft((current) => ({
-                                            ...current,
-                                            description: event.target.value,
-                                        }))
-                                    }
-                                    placeholder="Enter a task description"
-                                />
-
-                                    <fieldset className="">
-                                    <legend>Status</legend>
-
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="status-update"
-                                            checked={draft.status == TodoStatus.Backlog}
-                                            disabled={!isEditing}
-                                            onChange={() =>
-                                                setDraft(current => ({
-                                                    ...current,
-                                                    status: TodoStatus.Backlog
-                                                }))
-                                            }
-                                        />
-
-                                        Backlog
-                                    </label>
-
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="status-update"
-                                            checked={draft.status == TodoStatus.InProgress}
-                                            disabled={!isEditing}
-                                            onChange={() =>
-                                                setDraft(current => ({
-                                                    ...current,
-                                                    status: TodoStatus.InProgress
-                                                }))
-                                            }
-                                        />
-
-                                        In Progress
-                                    </label>
-
-                                                            <label>
-                                        <input
-                                            type="radio"
-                                            name="status-update"
-                                            checked={draft.status == TodoStatus.Completed}
-                                            disabled={!isEditing}
-                                            onChange={() =>
-                                                setDraft(current => ({
-                                                    ...current,
-                                                    status: TodoStatus.Completed,
-                                                    unassign: true
-                                                }))
-                                            }
-                                        />
-
-                                        Completed
-                                    </label>
-                                </fieldset>
-
-                            </div>
+                            <textarea
+                                className="task-description-input"
+                                value={draft.description}
+                                onChange={(event) =>
+                                    setDraft((current) => ({
+                                        ...current,
+                                        description: event.target.value,
+                                    }))
+                                }
+                                placeholder="Enter a task description"
+                            />
                         ) : (
                             <p className="task-description">
-                                {task.description || "No description provided."}
+                                {task.description ||
+                                    "No description provided."}
                             </p>
-                        
-                        
-                        
+                        )}
+
+                        {isEditing && (
+                            <fieldset className="form-option-group form-option-group-4">
+                                <legend>Status</legend>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="status-update"
+                                        checked={
+                                            draft.status ===
+                                            TodoStatus.Backlog
+                                        }
+                                        onChange={() =>
+                                            setDraft((current) => ({
+                                                ...current,
+                                                status: TodoStatus.Backlog,
+                                            }))
+                                        }
+                                    />
+                                    Backlog
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="status-update"
+                                        checked={
+                                            draft.status ===
+                                            TodoStatus.InProgress
+                                        }
+                                        onChange={() =>
+                                            setDraft((current) => ({
+                                                ...current,
+                                                status: TodoStatus.InProgress,
+                                            }))
+                                        }
+                                    />
+                                    In Progress
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="status-update"
+                                        checked={
+                                            draft.status ===
+                                            TodoStatus.Completed
+                                        }
+                                        onChange={() =>
+                                            setDraft((current) => ({
+                                                ...current,
+                                                status: TodoStatus.Completed,
+                                                unassign: true,
+                                            }))
+                                        }
+                                    />
+                                    Completed
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="status-update"
+                                        checked={
+                                            draft.status ===
+                                            TodoStatus.Archived
+                                        }
+                                        onChange={() =>
+                                            setDraft((current) => ({
+                                                ...current,
+                                                status: TodoStatus.Archived,
+                                                unassign: true,
+                                            }))
+                                        }
+                                    />
+                                    Archived
+                                </label>
+
+                            </fieldset>
                         )}
                     </section>
 
                     {isEditing && (
                         <footer className="task-edit-footer">
                             {error && (
-                                <p className="task-edit-error">
+                                <p className="error">
                                     {error}
                                 </p>
                             )}
@@ -323,7 +346,7 @@ export default function TaskPage({
                 </article>
 
                 <aside className="task-sidebar">
-                    <section className="task-sidebar-section">
+                    <section className="panel">
                         <h2>Task Information</h2>
 
                         <dl className="task-metadata">
@@ -352,34 +375,107 @@ export default function TaskPage({
 
                             <div>
                                 <dt>Status</dt>
-                                <dd>{getTodoStatusLabel(task.status)}</dd>
+                                <dd>
+                                    {getTodoStatusLabel(task.status)}
+                                </dd>
                             </div>
                         </dl>
                     </section>
-                    
-                    {canEditTask && (<section className="task-sidebar-section">
-                        <h2>Actions</h2>
 
-                        <div className="task-sidebar-actions">
-                            <button type="button">
-                                Assign to Self
-                            </button>
+                    {canEditTask && (
+                        <section className="panel">
+                            <h2>Actions</h2>
 
-                            {canAssignToOthers && (
-                                <button type="button" onClick={() => setShowAssign(true)}>
-                                    Change Assignee
-                                </button>
-                            )}
-
-                            {canEditTask && (
+                            <div className="task-sidebar-actions">
                                 <button type="button">
-                                    Change Status
+                                    Assign to Self
                                 </button>
-                            )}
-                        </div>
-                    </section>)}
+
+                                {canAssignToOthers && (
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowAssign(true)
+                                        }
+                                    >
+                                        Change Assignee
+                                    </button>
+                                )}
+                            </div>
+                        </section>
+                    )}
+                    {canEditTask && (
+                        <section className="panel task-status-panel">
+                            <h2>Status</h2>
+
+                            <div className="task-status-options">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="task-status"
+                                        value={TodoStatus.Backlog}
+                                        checked={selectedStatus === TodoStatus.Backlog}
+                                        onChange={() =>
+                                            setSelectedStatus(TodoStatus.Backlog)
+                                        }
+                                    />
+                                    Backlog
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="task-status"
+                                        value={TodoStatus.InProgress}
+                                        checked={selectedStatus === TodoStatus.InProgress}
+                                        onChange={() =>
+                                            setSelectedStatus(TodoStatus.InProgress)
+                                        }
+                                    />
+                                    In Progress
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="task-status"
+                                        value={TodoStatus.Completed}
+                                        checked={selectedStatus === TodoStatus.Completed}
+                                        onChange={() =>
+                                            setSelectedStatus(TodoStatus.Completed)
+                                        }
+                                    />
+                                    Completed
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="task-status"
+                                        value={TodoStatus.Archived}
+                                        checked={selectedStatus === TodoStatus.Archived}
+                                        onChange={() =>
+                                            setSelectedStatus(TodoStatus.Archived)
+                                        }
+                                    />
+                                    Archived
+                                </label>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="primary-button"
+                                onClick={()=>console.log()}
+                                disabled={selectedStatus === task.status}
+                            >
+                                Change Status
+                            </button>
+                        </section>
+                    )}
                 </aside>
             </div>
+
+            <aside className="page-side" />
         </main>
     );
 }
