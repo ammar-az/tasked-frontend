@@ -4,7 +4,8 @@
 }
 
 .orgs-page h1 {
-    margin-bottom: 1.5rem;
+    margin: 0 0 1.5rem;
+    text-align: center;
 }
 
 .orgs-controls {
@@ -19,20 +20,23 @@
     font: inherit;
 }
 
+.orgs-controls button {
+    width: 2.75rem;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
 .orgs-list {
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
 }
 
+
 .org-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-
     padding: 0.9rem 1rem;
-
     border-bottom: 1px solid var(--border);
 }
 

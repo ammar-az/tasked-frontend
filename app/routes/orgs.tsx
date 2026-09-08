@@ -56,10 +56,18 @@ export default function OrgsPage({
                     type="submit"
                     name="descending"
                     value={orgRequest.descending ? "false" : "true"}
+                    aria-label={
+                        orgRequest.descending
+                            ? "Sort ascending"
+                            : "Sort descending"
+                    }
+                    title={
+                        orgRequest.descending
+                            ? "Sort ascending"
+                            : "Sort descending"
+                    }
                 >
-                    {orgRequest.descending
-                        ? "Descending"
-                        : "Ascending"}
+                    {orgRequest.descending ? "↓" : "↑"}
                 </button>
             </form>
 
@@ -70,20 +78,13 @@ export default function OrgsPage({
                     </p>
                 ) : (
                     organizations.map((org) => (
-                        <div
-                            className="org-row"
-                            key={org.name}
-                        >
+                        <div className="org-row" key={org.name}>
                             <Link
                                 to={`/orgs/${org.name}`}
                                 className="org-name"
                             >
                                 {org.name}
                             </Link>
-
-                            <button type="button">
-                                Join
-                            </button>
                         </div>
                     ))
                 )}
