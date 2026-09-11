@@ -4,6 +4,7 @@ import {
     type FormEvent,
 } from "react";
 import {
+    Link,
     useNavigate,
     useRevalidator,
 } from "react-router";
@@ -223,16 +224,13 @@ export default function ProjectSettingsPage({
     return (
         <main className = "page-layout">
             <div className = "page-side">
-                <button
-                        type="button"
-                        className="back-button"
-                        onClick={() =>
-                            navigate(`/projects/${project.slug}`)
-                        }
-                        aria-label="Back to project"
-                    >
-                        ←
-                    </button>
+                <Link
+                    to={`/projects/${project.slug}`}
+                    className="back-button"
+                >
+                    <span aria-hidden="true">←</span>
+                    Back to {project.slug}
+                </Link>
             </div>
                 
             <div className="page-main">
