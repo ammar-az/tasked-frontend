@@ -2,7 +2,8 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 
 import type { Route } from "./+types/org";
 
-import "./org.css";
+import "./orgs.css";
+
 import {
     getOrgByNameEndpoint,
     getOrgProjectsEndpoint,
@@ -119,145 +120,179 @@ export default function OrgPage({
         setSearchParams(params);
     }
 
+    function handleSort() {
+        const params = new URLSearchParams(searchParams);
+
+        if(params.get("descending") === "true"){
+            params.set("descending", "false");
+        }else{
+            params.set("descending", "true");
+        }
+
+        params.set("page", "1");
+
+        setSearchParams(params);
+    }
+
     return (
-        <main className="org-page">
-            <section className="org-header">
-                <button
-                    type="button"
-                    className="org-back-button"
-                    onClick={() => navigate(-1)}
-                    aria-label="Go back"
-                >
-                    ←
-                </button>
-
-                <div className="org-info">
-                    <h1>{org.name}</h1>
-
-                    <p>
-                        Organization information can go here
-                        later. For now just the GUID: {org.id}
-                    </p>
-                </div>
-
-                {isAuthenticated && (
-                    <div className="org-actions">
-                        {isMember ? (
-                            <button
-                                onClick={handleLeave}
-                                type="button"
-                            >
-                                Leave Organization
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleJoin}
-                                type="button"
-                            >
-                                Join Organization
-                            </button>
-                        )}
-                    </div>
-                )}
-            </section>
-
-            <section className="org-content">
-                <div className="org-tabs">
-                    <button
-                        type="button"
-                        className={
-                            view === "projects"
-                                ? "org-tab active"
-                                : "org-tab"
-                        }
-                        onClick={() =>
-                            changeView("projects")
-                        }
+        <main className="simple-layout">
+            <div className="orgs-page">
+                <section className="org-header">
+                    <Link
+                        to={"/orgs"}
+                        className="back-button"
                     >
-                        Projects
-                    </button>
+                        <span aria-hidden="true">←</span>
+                </Link>
 
-                    <button
-                        type="button"
-                        className={
-                            view === "users"
-                                ? "org-tab active"
-                                : "org-tab"
-                        }
-                        onClick={() =>
-                            changeView("users")
-                        }
-                    >
-                        Members
-                    </button>
-                </div>
+                    <div className="org-info">
+                        <h1>{org.name}</h1>
 
-                <div className="org-search">
-                    <input
-                        type="search"
-                        placeholder={
-                            view === "projects"
-                                ? "Search projects..."
-                                : "Search members..."
-                        }
-                        value={orgRequest.search ?? ""}
-                        onChange={handleSearch}
-                    />
-                </div>
-
-                {view === "projects" ? (
-                    <div className="org-list">
-                        {projects.length === 0 ? (
-                            <p className="org-empty">
-                                No projects found.
-                            </p>
-                        ) : (
-                            projects.map((project) => (
-                                <div
-                                    key={project.id}
-                                    className="org-list-item"
-                                >
-                                    <div>
-                                        <Link
-                                            to={`/projects/${project.slug}`}
-                                            className="org-project-name"
-                                        >
-                                            {project.name}
-                                        </Link>
-
-                                        <p>
-                                            {project.description ??
-                                                "No project description."}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                        <p>
+                            Organization information can go here
+                            later. For now just the GUID: {org.id}
+                        </p>
                     </div>
-                ) : (
-                    <div className="org-list">
-                        {users.length === 0 ? (
-                            <p className="org-empty">
-                                No members found.
-                            </p>
-                        ) : (
-                            users.map((member) => (
-                                <div
-                                    key={member.id}
-                                    className="org-list-item"
+
+                    {isAuthenticated && (
+                        <div className="org-actions">
+                            {isMember ? (
+                                <button
+                                    onClick={handleLeave}
+                                    type="button"
                                 >
-                                    <Link
-                                        to={`/users/${member.id}`}
-                                        className="org-member-name"
+                                    Leave Organization
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleJoin}
+                                    type="button"
+                                >
+                                    Join Organization
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </section>
+
+                <section className="org-content">
+                    <div className="org-tabs">
+                        <button
+                            type="button"
+                            className={
+                                view === "projects"
+                                    ? "org-tab active"
+                                    : "org-tab"
+                            }
+                            onClick={() =>
+                                changeView("projects")
+                            }
+                        >
+                            Projects
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                view === "users"
+                                    ? "org-tab active"
+                                    : "org-tab"
+                            }
+                            onClick={() =>
+                                changeView("users")
+                            }
+                        >
+                            Members
+                        </button>
+                    </div>
+
+                    <div className="orgs-controls">
+                        <input
+                            type="search"
+                            name="search"
+                            placeholder={
+                                view === "projects"
+                                    ? "Search projects..."
+                                    : "Search members..."
+                            }
+                            defaultValue={orgRequest.search ?? ""}
+                            onChange={handleSearch}
+                        />
+
+                        <button
+                            type="button"
+                            name="descending"
+                            value={orgRequest.descending ? "false" : "true"}
+                            aria-label={
+                                orgRequest.descending
+                                    ? "Sort ascending"
+                                    : "Sort descending"
+                            }
+                            title={
+                                orgRequest.descending
+                                    ? "Sort ascending"
+                                    : "Sort descending"
+                            }
+                            onClick={handleSort}
+                        >
+                            {orgRequest.descending ? "↓" : "↑"}
+                        </button>
+                    </div>
+
+                    {view === "projects" ? (
+                        <div className="org-list">
+                            {projects.length === 0 ? (
+                                <p className="orgs-empty">
+                                    No projects found.
+                                </p>
+                            ) : (
+                                projects.map((project) => (
+                                    <div
+                                        key={project.id}
+                                        className="org-list-item"
                                     >
-                                        {member.username}
-                                    </Link>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )}
-            </section>
+                                        <div>
+                                            <Link
+                                                to={`/projects/${project.slug}`}
+                                                className="org-project-name"
+                                            >
+                                                {project.name}
+                                            </Link>
+
+                                            <p>
+                                                {project.description ??
+                                                    "No project description."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    ) : (
+                        <div className="org-list">
+                            {users.length === 0 ? (
+                                <p className="orgs-empty">
+                                    No members found.
+                                </p>
+                            ) : (
+                                users.map((member) => (
+                                    <div
+                                        key={member.username}
+                                        className="org-list-item"
+                                    >
+                                        <Link
+                                            to={`/users/${member.username}`}
+                                            className="org-member-name"
+                                        >
+                                            {member.username}
+                                        </Link>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </section>
+            </div>
         </main>
     );
 }
