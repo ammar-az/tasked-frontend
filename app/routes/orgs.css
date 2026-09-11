@@ -1,6 +1,7 @@
 .orgs-page {
     width: min(900px, calc(100% - 2rem));
     margin: 2rem auto;
+    height: 100%;
 }
 
 .orgs-page h1 {

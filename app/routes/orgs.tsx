@@ -41,54 +41,56 @@ export default function OrgsPage({
     const { organizations, orgRequest } = loaderData;
 
     return (
-        <main className="orgs-page">
-            <h1>View Organizations</h1>
+        <main className="simple-layout">
+            <div className="orgs-page">
+                <h1>View Organizations</h1>
 
-            <form className="orgs-controls">
-                <input
-                    type="search"
-                    name="search"
-                    placeholder="Search organizations..."
-                    defaultValue={orgRequest.search ?? ""}
-                />
+                <form className="orgs-controls">
+                    <input
+                        type="search"
+                        name="search"
+                        placeholder="Search organizations..."
+                        defaultValue={orgRequest.search ?? ""}
+                    />
 
-                <button
-                    type="submit"
-                    name="descending"
-                    value={orgRequest.descending ? "false" : "true"}
-                    aria-label={
-                        orgRequest.descending
-                            ? "Sort ascending"
-                            : "Sort descending"
-                    }
-                    title={
-                        orgRequest.descending
-                            ? "Sort ascending"
-                            : "Sort descending"
-                    }
-                >
-                    {orgRequest.descending ? "↓" : "↑"}
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        name="descending"
+                        value={orgRequest.descending ? "false" : "true"}
+                        aria-label={
+                            orgRequest.descending
+                                ? "Sort ascending"
+                                : "Sort descending"
+                        }
+                        title={
+                            orgRequest.descending
+                                ? "Sort ascending"
+                                : "Sort descending"
+                        }
+                    >
+                        {orgRequest.descending ? "↓" : "↑"}
+                    </button>
+                </form>
 
-            <section className="orgs-list">
-                {organizations.length === 0 ? (
-                    <p className="orgs-empty">
-                        No organizations found.
-                    </p>
-                ) : (
-                    organizations.map((org) => (
-                        <div className="org-row" key={org.name}>
-                            <Link
-                                to={`/orgs/${org.name}`}
-                                className="org-name"
-                            >
-                                {org.name}
-                            </Link>
-                        </div>
-                    ))
-                )}
-            </section>
+                <section className="orgs-list">
+                    {organizations.length === 0 ? (
+                        <p className="orgs-empty">
+                            No organizations found.
+                        </p>
+                    ) : (
+                        organizations.map((org) => (
+                            <div className="org-row" key={org.name}>
+                                <Link
+                                    to={`/orgs/${org.name}`}
+                                    className="org-name"
+                                >
+                                    {org.name}
+                                </Link>
+                            </div>
+                        ))
+                    )}
+                </section>
+            </div>
         </main>
     );
 }
