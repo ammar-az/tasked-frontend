@@ -368,7 +368,7 @@ export default function MembersPage({
 
                 
                     <nav
-                        className="members-tabs"
+                        className="tabs"
                         aria-label="Project member sections"
                     >
                         <TabButton
@@ -727,8 +727,8 @@ function TabButton({
             type="button"
             className={
                 active
-                    ? "members-tab active"
-                    : "members-tab"
+                    ? "tab active"
+                    : "tab"
             }
             onClick={onClick}
         >

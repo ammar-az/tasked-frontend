@@ -256,6 +256,77 @@ svg {
     line-height: 1;
 }
 
+/* Lists */
+
+.enclosed-list { 
+    min-height: 400px;
+    flex: 1;
+    border: 1px solid var(--border);
+}
+
+.enclosed-list-identity {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+    padding-right: 8rem;
+}
+
+.enclosed-list-name {
+    color: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.enclosed-list-name:hover {
+    text-decoration: underline;
+}
+
+.enclosed-list-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 80px;
+    padding: 1rem 1.25rem;
+
+    border-bottom: 1px solid var(--border);
+}
+
+/* Tabs*/
+
+.tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.tab {
+    min-height: 3rem;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background: var(--surface-hover);
+}
+
+.tab.active {
+    font-weight: bold;
+    box-shadow: inset 0 -3px var(--text);
+}
+
 /* Form groups */
 
 .form {
