@@ -255,7 +255,7 @@ export default function ProfilePage({
                                 >
                                     <div className="enclosed-list-identity">
                                         <Link
-                                            to={`/projects/${task.projectSlug}/task/${task.issueNo}`}
+                                            to={`/projects/${task.projectSlug}/tasks/${task.issueNo}`}
                                             className="enclosed-list-name"
                                         >
                                             {task.title}

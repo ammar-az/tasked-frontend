@@ -38,7 +38,7 @@ export async function clientLoader({
         assigned:url.searchParams.get("assigned")?.trim() || undefined,
         sortBy: parseTodoSort(url.searchParams.get("sort")) ?? TodoSort.IssueNo,
         descending: url.searchParams.get("descending") === "true",
-        page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
+        page: 1,
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
@@ -72,10 +72,19 @@ export default function ProjectPage({
 }: Route.ComponentProps) {
     const {
         project,
-        todos,
+        todos: initialTodos,
         member,
-        todoRequest,
+        todoRequest: initialTodoRequest,
     } = loaderData;
+
+    const [todos, setTodos] = useState(initialTodos);
+    const [todoRequest, setTodoRequest] = useState(
+        initialTodoRequest,
+    );
+    const [hasMore, setHasMore] = useState(
+        initialTodos.length === initialTodoRequest.pageSize,
+    );
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const navigate = useNavigate();
     
@@ -90,6 +99,14 @@ export default function ProjectPage({
         useState<string | null>(
             todos[0]?.id ?? null,
         );
+    
+    useEffect(() => {
+        setTodos(initialTodos);
+        setTodoRequest(initialTodoRequest);
+        setHasMore(
+            initialTodos.length === initialTodoRequest.pageSize,
+        );
+    }, [initialTodos, initialTodoRequest]);
 
     useEffect(() => {
         setSearchInput(todoRequest.search ?? "");
@@ -116,26 +133,17 @@ export default function ProjectPage({
 
     const role = member?.role;
 
-    function updateQueryParameter(
-        name: string,
-        value: string | undefined,
-        resetPage = true,
+   function updateQueryParameter(
+    name: string,
+    value: string | undefined,
     ) {
         setSearchParams((current) => {
-            const next =
-                new URLSearchParams(current);
+            const next = new URLSearchParams(current);
 
-            if (
-                value === undefined ||
-                value === ""
-            ) {
+            if (value === undefined || value === "") {
                 next.delete(name);
             } else {
                 next.set(name, value);
-            }
-
-            if (resetPage) {
-                next.set("page", "1");
             }
 
             return next;
@@ -177,13 +185,38 @@ export default function ProjectPage({
         );
     }
 
-    function changePage(page: number) {
-        updateQueryParameter(
-            "page",
-            String(page),
-            false,
-        );
+    async function loadMore() {
+    if (loadingMore || !hasMore) {
+        return;
     }
+
+    setLoadingMore(true);
+
+    try {
+        const nextPage = todoRequest.page + 1;
+
+        const response = await getProjectTodosEndpoint(params.slug, {
+            ...todoRequest,
+            page: nextPage,
+        });
+
+        setTodos((current) => [
+            ...current,
+            ...response,
+        ]);
+
+        setTodoRequest((current) => ({
+            ...current,
+            page: nextPage,
+        }));
+
+        setHasMore(
+            response.length === todoRequest.pageSize,
+        );
+    } finally {
+        setLoadingMore(false);
+    }
+}
 
     async function handleJoin(){
         await joinEndpoint(project.id);
@@ -197,29 +230,26 @@ export default function ProjectPage({
 
     return (
         <main className="project-page">
-            <section className="project-summary">
+            <section className="project-header">
                 <div className="project-information">
                     <h1>{project.name}</h1>
-
                     <p>
                         {project.description ||
                             "No project description."}
                     </p>
                 </div>
 
-                <div className="project-actions">
-                    <Link
-                        to={`/projects/${params.slug}/members`}
-                    >
+                <aside className="project-actions">
+                    <Link to={`/projects/${params.slug}/members`}>
                         Member List
                     </Link>
 
-                   {canContribute(role) && ( <Link
-                        to={`/projects/${params.slug}/tasks/new`}
-                    >
-                        New Task
-                    </Link>)}
-                    
+                    {canContribute(role) && (
+                        <Link to={`/projects/${params.slug}/tasks/new`}>
+                            New Task
+                        </Link>
+                    )}
+
                     {isAdmin(role) && (
                         <Link to={`/projects/${project.slug}/settings`}>
                             Settings
@@ -227,134 +257,167 @@ export default function ProjectPage({
                     )}
 
                     {isMember(role) ? (
-                        <button onClick={handleLeave}>Leave Project</button>
-                    ) : (project.joinPolicy != JoinPolicy.Closed && (
-                        <button onClick={handleJoin}>Join Project</button>
-                    ))}
-                    
-                </div>
+                        <button type="button" onClick={handleLeave}>
+                            Leave Project
+                        </button>
+                    ) : (
+                        project.joinPolicy !== JoinPolicy.Closed && (
+                            <button type="button" onClick={handleJoin}>
+                                Join Project
+                            </button>
+                        )
+                    )}
+                </aside>
             </section>
 
             <section className="task-workspace">
                 <div className="task-list-panel">
                     <div className="task-toolbar">
-                        <div className="task-search">
+                        <form
+                            className="task-search"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                submitSearch();
+                            }}
+                        >
                             <input
                                 type="search"
                                 value={searchInput}
                                 onChange={(event) =>
-                                    setSearchInput(
-                                        event.target.value,
-                                    )
+                                    setSearchInput(event.target.value)
                                 }
-                                onKeyDown={
-                                    handleSearchKeyDown
-                                }
+                                onKeyDown={handleSearchKeyDown}
                                 placeholder="Search tasks"
                             />
 
                             <button
-                                type="button"
-                                onClick={submitSearch}
+                                type="submit"
+                                aria-label="Search"
+                                title="Search"
                             >
-                                Search
+                                ⌕
                             </button>
-                        </div>
-
-                        <select
-                            value={
-                                todoRequest.status ??
-                                ""
-                            }
-                            onChange={(event) =>
-                                changeStatus(
-                                    event.target.value,
-                                )
-                            }
-                            aria-label="Filter by status"
-                        >
-                            <option value="">
-                                All statuses
-                            </option>
-
-                            <option
-                                value={
-                                    TodoStatus.Backlog
-                                }
-                            >
-                                Backlog
-                            </option>
-
-                            <option
-                                value={
-                                    TodoStatus.InProgress
-                                }
-                            >
-                                In Progress
-                            </option>
-
-                            <option
-                                value={
-                                    TodoStatus.Completed
-                                }
-                            >
-                                Completed
-                            </option>
-
-                            <option
-                                value={
-                                    TodoStatus.Archived
-                                }
-                            >
-                                Archived
-                            </option>
-                        </select>
+                        </form>
 
                         <select
                             value={todoRequest.sortBy}
                             onChange={(event) =>
-                                changeSort(
-                                    event.target.value,
-                                )
+                                changeSort(event.target.value)
                             }
                             aria-label="Sort tasks"
                         >
                             <option value={TodoSort.IssueNo}>
                                 Issue Number
                             </option>
-
                             <option value={TodoSort.Title}>
                                 Title
                             </option>
-
                             <option value={TodoSort.Status}>
                                 Status
                             </option>
                         </select>
 
-                        <select
-                            value={
-                                todoRequest.descending
-                                    ? "descending"
-                                    : "ascending"
+                        <button
+                            type="button"
+                            className="task-sort-direction"
+                            onClick={() =>
+                                changeDescending(!todoRequest.descending)
                             }
-                            onChange={(event) =>
-                                changeDescending(
-                                    event.target.value ===
-                                        "descending",
+                            aria-label={
+                                todoRequest.descending
+                                    ? "Sort ascending"
+                                    : "Sort descending"
+                            }
+                            title={
+                                todoRequest.descending
+                                    ? "Ascending"
+                                    : "Descending"
+                            }
+                        >
+                            {todoRequest.descending ? "↓" : "↑"}
+                        </button>
+                    </div>
+
+                    <nav
+                        className="tabs task-status-tabs"
+                        aria-label="Task status"
+                    >
+                        <button
+                            type="button"
+                            className={
+                                todoRequest.status == null
+                                    ? "tab active"
+                                    : "tab"
+                            }
+                            onClick={() => changeStatus("")}
+                        >
+                            All
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                todoRequest.status === TodoStatus.Backlog
+                                    ? "tab active"
+                                    : "tab"
+                            }
+                            onClick={() =>
+                                changeStatus(
+                                    TodoStatus.Backlog.toString(),
                                 )
                             }
-                            aria-label="Sort direction"
                         >
-                            <option value="descending">
-                                Descending
-                            </option>
+                            Backlog
+                        </button>
 
-                            <option value="ascending">
-                                Ascending
-                            </option>
-                        </select>
-                    </div>
+                        <button
+                            type="button"
+                            className={
+                                todoRequest.status === TodoStatus.InProgress
+                                    ? "tab active"
+                                    : "tab"
+                            }
+                            onClick={() =>
+                                changeStatus(
+                                    TodoStatus.InProgress.toString(),
+                                )
+                            }
+                        >
+                            In Progress
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                todoRequest.status === TodoStatus.Completed
+                                    ? "tab active"
+                                    : "tab"
+                            }
+                            onClick={() =>
+                                changeStatus(
+                                    TodoStatus.Completed.toString(),
+                                )
+                            }
+                        >
+                            Completed
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                todoRequest.status === TodoStatus.Archived
+                                    ? "tab active"
+                                    : "tab"
+                            }
+                            onClick={() =>
+                                changeStatus(
+                                    TodoStatus.Archived.toString(),
+                                )
+                            }
+                        >
+                            Archived
+                        </button>
+                    </nav>
 
                     <div className="task-list-header">
                         <span>#</span>
@@ -362,106 +425,65 @@ export default function ProjectPage({
                         <span>Status</span>
                     </div>
 
-                    <div className="task-list">
+                    <div className="enclosed-list project-task-list">
                         {todos.length > 0 ? (
-                            todos.map(
-                                (todo: TodoDto) => (
-                                    <button
-                                        key={todo.id}
-                                        type="button"
-                                        className={
-                                            selectedTodoId ===
-                                            todo.id
-                                                ? "task-row selected"
-                                                : "task-row"
-                                        }
-                                        onClick={() =>
-                                            setSelectedTodoId(
-                                                todo.id,
-                                            )
-                                        }
-                                    >
-                                        <span>
-                                            #
-                                            {
-                                                todo.issueNo
-                                            }
-                                        </span>
+                            todos.map((todo: TodoDto) => (
+                                <button
+                                    key={todo.id}
+                                    type="button"
+                                    className={
+                                        selectedTodoId === todo.id
+                                            ? "enclosed-list-row project-task-row selected"
+                                            : "enclosed-list-row project-task-row"
+                                    }
+                                    onClick={() =>
+                                        setSelectedTodoId(todo.id)
+                                    }
+                                >
+                                    <span className="project-task-issue">
+                                        #{todo.issueNo}
+                                    </span>
 
-                                        <span>
-                                            {todo.title}
-                                        </span>
+                                    <span className="project-task-title">
+                                        {todo.title}
+                                    </span>
 
-                                        <span>
-                                            {getTodoStatusLabel(
-                                                todo.status,
-                                            )}
-                                        </span>
-                                    </button>
-                                ),
-                            )
+                                    <span className="project-task-status">
+                                        {getTodoStatusLabel(todo.status)}
+                                    </span>
+                                </button>
+                            ))
                         ) : (
                             <div className="task-list-empty">
                                 No matching tasks.
                             </div>
                         )}
+
+                        <button
+                            type="button"
+                            className="project-task-load-more"
+                            disabled={loadingMore || !hasMore}
+                            onClick={loadMore}
+                        >
+                            {loadingMore
+                                ? "Loading..."
+                                : hasMore
+                                ? "Load More"
+                                : "No more tasks"}
+                        </button>
                     </div>
-
-                    <footer className="task-pagination">
-                        <button
-                            type="button"
-                            disabled={
-                                todoRequest.page <= 1
-                            }
-                            onClick={() =>
-                                changePage(
-                                    todoRequest.page -
-                                        1,
-                                )
-                            }
-                        >
-                            Previous
-                        </button>
-
-                        <span>
-                            Page {todoRequest.page}
-                        </span>
-
-                        <button
-                            type="button"
-                            disabled={
-                                todos.length <
-                                todoRequest.pageSize
-                            }
-                            onClick={() =>
-                                changePage(
-                                    todoRequest.page +
-                                        1,
-                                )
-                            }
-                        >
-                            Next
-                        </button>
-                    </footer>
                 </div>
 
-                <div className="selected-task-panel">
+                <aside className="selected-task-panel">
                     {selectedTodo ? (
                         <>
                             <header className="selected-task-heading">
                                 <div>
                                     <span>
-                                        #
-                                        {
-                                            selectedTodo.issueNo
-                                        }
+                                        #{selectedTodo.issueNo}
                                     </span>
 
-                                    <h2>
-                                        {
-                                            selectedTodo.title
-                                        }
-                                    </h2>
+                                    <h2>{selectedTodo.title}</h2>
                                 </div>
 
                                 <Link
@@ -474,8 +496,7 @@ export default function ProjectPage({
                             <div className="selected-task-details">
                                 <span>
                                     Assigned to:{" "}
-                                    {selectedTodo
-                                        .assignedName ??
+                                    {selectedTodo.assignedName ??
                                         "Unassigned"}
                                 </span>
 
@@ -493,11 +514,10 @@ export default function ProjectPage({
                         </>
                     ) : (
                         <div className="no-task-selected">
-                            Select a task to view its
-                            details.
+                            Select a task to view its details.
                         </div>
                     )}
-                </div>
+                </aside>
             </section>
         </main>
     );

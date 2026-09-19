@@ -55,9 +55,6 @@
     border-bottom: 1px solid var(--border);
 }
 
-.org-row:last-child {
-    border-bottom: none;
-}
 
 .org-name {
     font-weight: 500;
