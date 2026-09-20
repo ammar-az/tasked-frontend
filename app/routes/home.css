@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     min-height: 520px;
-    padding: 5rem 0;
+    padding: 2rem 0;
     text-align: center;
 }
 
@@ -97,7 +97,7 @@
 /* Feature gallery */
 
 .home-feature-section {
-    padding: 4rem 0;
+    padding: 2rem 0;
 }
 
 .home-feature-gallery {

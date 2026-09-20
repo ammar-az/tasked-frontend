@@ -18,7 +18,7 @@ const features = [
     {
         title: "Projects",
         description:
-            "Organize your work into projects, keep tasks together, and control who can participate.",
+            "pretty important stuff should let em know",
         link: "/projects",
         linkText: "Explore Projects",
     },
@@ -32,14 +32,14 @@ const features = [
     {
         title: "Collaboration",
         description:
-            "Work together with different project roles, invitations, assignments, and permissions.",
+            "Nah no way this page makes the cut lmao",
         link: "/orgs",
         linkText: "Explore Organizations",
     },
     {
         title: "Organizations",
         description:
-            "Bring people and projects together under an organization and manage your team's work in one place.",
+            "Well it's a proof of concept but you know how it is :P",
         link: "/orgs",
         linkText: "View Organizations",
     },
@@ -49,18 +49,18 @@ const showcaseProjects = [
     {
         name: "Tasked Development",
         description:
-            "The project used to build Tasked itself, from the initial API to the finished application.",
+            "Project chronicling ",
         taskCount: 47,
         memberCount: 1,
         link: "/projects/tasked-development",
     },
     {
-        name: "Game Development",
+        name: "Collaborative Development",
         description:
             "A sample collaborative project demonstrating tasks, assignments, project roles, and organization membership.",
         taskCount: 32,
         memberCount: 8,
-        link: "/projects/game-development",
+        link: "/projects/teamwork-demo",
     },
     {
         name: "Explore Tasked",
@@ -121,7 +121,7 @@ export default function HomePage() {
                                     Log In
                                 </Link>
                             </>
-                        )}
+                        )}  
                     </div>
                 </div>
             </section>
@@ -129,7 +129,7 @@ export default function HomePage() {
             <section className="home-feature-section">
                 <div className="home-section-heading">
                     <span>WHAT YOU CAN DO</span>
-                    <h2>Everything revolves around your projects.</h2>
+                    <h2>Discover Tasked.</h2>
                 </div>
 
                 <div className="home-feature-gallery">
@@ -187,7 +187,7 @@ export default function HomePage() {
 
             <section className="home-showcase">
                 <div className="home-section-heading">
-                    <span>PUBLIC PROJECTS</span>
+                    <span>DEMO PROJECTS</span>
                     <h2>See Tasked in action.</h2>
                     <p>
                         Explore a few projects built to demonstrate
