@@ -1,30 +1,33 @@
 :root {
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     line-height: 1.5;
     font-weight: 400;
-
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
+    /* Colors */
     --background: #242424;
     --surface: #2d2d2d;
     --surface-hover: #373737;
+
     --text: rgba(255, 255, 255, 0.87);
     --muted-text: rgba(255, 255, 255, 0.65);
+
     --border: rgba(255, 255, 255, 0.3);
+
     --input-background: #1a1a1a;
     --button-background: #1a1a1a;
 
-    --link: #646cff;
-    --link-hover: #747bff;
-    --focus: #646cff;
+    --link: #7b8cff;
+    --link-hover: #929fff;
+    --focus: #7b8cff;
+
+    --danger: #c94b4b;
+    --danger-hover: #e15b5b;
 }
 
 *,
@@ -42,6 +45,7 @@ body {
     min-width: 320px;
     min-height: 100vh;
     margin: 0;
+
     background: var(--background);
     color: var(--text);
 }
@@ -79,6 +83,16 @@ button:disabled {
     opacity: 0.55;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
 input,
 select,
 textarea {
@@ -104,16 +118,6 @@ a:hover {
     text-decoration: underline;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-summary:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-}
-
 h1,
 h2,
 h3,
@@ -133,33 +137,308 @@ svg {
     max-width: 100%;
 }
 
-fieldset {
-    min-width: 0;
+/* Page layout */
+
+.simple-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 93vh; /* should be same as page layout when navbar done*/
 }
 
-table {
-    border-collapse: collapse;
+.page-layout {
+    display: flex;
+    width: 100%;
+    height: 93vh;
+    /*min-height: calc(100vh - var(--navbar-height));*/
 }
 
-@media (prefers-color-scheme: light) {
-    :root {
-        color: #213547;
-        background-color: #ffffff;
-
-        --background: #ffffff;
-        --surface: #f4f4f4;
-        --surface-hover: #e9e9e9;
-        --text: #213547;
-        --muted-text: #66717c;
-        --border: rgba(33, 53, 71, 0.35);
-        --input-background: #ffffff;
-        --button-background: #f9f9f9;
-
-        --link: #646cff;
-        --link-hover: #535bf2;
-        --focus: #646cff;
-    }
+.page-side {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 2rem;
 }
+
+.page-main {
+    display: flex;
+    flex-direction: column;
+    width: min(700px, calc(100% - 2rem));
+    margin: 1.5rem auto;
+}
+
+.page-main-narrow{
+    width: max(300px, 15%);
+    align-items: center;
+}
+
+.page-main-wide {
+    width: min(90%, 800px);
+}
+
+.page-main-project {
+    width: min(90%, 1400px);
+}
+
+/* Generic panels */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+
+    border: 1px solid var(--border);
+}
+
+.panel h2,
+.panel h3 {
+    margin: 0;
+}
+
+.panel p {
+    margin: 0.4rem 0 0;
+    color: var(--muted-text);
+}
+
+.panel-danger {
+    border-color: var(--danger);
+}
+
+/* Buttons */
+
+.danger-button {
+    border-color: var(--danger);
+    align-self: flex-end;
+}
+
+.danger-button:hover:not(:disabled) {
+    border-color: var(--danger-hover);
+}
+
+.submit-button {
+    min-height: 4.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.submit-button:disabled{
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: inherit;
+    font-size: 1.5rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.back-button:hover {
+    text-decoration: underline;
+}
+
+.back-button span {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+/* Lists */
+
+.enclosed-list { 
+    min-height: 400px;
+    flex: 1;
+    border: 1px solid var(--border);
+}
+
+.enclosed-list-identity {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: 100%;
+    padding-right: 8rem;
+}
+
+.enclosed-list-name {
+    color: inherit;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.enclosed-list-name:hover {
+    text-decoration: underline;
+}
+
+.enclosed-list-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 80px;
+    padding: 1rem 1.25rem;
+
+    border-bottom: 1px solid var(--border);
+}
+
+/* Tabs*/
+
+.tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.tab {
+    min-height: 3rem;
+    padding: 0.6rem 1.1rem;
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tab:hover {
+    background: var(--surface-hover);
+}
+
+.tab.active {
+    font-weight: bold;
+    box-shadow: inset 0 -3px var(--text);
+}
+
+/* Form groups */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+}
+
+.form h1 {
+    margin: 0;
+    text-align: center;
+}
+
+.form-name,
+.form-description {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-name input,
+.form-description textarea {
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid;
+    background: none;
+    color: inherit;
+    font: inherit;
+}
+
+.form-name input {
+    min-height: 3.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.2rem;
+}
+
+.form-description textarea {
+    min-height: 270px;
+    padding: 1rem;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-option-group {
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: grid;
+}
+
+.form-option-group legend {
+    margin-bottom: 0.6rem;
+    font-weight: bold;
+    grid-column: 1 / -1;
+}
+
+.form-option-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.form-option-group label:has(input:disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.form-option-group-2 {
+    align-self: flex-start;
+    grid-template-columns: repeat(2, auto);
+    column-gap: 1.5rem;
+}
+
+.form-option-group-4 {
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+}
+
+.form-option-group-4 legend{
+    padding-right: 0.5rem;
+}
+
+/* Status messages */
+
+.message,
+.error {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+}
+
+.message {
+    background: var(--surface);
+}
+
+.error {
+    border-color: var(--danger);
+}
+
+/* Accessibility / motion */
 
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -169,5 +448,28 @@ table {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: #ffffff;
+        --surface: #f4f4f4;
+        --surface-hover: #e9e9e9;
+
+        --text: #213547;
+        --muted-text: #66717c;
+
+        --border: rgba(33, 53, 71, 0.35);
+
+        --input-background: #ffffff;
+        --button-background: #f9f9f9;
+
+        --link: #5369d9;
+        --link-hover: #4358c5;
+        --focus: #5369d9;
+
+        --danger: #b44747;
+        --danger-hover: #c94b4b;
     }
 }

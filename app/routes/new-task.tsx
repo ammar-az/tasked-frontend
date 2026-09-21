@@ -60,17 +60,19 @@ export default function NewTaskPage({
     }
 
     return (
-        <main className="task-page">
-            <Link
-                to={`/projects/${params.slug}`}
-                className="task-back-link"
-            >
-                <span aria-hidden="true">←</span>
-                Back to project
-            </Link>
+        <main className="page-layout task-page">
+            <aside className="page-side">
+                <Link
+                    to={`/projects/${params.slug}`}
+                    className="back-button"
+                >
+                    <span aria-hidden="true">←</span>
+                    Back to project
+                </Link>
+            </aside>
 
             <form
-                className="task-page-layout"
+                className="page-main-wide task-page-form"
                 onSubmit={handleSubmit}
             >
                 <article className="task-card">
@@ -85,9 +87,7 @@ export default function NewTaskPage({
                                 type="text"
                                 value={title}
                                 onChange={(event) =>
-                                    setTitle(
-                                        event.target.value,
-                                    )
+                                    setTitle(event.target.value)
                                 }
                                 placeholder="Task title"
                                 maxLength={200}
@@ -104,9 +104,7 @@ export default function NewTaskPage({
                             className="task-description-input"
                             value={description}
                             onChange={(event) =>
-                                setDescription(
-                                    event.target.value,
-                                )
+                                setDescription(event.target.value)
                             }
                             placeholder="Describe the task"
                             maxLength={4000}
@@ -115,7 +113,7 @@ export default function NewTaskPage({
 
                     <footer className="task-edit-footer">
                         {error && (
-                            <p className="task-edit-error">
+                            <p className="error">
                                 {error}
                             </p>
                         )}
@@ -144,10 +142,10 @@ export default function NewTaskPage({
                 </article>
 
                 <aside className="task-sidebar">
-                    <section className="task-sidebar-section">
+                    <section className="panel">
                         <h2>Task Information</h2>
 
-                        <label className="new-task-field">
+                        <label className="form-group">
                             <span>Status</span>
 
                             <select
@@ -155,47 +153,37 @@ export default function NewTaskPage({
                                 onChange={(event) =>
                                     setStatus(
                                         Number(
-                                            event.target
-                                                .value,
+                                            event.target.value,
                                         ) as TodoStatus,
                                     )
                                 }
                             >
-                                <option
-                                    value={
-                                        TodoStatus.Backlog
-                                    }
-                                >
+                                <option value={TodoStatus.Backlog}>
                                     Backlog
                                 </option>
-
-                                <option
-                                    value={
-                                        TodoStatus.InProgress
-                                    }
-                                >
+                                <option value={TodoStatus.InProgress}>
                                     In Progress
                                 </option>
                             </select>
                         </label>
 
-                        <label className="new-task-checkbox">
+                        <label className="form-checkbox">
                             <input
                                 type="checkbox"
                                 checked={assignToSelf}
                                 onChange={(event) =>
                                     setAssignToSelf(
-                                        event.target
-                                            .checked,
+                                        event.target.checked,
                                     )
                                 }
                             />
-
-                            Assign this task to me
+                            <span>Assign this task to me</span>
                         </label>
                     </section>
                 </aside>
             </form>
+
+            <aside className="page-side" />
         </main>
     );
 }

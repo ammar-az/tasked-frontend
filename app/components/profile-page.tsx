@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import "./profile.css";
 import { MemberOverviewDto } from "../types/membership-types";
@@ -62,7 +62,6 @@ export default function ProfilePage({
     data,
     isOwnProfile,
 }: ProfilePageProps) {
-    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [showInvite, setShowInvite] = useState(false);
 
@@ -91,9 +90,8 @@ export default function ProfilePage({
     }
 
     return (
-        <main className="profile-page">
-
-            {showInvite && (
+    <main className="profile-page">
+        {showInvite && (
             <InviteProjectModal
                 userId={data.user.id}
                 onClose={() => setShowInvite(false)}
@@ -104,252 +102,226 @@ export default function ProfilePage({
                     );
                 }}
             />
-            )}
+        )}
 
-            <section className="profile-header">
-                <button
-                    type="button"
-                    className="profile-back-button"
-                    onClick={() => navigate(-1)}
-                    aria-label="Go back"
-                >
-                    ←
-                </button>
+        <section className="profile-header">
+            <div
+                className="profile-avatar"
+                aria-label={`${data.user.username}'s profile picture`}
+            >
+                {initials}
+            </div>
 
-                <div
-                    className="profile-avatar"
-                    aria-label={`${data.user.username}'s profile picture`}
-                >
-                    {initials}
-                </div>
+            <div className="profile-identity">
+                <h1>{data.user.username}</h1>
 
-                <div className="profile-identity">
-                    <h1>{data.user.username}</h1>
+                <div className="profile-organization">
+                    <span aria-hidden="true">♧</span>
 
-                    <div className="profile-organization">
-                        <span aria-hidden="true">♧</span>
-                        {data.user.orgName !== null 
-                        ?   
-                            <Link
-                                    to={`/orgs/${data.user.orgName}`}
-                                    className="org-name"
-                                >
-                                    {data.user.orgName}
-                            </Link>
-                        : "No organization"}
-                    </div>
-                </div>
-
-                <div className="profile-primary-action">
-                    {isOwnProfile ? (
+                    {data.user.orgName !== null ? (
                         <Link
-                            to="/account/edit"
-                            className="profile-action-button"
+                            to={`/orgs/${data.user.orgName}`}
+                            className="org-name"
                         >
-                            Edit Account
+                            {data.user.orgName}
                         </Link>
                     ) : (
-                        <button
-                            type="button"
-                            onClick={() => setShowInvite(true)}
-                            className="profile-action-button"
-                            disabled={!data.canInviteToProject}
-                        >
-                            Invite to a Project
-                        </button>
+                        "No organization"
                     )}
                 </div>
-            </section>
-
-            <section className="profile-content">
-                <nav
-                    className="profile-tabs"
-                    aria-label="Profile sections"
-                >
-                    {availableTabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            type="button"
-                            className={
-                                activeTab === tab.id
-                                    ? "profile-tab active"
-                                    : "profile-tab"
-                            }
-                            onClick={() => changeTab(tab.id)}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                </nav>
-
-                <div className="profile-tab-content">
-                    {activeTab === "owned" && (
-                        <ProjectList
-                            projects={data.ownedProjects}
-                            emptyMessage="This user does not own any visible projects."
-                        />
-                    )}
-
-                    {activeTab === "memberships" && (
-                        <ProjectList
-                            projects={data.memberships}
-                            emptyMessage="This user has no visible project memberships."
-                        />
-                    )}
-
-                    {activeTab === "tasks" && isOwnProfile && (
-                        <AssignedTaskList
-                            tasks={data.assignedTasks}
-                        />
-                    )}
-
-                    {activeTab === "invites" && isOwnProfile && (
-                        <InviteList invites={data.invites} />
-                    )}
-                </div>
-            </section>
-        </main>
-    );
-}
-
-function ProjectList({
-    projects,
-    emptyMessage,
-}: {
-    projects: MemberOverviewDto[];
-    emptyMessage: string;
-}) {
-    if (projects.length === 0) {
-        return (
-            <div className="profile-empty-state">
-                {emptyMessage}
             </div>
-        );
-    }
 
-    return (
-        <div className="profile-project-list">
-            {projects.map((project) => (
-                <article
-                    key={project.projectId}
-                    className="profile-project-card"
-                >
-                    <div className="profile-project-heading">
-                        <div>
-                            <Link
-                                to={`/projects/${project.projectSlug}`}
-                                className="profile-project-name"
-                            >
-                                {project.projectName}
-                            </Link>
-
-                            {project.orgname && (
-                                <span className="profile-project-org">
-                                    <span aria-hidden="true">♧</span>
-                                    {project.orgname}
-                                </span>
-                            )}
-                        </div>
-
-                        <span className="profile-project-role">
-                            {getMemberRoleLabel(project.role)}
-                        </span>
-                    </div>
-
-                    <p className="profile-project-description">
-                        {project.projectDesc ??
-                            "No project description."}
-                    </p>
-                </article>
-            ))}
-        </div>
-    );
-}
-
-function AssignedTaskList({
-    tasks,
-}: {
-    tasks: TodoDto[];
-}) {
-    if (tasks.length === 0) {
-        return (
-            <div className="profile-empty-state">
-                You have no assigned tasks.
+            <div className="profile-primary-action">
+                {isOwnProfile ? (
+                    <Link
+                        to="/account/edit"
+                        className="profile-action-button"
+                    >
+                        Edit Account
+                    </Link>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={() => setShowInvite(true)}
+                        className="profile-action-button"
+                        disabled={!data.canInviteToProject}
+                    >
+                        Invite to a Project
+                    </button>
+                )}
             </div>
-        );
-    }
+        </section>
 
-    return (
-        <div className="profile-task-list">
-            {tasks.map((task) => (
-                <Link
-                    key={task.id}
-                    to={`/projects/${task.projectSlug}/tasks/${task.issueNo}`}
-                    className="profile-task-card"
-                >
-                    <div className="profile-task-heading">
-                        <span>
-                            #{task.issueNo} {task.title}
-                        </span>
+        <section className="profile-content">
+            <nav
+                className="tabs"
+                aria-label="Profile sections"
+            >
+                {availableTabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        className={
+                            activeTab === tab.id
+                                ? "tab active"
+                                : "tab"
+                        }
+                        onClick={() => changeTab(tab.id)}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </nav>
 
-                        <span>
-                            {getTodoStatusLabel(task.status)}
-                        </span>
-                    </div>
+            <div className="profile-tab-content">
+                {activeTab === "owned" && (
+                    <div className="enclosed-list">
+                        {data.ownedProjects.length > 0 ? (
+                            data.ownedProjects.map((project) => (
+                                <article
+                                    key={project.projectId}
+                                    className="enclosed-list-row"
+                                >
+                                    <div className="enclosed-list-identity">
+                                        <Link
+                                            to={`/projects/${project.projectSlug}`}
+                                            className="enclosed-list-name"
+                                        >
+                                            {project.projectName}
+                                        </Link>
 
-                    <span className="profile-task-project">
-                        {task.projectName}
-                    </span>
-                </Link>
-            ))}
-        </div>
-    );
-}
+                                        <span className="profile-list-label">
+                                            {getMemberRoleLabel(project.role)}
+                                        </span>
 
-function InviteList({
-    invites,
-}: {
-    invites: MemberOverviewDto[];
-}) {
-    if (invites.length === 0) {
-        return (
-            <div className="profile-empty-state">
-                You have no pending project invites.
-            </div>
-        );
-    }
-
-    return (
-        <div className="profile-invite-list">
-            {invites.map((invite) => (
-                <article
-                    key={invite.projectId}
-                    className="profile-invite-card"
-                >
-                    <div>
-                        <Link
-                            to={`/projects/${invite.projectSlug}`}
-                            className="profile-project-name"
-                        >
-                            {invite.projectName}
-                        </Link>
-
-                        {invite.orgname && (
-                            <p>{invite.orgname}</p>
+                                        <span className="enclosed-list-description">
+                                            {project.projectDesc ?? "No description."}
+                                        </span>
+                                    </div>
+                                    <span className="profile-list-label">
+                                        {getMemberRoleLabel(project.role)}
+                                    </span>
+                                </article>
+                            ))
+                        ) : (
+                            <div className="profile-empty-state">
+                                This user owns no visible projects.
+                            </div>
                         )}
                     </div>
+                )}
 
-                    <div className="profile-invite-actions">
-                        <button type="button">
-                            Decline
-                        </button>
+                {activeTab === "memberships" && (
+                    <div className="enclosed-list">
+                        {data.memberships.length > 0 ? (
+                            data.memberships.map((project) => (
+                                <article
+                                    key={project.projectId}
+                                    className="enclosed-list-row"
+                                >
+                                    <div className="enclosed-list-identity">
+                                        <Link
+                                            to={`/projects/${project.projectSlug}`}
+                                            className="enclosed-list-name"
+                                        >
+                                            {project.projectName}
+                                        </Link>
 
-                        <button type="button">
-                            Accept
-                        </button>
+                                        <span className="profile-list-label">
+                                            {getMemberRoleLabel(project.role)}
+                                        </span>
+
+                                        <span className="enclosed-list-description">
+                                            {project.projectDesc ?? "No description"}
+                                        </span>
+                                    </div>
+                                </article>
+                            ))
+                        ) : (
+                            <div className="profile-empty-state">
+                                This user has no visible project memberships.
+                            </div>
+                        )}
                     </div>
-                </article>
-            ))}
-        </div>
-    );
+                )}
+
+                {activeTab === "tasks" && isOwnProfile && (
+                    <div className="enclosed-list">
+                        {data.assignedTasks.length > 0 ? (
+                            data.assignedTasks.map((task) => (
+                                <article
+                                    key={task.id}
+                                    className="enclosed-list-row"
+                                >
+                                    <div className="enclosed-list-identity">
+                                        <Link
+                                            to={`/projects/${task.projectSlug}/tasks/${task.issueNo}`}
+                                            className="enclosed-list-name"
+                                        >
+                                            {task.title}
+                                        </Link>
+
+                                        <span className="profile-list-label">
+                                            {getTodoStatusLabel(task.status)}
+                                        </span>
+
+                                        <span className="enclosed-list-description">
+                                            {task.description ?? "..."}
+                                        </span>
+                                    </div>
+                                </article>
+
+
+                            ))
+                        ) : (
+                            <div className="profile-empty-state">
+                                You have no assigned tasks.
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === "invites" && isOwnProfile && (
+                    <div className="enclosed-list">
+                        {data.invites.length > 0 ? (
+                            data.invites.map((invite) => (
+                                <article
+                                    key={invite.projectId}
+                                    className="enclosed-list-row"
+                                >
+                                    <div className="enclosed-list-identity">
+                                        <Link
+                                            to={`/projects/${invite.projectSlug}`}
+                                            className="enclosed-list-name"
+                                        >
+                                            {invite.projectName}
+                                        </Link>
+
+                                        {/* <span className="enclosed-list-secondary">
+                                            {invite.message}
+                                        </span> */}
+                                    </div>
+
+                                    <div className="profile-invite-actions">
+                                        <button type="button">
+                                            Accept
+                                        </button>
+                                        <button type="button">
+                                            Decline
+                                        </button>
+                                    </div>
+                                </article>
+                            ))
+                        ) : (
+                            <div className="profile-empty-state">
+                                You have no pending project invites.
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </section>
+    </main>
+);
 }
+

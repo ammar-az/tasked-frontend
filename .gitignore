@@ -198,5 +198,7 @@ dist
 .dev.vars*
 !.dev.vars.example
 
+# Other
+*.txt
 .react-router/
 build/

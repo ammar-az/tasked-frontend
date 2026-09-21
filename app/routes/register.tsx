@@ -7,16 +7,19 @@ export default function RegisterPage({}: Route.ComponentProps) {
     const {register, isAuthenticated} = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    
+    const [error, setError] = useState<string | null>(null);
+
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try{
+            if(username == "" || password == "") throw new Error;
+
             await register(username, password);
             navigate("/");
         }catch{
-            console.log("Couldn't register. Make an error UI for this twin.");
+            setError("Could not register. Ensure a valid username and password have been entered and that the username is not taken.");
         }
     }
 
@@ -27,45 +30,35 @@ export default function RegisterPage({}: Route.ComponentProps) {
     });
 
     return (
-        <main
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "100vh",
-            }}
-        >
-            <form onSubmit={handleSubmit}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1rem",
-                    width: "300px",
-                }}
-            >
-                <h1>Register</h1>
+        <main className = "simple-layout">
+            <div className = "page-main-narrow">
+                <form onSubmit={handleSubmit} className = "form">
+                    <h1>Register</h1>
 
-                <input
-                    type="text"
-                    placeholder="Username"
-                    autoComplete="username"
-                    onChange={(e) => setUsername(e.target.value)} 
-                />
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        autoComplete="username"
+                        onChange={(e) => setUsername(e.target.value)} 
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    onChange={(e) => setPassword(e.target.value)} 
-                />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        autoComplete="current-password"
+                        onChange={(e) => setPassword(e.target.value)} 
+                    />
 
-                <button type="submit">Register</button>
+                    {error && (<p className="error">{error}</p>)} 
 
-                <p>
-                    Already have an account?{" "}
-                    <Link to="/login">Login here</Link>
-                </p>
-            </form>
+                    <button type="submit">Register</button>
+
+                    <p>
+                        Already have an account?{" "}
+                        <Link to="/login">Login here</Link>
+                    </p>
+                </form>
+            </div>
         </main>
     );
 }
