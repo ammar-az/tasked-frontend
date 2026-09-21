@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/home";
-import { useAuth } from "../auth/AuthContext";
 import "./home.css";
+import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
     return [
@@ -18,7 +18,7 @@ const features = [
     {
         title: "Projects",
         description:
-            "pretty important stuff should let em know",
+            "pretty important stuff should let em know. Let's see how longer descriptions look. pretty important stuff should let em know. Let's see how longer descriptions look pretty important stuff should let em know. Let's see how longer descriptions look pretty important stuff should let em know. Let's see how longer descriptions look",
         link: "/projects",
         linkText: "Explore Projects",
     },
@@ -30,20 +30,32 @@ const features = [
         linkText: "View Tasks",
     },
     {
-        title: "Collaboration",
+        title: "Accounts",
         description:
             "Nah no way this page makes the cut lmao",
-        link: "/orgs",
-        linkText: "Explore Organizations",
+        link: "/myaccount",
+        linkText: "View your account",
     },
     {
         title: "Organizations",
         description:
             "Well it's a proof of concept but you know how it is :P",
         link: "/orgs",
-        linkText: "View Organizations",
+        linkText: "Explore Organizations",
     },
 ];
+
+const slides = [
+    {
+        type: "intro" as const,
+        title: "Tasked",
+    },
+    ...features.map((feature) => ({
+        type: "feature" as const,
+        ...feature,
+    })),
+];
+
 
 const showcaseProjects = [
     {
@@ -73,119 +85,148 @@ const showcaseProjects = [
 ];
 
 export default function HomePage() {
-    const { isAuthenticated } = useAuth();
+
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    function goToSlide(index: number) {
+        const nextIndex = (index + slides.length) % slides.length;
+
+        if (nextIndex === currentSlide || isAnimating) {
+            return;
+        }
+
+        setIsAnimating(true);
+        setCurrentSlide(nextIndex);
+
+        window.setTimeout(() => {
+            setIsAnimating(false);
+        }, 300);
+    }
+
+    function nextSlide() {
+        goToSlide(currentSlide + 1);
+    }
+
+    function previousSlide() {
+        goToSlide(currentSlide - 1);
+    }
+
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "ArrowLeft") {
+                previousSlide();
+            } else if (event.key === "ArrowRight") {
+                nextSlide();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [currentSlide, isAnimating]);
+
+    useEffect(() => {
+        const timer = window.setInterval(() => {
+            setCurrentSlide((current) => (current + 1) % slides.length);
+        }, 30000);
+
+        return () => window.clearInterval(timer);
+    }, []);
 
     return (
         <main className="home-page">
-            <section className="home-hero">
-                <div className="home-hero-content">
-                    <p className="home-eyebrow">TASK MANAGEMENT</p>
-
-                    <h1>Projects without the clutter.</h1>
-
-                    <p className="home-hero-description">
-                        Tasked brings projects, tasks, and collaboration
-                        together in one place.
-                    </p>
-
-                    <div className="home-hero-actions">
-                        {isAuthenticated ? (
-                            <>
-                                <Link
-                                    to="/create"
-                                    className="home-primary-button"
-                                >
-                                    Create a Project
-                                </Link>
-
-                                <Link
-                                    to="/myaccount"
-                                    className="home-secondary-button"
-                                >
-                                    My Account
-                                </Link>
-                            </>
-                        ) : (
-                            <>
-                                <Link
-                                    to="/register"
-                                    className="home-primary-button"
-                                >
-                                    Get Started
-                                </Link>
-
-                                <Link
-                                    to="/login"
-                                    className="home-secondary-button"
-                                >
-                                    Log In
-                                </Link>
-                            </>
-                        )}  
-                    </div>
-                </div>
-            </section>
+            
 
             <section className="home-feature-section">
-                <div className="home-section-heading">
-                    <span>WHAT YOU CAN DO</span>
-                    <h2>Discover Tasked.</h2>
-                </div>
-
                 <div className="home-feature-gallery">
                     <button
                         type="button"
                         className="home-gallery-arrow"
                         aria-label="Previous feature"
+                        onClick={previousSlide}
                     >
                         ←
                     </button>
 
-                    <article className="home-feature-panel">
-                        <span className="home-feature-number">
-                            01 / 04
-                        </span>
+                    <article
+                        key={currentSlide}
+                        className={`home-feature-panel home-feature-panel-animated ${slides[currentSlide].type === "intro" ? "home-intro-panel" : ""}`}
+                    >
+                        {slides[currentSlide].type === "intro" ? (
+                            <>
+                                <div className="home-intro-content">
+                                    <p className="home-eyebrow">TASK MANAGEMENT</p>
 
-                        <div className="home-feature-content">
-                            <h3>{features[0].title}</h3>
+                                    <h1>Projects but better.</h1>
 
-                            <p>{features[0].description}</p>
+                                    <p className="home-hero-description">
+                                        Tasked brings projects, tasks, and collaboration
+                                        together in one place. 
+                                    </p>
+                                </div>
 
-                            <Link to={features[0].link}>
-                                {features[0].linkText} →
-                            </Link>
-                        </div>
+                                <button
+                                    type="button"
+                                    className="home-intro-link"
+                                    onClick={() =>
+                                        document
+                                            .getElementById("home-showcase")
+                                            ?.scrollIntoView({ behavior: "smooth" })
+                                    }
+                                >
+                                    See more of Tasked
+                                    <span aria-hidden="true">↓</span>
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <div className="home-feature-title">
+                                    <h3>{slides[currentSlide].title}</h3>
+                                </div>
+
+                                <div className="home-feature-description">
+                                    <p>{slides[currentSlide].description}</p>
+
+                                    <Link to={slides[currentSlide].link}>
+                                        {slides[currentSlide].linkText} →
+                                    </Link>
+                                </div>
+                            </>
+                        )}
                     </article>
 
                     <button
                         type="button"
                         className="home-gallery-arrow"
                         aria-label="Next feature"
+                        onClick={nextSlide}
                     >
                         →
                     </button>
                 </div>
 
-                <div
-                    className="home-gallery-dots"
-                    aria-label="Feature slides"
-                >
-                    {features.map((feature, index) => (
+                <div className="home-gallery-dots" aria-label="Feature slides">
+                    {slides.map((slide, index) => (
                         <button
-                            key={feature.title}
+                            key={slide.title}
                             type="button"
                             className={
-                                index === 0
+                                index === currentSlide
                                     ? "home-gallery-dot active"
                                     : "home-gallery-dot"
                             }
-                            aria-label={`Show ${feature.title}`}
+                            aria-label={`Show ${slide.title}`}
+                            aria-current={index === currentSlide ? "true" : undefined}
+                            onClick={() => goToSlide(index)}
                         />
                     ))}
                 </div>
             </section>
 
-            <section className="home-showcase">
+            <section id="home-showcase" className="home-showcase">
                 <div className="home-section-heading">
                     <span>DEMO PROJECTS</span>
                     <h2>See Tasked in action.</h2>
