@@ -42,8 +42,8 @@ export async function clientLoader({
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    try
-    {    const [project, todos, member] = await Promise.all([
+    try {    
+        const [project, todos, member] = await Promise.all([
             getProjectEndpoint(params.slug),
 
             getProjectTodosEndpoint(
@@ -59,7 +59,7 @@ export async function clientLoader({
             member,
             todoRequest,
         };
-    }catch{
+    } catch {
         throw new Response("This project doesn't exist or you don't have permission to view it.", {
             status: 404,
         });

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import type { Route } from "./+types/register";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function RegisterPage({}: Route.ComponentProps) {
     const {register, isAuthenticated} = useAuth();
@@ -14,12 +15,23 @@ export default function RegisterPage({}: Route.ComponentProps) {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try{
-            if(username == "" || password == "") throw new Error;
+            if(username == "" || password == ""){
+                setError("Username and password are required.");
+                return;
+            } 
 
             await register(username, password);
             navigate("/");
-        }catch{
-            setError("Could not register. Ensure a valid username and password have been entered and that the username is not taken.");
+        }catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Registration failed.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         }
     }
 

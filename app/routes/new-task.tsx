@@ -6,6 +6,7 @@ import { TodoStatus, TodoRequest } from "../types/todo-types";
 import { createTodoEndpoint } from "../api/todos";
 
 import "./task.css";
+import axios from "axios";
 
 export default function NewTaskPage({
     params,
@@ -52,8 +53,16 @@ export default function NewTaskPage({
             navigate(`/projects/${params.slug}/tasks/${createdTodo.issueNo}`);
             
             console.log("Create task:", request);
-        } catch {
-            setError("The task could not be created.");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Could not create task.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         } finally {
             setIsSubmitting(false);
         }

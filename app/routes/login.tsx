@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import type { Route } from "./+types/login";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function LoginPage({}: Route.ComponentProps) {
     const {login, isAuthenticated} = useAuth();
@@ -13,12 +14,23 @@ export default function LoginPage({}: Route.ComponentProps) {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try{
-            if(username == "" || password == "") throw new Error;
+            if(username == "" || password == ""){
+                setError("Username and password are required.");
+                return;
+            } 
 
             await login(username, password);
             navigate("/");
-        }catch{
-            setError("Could not log in. Ensure the username and password are both correct.");
+        }catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Login failed.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         }
     }
 

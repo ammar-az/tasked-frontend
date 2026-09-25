@@ -5,6 +5,7 @@ import { createProjectEndpoint } from "../api/projects";
 import { useAuth } from "../auth/AuthContext";
 
 import "./create.css";
+import axios from "axios";
 
 export default function CreateProjectPage() {
     const navigate = useNavigate();
@@ -55,8 +56,16 @@ export default function CreateProjectPage() {
             navigate(`/projects/${project.slug}`);
             
             console.log("Create project:", request);
-        } catch {
-            setError("The project could not be created.");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Project creation failed.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         } finally {
             setIsSubmitting(false);
         }
