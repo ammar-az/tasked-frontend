@@ -256,7 +256,6 @@ export default function MembersPage({
         
         switch (action){
             case "admin":
-                //check if owner
                 await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Admin});
                 break;
             case "contributor":
@@ -278,7 +277,6 @@ export default function MembersPage({
                 break;
         }
 
-        console.log(action, member);
         await revalidator.revalidate();
     }
 

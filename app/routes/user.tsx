@@ -51,7 +51,6 @@ export async function clientLoader({
         assignedTasks: [],
         invites: [],
 
-        // Check for admin of project, create dropdown etc?
         canInviteToProject: true,
     };
 }

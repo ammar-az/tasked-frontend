@@ -122,11 +122,6 @@ export default function TaskPage({
             description: current.description?.trim(),
         }))
 
-        // if (!title) {
-        //     setError("A task title is required.");
-        //     return;
-        // }
-
         try {
             setError(null);
             
@@ -138,7 +133,7 @@ export default function TaskPage({
             setTask(updatedTodo);
             
         } catch {
-            setError("The task could not be created.");
+            setError("The task could not be updated.");
         } finally {
             setIsEditing(false);
         }

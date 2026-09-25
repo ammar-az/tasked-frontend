@@ -297,9 +297,6 @@ export default function ProfilePage({
                                             {invite.projectName}
                                         </Link>
 
-                                        {/* <span className="enclosed-list-secondary">
-                                            {invite.message}
-                                        </span> */}
                                     </div>
 
                                     <div className="profile-invite-actions">
