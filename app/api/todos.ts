@@ -1,4 +1,4 @@
-import type { TodoDto, TodoRequest, TodoUpdateRequest } from "../types/todo-types";
+import type { TodoAssignRequest, TodoDto, TodoRequest, TodoUpdateRequest } from "../types/todo-types";
 import api from "./client";
 
 export async function createTodoEndpoint(projectSlug: string, request: TodoRequest): Promise<number>{
@@ -25,7 +25,7 @@ export async function updateTodoEndpoint(todoId: string, request: TodoUpdateRequ
   return response.data;
 }
 
-export async function assignTodoEndpoint(todoId:string, userId: string): Promise<TodoDto>{
-  const response = await api.patch<TodoDto>(`/todos/${todoId}/assign/${userId}`);
+export async function assignTodoEndpoint(todoId:string, request: TodoAssignRequest): Promise<TodoDto>{
+  const response = await api.patch<TodoDto>(`/todos/assign/${todoId}`, request);
   return response.data;
 }

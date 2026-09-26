@@ -27,6 +27,11 @@ export interface TodoDto{
     issueNo: number;
 }
 
+export interface TodoAssignRequest{
+    unassign: boolean;
+    assignId: string | undefined;
+}
+
 export interface TodoRequest{
     title: string;
     description: string | undefined;

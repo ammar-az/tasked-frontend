@@ -51,8 +51,6 @@ export default function NewTaskPage({
             );
             
             navigate(`/projects/${params.slug}/tasks/${createdTodo}`);
-            
-            console.log("Create task:", request);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 if (error.response) {
