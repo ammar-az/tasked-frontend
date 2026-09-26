@@ -52,8 +52,8 @@ export default function CreateProjectPage() {
             setIsSubmitting(true);
             setError(null);
         
-            const project = await createProjectEndpoint(request);
-            navigate(`/projects/${project.slug}`);
+            const slug = await createProjectEndpoint(request);
+            navigate(`/projects/${slug}`);
             
             console.log("Create project:", request);
         } catch (error) {

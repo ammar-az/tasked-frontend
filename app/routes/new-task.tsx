@@ -49,8 +49,8 @@ export default function NewTaskPage({
                 params.slug!,
                 request,
             );
-
-            navigate(`/projects/${params.slug}/tasks/${createdTodo.issueNo}`);
+            
+            navigate(`/projects/${params.slug}/tasks/${createdTodo}`);
             
             console.log("Create task:", request);
         } catch (error) {

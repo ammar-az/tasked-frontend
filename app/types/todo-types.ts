@@ -35,11 +35,9 @@ export interface TodoRequest{
 }
 
 export interface TodoUpdateRequest{
-    title: string | undefined;
+    title: string;
     description: string | undefined;
-    status: TodoStatus | undefined;
-    assigned: string | undefined;
-    unassign: boolean;
+    status: TodoStatus;
 }
 
 export interface MultiTodoRequest{

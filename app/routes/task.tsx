@@ -10,6 +10,7 @@ import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helper
 import { getMemberEndpoint } from "../api/projects";
 import { MemberOverviewDto } from "../types/membership-types";
 import AssignTaskModal from "../components/AssignModal";
+import axios from "axios";
 
 export async function clientLoader({
     params,
@@ -69,8 +70,6 @@ export default function TaskPage({
         title: todo.title,
         description: todo.description ?? "",
         status: todo.status,
-        assigned: todo.assigned,
-        unassign: false
     });
 
     const canEditTask = canContribute(member?.role);
@@ -82,8 +81,6 @@ export default function TaskPage({
             title: todo.title,
             description: todo.description ?? "",
             status: todo.status,
-            assigned: undefined,
-            unassign: false
         });
         setIsEditing(false);
         setError(null);
@@ -91,11 +88,9 @@ export default function TaskPage({
 
     function beginEditing() {
         setDraft({
-            title: todo.title,
-            description: todo.description ?? "",
-            status: todo.status,
-            assigned: undefined,
-            unassign: false
+            title: task.title,
+            description: task.description ?? "",
+            status: task.status,
         });
 
         setError(null);
@@ -104,11 +99,9 @@ export default function TaskPage({
 
     function cancelEditing() {
         setDraft({
-            title: todo.title,
-            description: todo.description ?? "",
-            status: todo.status,
-            assigned: undefined,
-            unassign: false
+            title: task.title,
+            description: task.description ?? "",
+            status: task.status,
         });
 
         setError(null);
@@ -129,13 +122,19 @@ export default function TaskPage({
                 task.id,
                 draft,
             );
-
-            setTask(updatedTodo);
             
-        } catch {
-            setError("The task could not be updated.");
-        } finally {
+            setTask(updatedTodo);
             setIsEditing(false);
+        } catch (error){
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Task creation failed.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         }
     }
 
@@ -281,7 +280,6 @@ export default function TaskPage({
                                             setDraft((current) => ({
                                                 ...current,
                                                 status: TodoStatus.Completed,
-                                                unassign: true,
                                             }))
                                         }
                                     />
@@ -300,7 +298,6 @@ export default function TaskPage({
                                             setDraft((current) => ({
                                                 ...current,
                                                 status: TodoStatus.Archived,
-                                                unassign: true,
                                             }))
                                         }
                                     />
