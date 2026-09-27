@@ -179,9 +179,16 @@ svg {
     width: min(90%, 800px);
 }
 
-.page-main-project {
-    width: min(90%, 1400px);
+.page-main-profile {
+    width: min(90%, 1200px, calc(100% - 2rem));
+    margin: 0 auto;
 }
+
+.page-main-project {
+    width: min(1400px, calc(100% - 2rem));
+}
+
+
 
 /* Generic panels */
 
