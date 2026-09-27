@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     width: min(1100px, 100%);
-    min-height: calc(100vh - 7vh - 3.5rem);
+    min-height: calc(100vh - var(--navbar-height) - 3.5rem);
     margin: 2rem auto 0.5rem;
 }
 
@@ -98,6 +98,8 @@
     min-height: 400px;
     flex: 1;
     border: 1px solid var(--border);
+    margin-bottom: 2rem;
+    overflow-y: auto;
 }
 
 .row-wrapper {

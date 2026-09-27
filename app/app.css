@@ -28,6 +28,9 @@
 
     --danger: #c94b4b;
     --danger-hover: #e15b5b;
+
+    /*navbar var*/
+    --navbar-height: max(60px, 7vh)
 }
 
 *,
@@ -145,14 +148,13 @@ svg {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 93vh; /* should be same as page layout when navbar done*/
+    height: calc(100vh - var(--navbar-height));
 }
 
 .page-layout {
     display: flex;
     width: 100%;
-    height: 93vh;
-    /*min-height: calc(100vh - var(--navbar-height));*/
+    height: calc(100vh - var(--navbar-height));
 }
 
 .page-side {
@@ -302,6 +304,34 @@ svg {
     padding: 1rem 1.25rem;
 
     border-bottom: 1px solid var(--border);
+}
+
+.list-load-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    min-height: 60px;
+    padding: 0.9rem 1.25rem;
+
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: none;
+    color: inherit;
+
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+}
+
+.list-load-more:hover:not(:disabled) {
+    background: var(--surface-hover);
+}
+
+.list-load-more:disabled {
+    color: var(--muted-text);
+    cursor: default;
 }
 
 /* Tabs*/

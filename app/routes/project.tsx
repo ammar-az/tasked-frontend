@@ -78,27 +78,17 @@ export default function ProjectPage({
     } = loaderData;
 
     const [todos, setTodos] = useState(initialTodos);
-    const [todoRequest, setTodoRequest] = useState(
-        initialTodoRequest,
-    );
-    const [hasMore, setHasMore] = useState(
-        initialTodos.length === initialTodoRequest.pageSize,
-    );
+    const [todoRequest, setTodoRequest] = useState(initialTodoRequest);
+    const [hasMore, setHasMore] = useState(initialTodos.length === initialTodoRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
 
     const navigate = useNavigate();
     
-    const [_, setSearchParams] =
-        useSearchParams();
+    const [_, setSearchParams] = useSearchParams();
 
-    const [searchInput, setSearchInput] = useState(
-        todoRequest.search ?? "",
-    );
+    const [searchInput, setSearchInput] = useState(todoRequest.search ?? "");
 
-    const [selectedTodoId, setSelectedTodoId] =
-        useState<string | null>(
-            todos[0]?.id ?? null,
-        );
+    const [selectedTodoId, setSelectedTodoId] = useState<string | null>(todos[0]?.id ?? null);
     
     useEffect(() => {
         setTodos(initialTodos);
@@ -186,37 +176,37 @@ export default function ProjectPage({
     }
 
     async function loadMore() {
-    if (loadingMore || !hasMore) {
-        return;
+        if (loadingMore || !hasMore) {
+            return;
+        }
+
+        setLoadingMore(true);
+
+        try {
+            const nextPage = todoRequest.page + 1;
+
+            const response = await getProjectTodosEndpoint(params.slug, {
+                ...todoRequest,
+                page: nextPage,
+            });
+
+            setTodos((current) => [
+                ...current,
+                ...response,
+            ]);
+
+            setTodoRequest((current) => ({
+                ...current,
+                page: nextPage,
+            }));
+
+            setHasMore(
+                response.length === todoRequest.pageSize,
+            );
+        } finally {
+            setLoadingMore(false);
+        }
     }
-
-    setLoadingMore(true);
-
-    try {
-        const nextPage = todoRequest.page + 1;
-
-        const response = await getProjectTodosEndpoint(params.slug, {
-            ...todoRequest,
-            page: nextPage,
-        });
-
-        setTodos((current) => [
-            ...current,
-            ...response,
-        ]);
-
-        setTodoRequest((current) => ({
-            ...current,
-            page: nextPage,
-        }));
-
-        setHasMore(
-            response.length === todoRequest.pageSize,
-        );
-    } finally {
-        setLoadingMore(false);
-    }
-}
 
     async function handleJoin(){
         await joinEndpoint(project.id);
@@ -459,18 +449,20 @@ export default function ProjectPage({
                             </div>
                         )}
 
-                        <button
-                            type="button"
-                            className="project-task-load-more"
-                            disabled={loadingMore || !hasMore}
-                            onClick={loadMore}
-                        >
-                            {loadingMore
-                                ? "Loading..."
-                                : hasMore
-                                ? "Load More"
-                                : "No more tasks"}
-                        </button>
+                        {todos.length > 0 && 
+                            <button
+                                type="button"
+                                className="list-load-more"
+                                disabled={loadingMore || !hasMore}
+                                onClick={loadMore}
+                            >
+                                {loadingMore
+                                    ? "Loading..."
+                                    : hasMore
+                                    ? "Load More"
+                                    : "No more tasks"}
+                            </button>
+                        }
                     </div>
                 </div>
 

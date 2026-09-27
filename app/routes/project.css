@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     width: min(1400px, calc(100% - 2rem));
-    height: calc(100vh - 7vh);
+    height: calc(100vh - var(--navbar-height));
     margin: 0 auto;
     overflow: hidden;
 }
@@ -215,34 +215,6 @@
     text-align: center;
 }
 
-.project-task-load-more {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 100%;
-    min-height: 60px;
-    padding: 0.9rem 1.25rem;
-
-    border: none;
-    border-bottom: 1px solid var(--border);
-    background: none;
-    color: inherit;
-
-    font: inherit;
-    text-align: center;
-    cursor: pointer;
-}
-
-.project-task-load-more:hover:not(:disabled) {
-    background: var(--surface-hover);
-}
-
-.project-task-load-more:disabled {
-    color: var(--muted-text);
-    cursor: default;
-}
-
 /* Selected task */
 
 .selected-task-panel {
@@ -323,7 +295,7 @@
     .project-page {
         width: min(900px, calc(100% - 2rem));
         height: auto;
-        min-height: calc(100vh - 7vh);
+        min-height: calc(100vh - var(--navbar-height));
         overflow: visible;
     }
 
