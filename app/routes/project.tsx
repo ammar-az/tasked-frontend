@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
     Link,
-    useNavigate,
+    useRevalidator,
     useSearchParams,
 } from "react-router";
 
@@ -45,11 +45,7 @@ export async function clientLoader({
     try {    
         const [project, todos, member] = await Promise.all([
             getProjectEndpoint(params.slug),
-
-            getProjectTodosEndpoint(
-                params.slug,
-                todoRequest,
-            ),
+            getProjectTodosEndpoint(params.slug, todoRequest),
             getMemberEndpoint(params.slug),
         ]);
 
@@ -81,8 +77,6 @@ export default function ProjectPage({
     const [todoRequest, setTodoRequest] = useState(initialTodoRequest);
     const [hasMore, setHasMore] = useState(initialTodos.length === initialTodoRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
-
-    const navigate = useNavigate();
     
     const [_, setSearchParams] = useSearchParams();
 
@@ -93,9 +87,7 @@ export default function ProjectPage({
     useEffect(() => {
         setTodos(initialTodos);
         setTodoRequest(initialTodoRequest);
-        setHasMore(
-            initialTodos.length === initialTodoRequest.pageSize,
-        );
+        setHasMore(initialTodos.length === initialTodoRequest.pageSize);
     }, [initialTodos, initialTodoRequest]);
 
     useEffect(() => {
@@ -208,14 +200,16 @@ export default function ProjectPage({
         }
     }
 
+    const revalidator = useRevalidator();
+
     async function handleJoin(){
         await joinEndpoint(project.id);
-        navigate(0); 
+        await revalidator.revalidate();
     }
 
     async function handleLeave(){
         await leaveEndpoint(project.id);
-        navigate(0); 
+        await revalidator.revalidate(); 
     }
 
     return (

@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useRevalidator, useSearchParams } from "react-router";
 
 import type { Route } from "./+types/org";
 
@@ -32,17 +32,8 @@ export async function clientLoader({
     const orgRequest: OrgsRequest = {
         search: url.searchParams.get("search")?.trim() || undefined,
         descending: url.searchParams.get("descending") === "true",
-        page: Math.max(
-            1,
-            Number(url.searchParams.get("page") ?? 1)
-        ),
-        pageSize: Math.min(
-            100,
-            Math.max(
-                1,
-                Number(url.searchParams.get("pageSize") ?? 20)
-            )
-        ),
+        page: Math.max(1,Number(url.searchParams.get("page") ?? 1)),
+        pageSize: Math.min(100,Math.max(1,Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
     var projects: Array<ProjectDto> = [];
@@ -75,23 +66,22 @@ export default function OrgPage({
     const { user, isAuthenticated } = useAuth();
     const { org, projects, users, orgRequest } = loaderData;
 
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] =
-        useSearchParams();
+    const revalidator = useRevalidator();
+    
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const view =
-        searchParams.get("view") ?? "projects";
+    const view = searchParams.get("view") ?? "projects";
 
     const isMember = user?.orgId == org.id;
-
+    
     async function handleJoin() {
         await joinOrgEndpoint(org.id);
-        navigate(0);
+        await revalidator.revalidate();
     }
 
     async function handleLeave() {
         await leaveOrgEndpoint(org.id);
-        navigate(0);
+        await revalidator.revalidate();
     }
 
     function changeView(newView: "projects" | "users") {

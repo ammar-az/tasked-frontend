@@ -45,10 +45,7 @@ export default function NewTaskPage({
             setIsSubmitting(true);
             setError(null);
             
-            const createdTodo = await createTodoEndpoint(
-                params.slug!,
-                request,
-            );
+            const createdTodo = await createTodoEndpoint(params.slug!, request);
             
             navigate(`/projects/${params.slug}/tasks/${createdTodo}`);
         } catch (error) {

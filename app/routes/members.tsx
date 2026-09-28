@@ -84,7 +84,7 @@ export async function clientLoader({
     const memberRequest: MemberOverviewRequest = {
         search: url.searchParams.get("search")?.trim() || undefined,
 
-        role: parseMemberRole(url.searchParams.get("role"),),
+        role: parseMemberRole(url.searchParams.get("role")),
         
         roleMin: url.searchParams.get("include") !== "false",
 
@@ -93,6 +93,7 @@ export async function clientLoader({
         descending: url.searchParams.get("descending") !== "false",
 
         page: 1,
+        
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
@@ -100,10 +101,7 @@ export async function clientLoader({
         const [project, me, members] = await Promise.all([
             getProjectEndpoint(params.slug),
             getMemberEndpoint(params.slug),
-            getMembersEndpoint(
-                params.slug,
-                memberRequest,
-            ),
+            getMembersEndpoint(params.slug,memberRequest),
         ]);
         return {
             project,
@@ -136,16 +134,11 @@ export default function MembersPage({
     const [hasMore, setHasMore] = useState(initialMembers.length === initialMemberRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    const [_, setSearchParams] =
-        useSearchParams();
+    const [_, setSearchParams] = useSearchParams();
 
-    const [searchInput, setSearchInput] = useState(
-        memberRequest.search ?? "",
-    );
+    const [searchInput, setSearchInput] = useState(memberRequest.search ?? "");
 
-    const activeView = getActiveView(
-        memberRequest.role,
-    );
+    const activeView = getActiveView(memberRequest.role);
 
     const canManageMembers = isAdmin(me?.role);
     const owns = me?.role == MemberRole.Owner;
@@ -153,9 +146,7 @@ export default function MembersPage({
     useEffect(() => {
         setMembers(initialMembers);
         setMemberRequest(initialMemberRequest);
-        setHasMore(
-            initialMembers.length === initialMemberRequest.pageSize,
-        );
+        setHasMore(initialMembers.length === initialMemberRequest.pageSize);
     }, [initialMembers, initialMemberRequest]);
 
     useEffect(() => {
@@ -170,10 +161,7 @@ export default function MembersPage({
         setSearchParams((current) => {
             const next = new URLSearchParams(current);
 
-            if (
-                value === undefined ||
-                value === ""
-            ) {
+            if (value === undefined || value === "") {
                 next.delete(name);
             } else {
                 next.set(name, value);

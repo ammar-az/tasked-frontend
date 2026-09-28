@@ -26,9 +26,7 @@ export async function clientLoader({
     const url = new URL(request.url);
     const activeView = getPublicProfileView(url);
 
-    const user = await getUserByNameEndpoint(
-        params.username,
-    );
+    const user = await getUserByNameEndpoint(params.username);
 
     const memberRequest = createMemberRequest(
         url,
@@ -37,10 +35,8 @@ export async function clientLoader({
             : undefined,
     );
 
-    const projects = await getUserProjectsEndpoint(
-        user.id,
-        memberRequest,
-    );
+    const projects = await getUserProjectsEndpoint(user.id,memberRequest);
+
     return {
         user,
 
@@ -49,6 +45,7 @@ export async function clientLoader({
         memberships: projects,
 
         assignedTasks: [],
+        
         invites: [],
 
         canInviteToProject: true,

@@ -14,17 +14,8 @@ export async function clientLoader({
     const orgRequest: OrgsRequest = {
         search: url.searchParams.get("search")?.trim() || undefined,
         descending: url.searchParams.get("descending") !== "false",
-        page: Math.max(
-            1,
-            Number(url.searchParams.get("page") ?? 1)
-        ),
-        pageSize: Math.min(
-            100,
-            Math.max(
-                1,
-                Number(url.searchParams.get("pageSize") ?? 20)
-            )
-        ),
+        page: Math.max(1,Number(url.searchParams.get("page") ?? 1)),
+        pageSize: Math.min(100,Math.max(1,Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
     const organizations = await getOrgsEndpoint(orgRequest);
