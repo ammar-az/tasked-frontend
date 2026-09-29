@@ -183,6 +183,7 @@ svg {
 
 .page-main-profile {
     width: min(90%, 1200px, calc(100% - 2rem));
+    height: calc(100vh - --navbar-height);
     margin: 0 auto;
 }
 
@@ -312,7 +313,7 @@ svg {
     align-items: center;
 
     width: 100%;
-    min-height: 60px;
+    min-height: 50px;
     padding: 0.9rem 1.25rem;
 
     border: none;

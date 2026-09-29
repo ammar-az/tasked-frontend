@@ -1,12 +1,17 @@
 .orgs-page {
     width: min(900px, calc(100% - 2rem));
     margin: 2rem auto;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 }
 
 .orgs-page h1 {
     margin: 0 0 1.5rem;
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .org-header {
@@ -46,6 +51,9 @@
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .org-row {
@@ -54,7 +62,6 @@
     padding: 0.9rem 1rem;
     border-bottom: 1px solid var(--border);
 }
-
 
 .org-name {
     font-weight: 500;
@@ -100,10 +107,21 @@
 
 /* Alternate list format*/
 
+.org-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
 .org-list {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
     gap: 0.75rem;
+    margin-bottom: 1rem;
+    overflow-y: auto;
 }
 
 .org-list-item {

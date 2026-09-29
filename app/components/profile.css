@@ -9,7 +9,7 @@
     grid-template-columns: 120px minmax(0, 1fr) auto;
     gap: 2rem;
     align-items: center;
-    min-height: 260px;
+    min-height: 200px;
 }
 
 .profile-avatar {
@@ -75,24 +75,29 @@
 /* Tabs / content */
 
 .profile-content {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    height: min(650px, calc(100vh - 300px));
     min-height: 0;
     margin-bottom: 2rem;
 }
 
 .profile-tab-content {
-    height: min(600px, calc(100vh - 400px));
-    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     border: 1px solid var(--border);
     border-top: none;
     overflow: hidden;
 }
 
 .profile-tab-content .enclosed-list {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
 }
-
 
 
 /* List content */

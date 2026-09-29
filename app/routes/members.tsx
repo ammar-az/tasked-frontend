@@ -128,9 +128,7 @@ export default function MembersPage({
     } = loaderData;
 
     const [members, setMembers] = useState(initialMembers);
-    const [memberRequest, setMemberRequest] = useState(
-        initialMemberRequest,
-    );
+    const [memberRequest, setMemberRequest] = useState(initialMemberRequest,);
     const [hasMore, setHasMore] = useState(initialMembers.length === initialMemberRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -473,7 +471,7 @@ export default function MembersPage({
                                     ? "Load More"
                                     : "No more members"}
                             </button>
-                        }
+                    }
                 </div>
             </div>
             <aside className="page-side"></aside>
