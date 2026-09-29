@@ -6,7 +6,7 @@ import { TodoDto } from "../types/todo-types";
 import { getMemberRoleLabel, getTodoStatusLabel } from "../utils/enum-helpers";
 import { useState } from "react";
 import InviteProjectModal from "./InviteModal";
-import { inviteEndpoint } from "../api/projects";
+import { inviteEndpoint, joinEndpoint, rejectEndpoint } from "../api/projects";
 import { UserDto } from "../types/user-types";
 import ChangeUsernameModal from "./ChangeUsernameModal";
 
@@ -105,7 +105,7 @@ export default function ProfilePage({
                             project.projectId,
                             data.user.id,
                         ); 
-                        await revalidator.revalidate(); ;
+                        await revalidator.revalidate(); 
                     }}
                 />
             )}
@@ -312,10 +312,22 @@ export default function ProfilePage({
                                         </div>
 
                                         <div className="profile-invite-actions">
-                                            <button type="button">
+                                            <button 
+                                                type="button"
+                                                onClick = {async () => {
+                                                    joinEndpoint(invite.projectId); 
+                                                    await revalidator.revalidate();
+                                                }}
+                                            >
                                                 Accept
                                             </button>
-                                            <button type="button">
+                                            <button 
+                                                type="button"
+                                                onClick = {async () => {
+                                                    rejectEndpoint(invite.projectId); 
+                                                    await revalidator.revalidate();
+                                                }}
+                                            >
                                                 Decline
                                             </button>
                                         </div>
