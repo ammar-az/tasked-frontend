@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router";
+import { Link, useSearchParams, useRevalidator } from "react-router";
 
 import "./profile.css";
 import { MemberOverviewDto } from "../types/membership-types";
@@ -8,6 +8,7 @@ import { useState } from "react";
 import InviteProjectModal from "./InviteModal";
 import { inviteEndpoint } from "../api/projects";
 import { UserDto } from "../types/user-types";
+import ChangeUsernameModal from "./ChangeUsernameModal";
 
 export interface ProfilePageData {
     user: UserDto;
@@ -63,6 +64,7 @@ export default function ProfilePage({
     isOwnProfile,
 }: ProfilePageProps) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [showUpdate, setShowUpdate] = useState(false);
     const [showInvite, setShowInvite] = useState(false);
 
     const availableTabs = isOwnProfile
@@ -89,6 +91,8 @@ export default function ProfilePage({
         });
     }
 
+    const revalidator = useRevalidator();
+
     return (
     <main className="page-layout">
         <div className="page-main page-main-profile">
@@ -100,8 +104,16 @@ export default function ProfilePage({
                         await inviteEndpoint(
                             project.projectId,
                             data.user.id,
-                        );
+                        ); 
+                        await revalidator.revalidate(); ;
                     }}
+                />
+            )}
+
+            {showUpdate && (
+                <ChangeUsernameModal
+                    currentUsername={data.user.username}
+                    onClose={async () => {setShowUpdate(false); await revalidator.revalidate();}}
                 />
             )}
 
@@ -117,7 +129,7 @@ export default function ProfilePage({
                     <h1>{data.user.username}</h1>
 
                     <div className="profile-organization">
-                        <span aria-hidden="true">♧</span>
+                        <span aria-hidden="true">⚯</span>
 
                         {data.user.orgName !== null ? (
                             <Link
@@ -134,12 +146,13 @@ export default function ProfilePage({
 
                 <div className="profile-primary-action">
                     {isOwnProfile ? (
-                        <Link
-                            to="/account/edit"
+                        <button
+                            type="button"
+                            onClick={() => setShowUpdate(true)}
                             className="profile-action-button"
                         >
-                            Edit Account
-                        </Link>
+                            Change Username
+                        </button>
                     ) : (
                         <button
                             type="button"

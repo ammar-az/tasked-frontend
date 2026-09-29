@@ -20,8 +20,7 @@ export default function InviteProjectModal({
 }: InviteProjectModalProps) {
     const [search, setSearch] = useState("");
     const [projects, setProjects] = useState<MemberOverviewDto[]>([]);
-    const [selectedProject, setSelectedProject] =
-        useState<MemberOverviewDto | null>(null);
+    const [selectedProject, setSelectedProject] = useState<MemberOverviewDto | null>(null);
 
     const [loading, setLoading] = useState(false);
     const [inviting, setInviting] = useState(false);

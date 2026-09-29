@@ -3,11 +3,7 @@ import {
     useState,
     type FormEvent,
 } from "react";
-import {
-    Link,
-    useNavigate,
-    useRevalidator,
-} from "react-router";
+import { Link, useNavigate, useRevalidator } from "react-router";
 
 import type { Route } from "./+types/settings";
 

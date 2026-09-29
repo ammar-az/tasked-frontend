@@ -5,10 +5,7 @@ import ProfilePage, {
 } from "../components/profile-page";
 
 import { getMe } from "../api/auth";
-import {
-    getUserProjectsEndpoint,
-    getUserTodosEndpoint,
-} from "../api/users";
+import { getUserProjectsEndpoint, getUserTodosEndpoint } from "../api/users";
 
 import { MemberRole } from "../types/membership-types";
 

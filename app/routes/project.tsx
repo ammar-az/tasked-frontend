@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    Link,
-    useRevalidator,
-    useSearchParams,
-} from "react-router";
+import { Link, useRevalidator,useSearchParams } from "react-router";
 
 import type { Route } from "./+types/project";
 

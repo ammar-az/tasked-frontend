@@ -7,5 +7,5 @@ export interface UserDto{
 }
 
 export interface UserUpdateRequest{
-    username: string | undefined;
+    username: string;
 }
