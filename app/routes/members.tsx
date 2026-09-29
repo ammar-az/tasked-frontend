@@ -547,7 +547,7 @@ function MemberRow({
 
                         {canContribute(member.role) ? (
                             <Link
-                                to={`/projects/${project.slug}?assigned=${encodeURIComponent(member.username)}`}
+                                to={`/projects/${project.slug}?assigned=${encodeURIComponent(member.userId)}`}
                                 className="assigned-tasks-link"
                             >
                                 View assigned tasks
