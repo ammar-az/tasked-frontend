@@ -3,11 +3,7 @@ import {
     useState,
     type FormEvent,
 } from "react";
-import {
-    Link,
-    useNavigate,
-    useRevalidator,
-} from "react-router";
+import { Link, useNavigate, useRevalidator } from "react-router";
 
 import type { Route } from "./+types/settings";
 
@@ -81,28 +77,19 @@ export default function ProjectSettingsPage({
     const revalidator = useRevalidator();
 
     const [name, setName] = useState(project.name);
-    const [description, setDescription] = useState(
-        project.description ?? "",
-    );
-    const [isVisible, setIsVisible] = useState(
-        project.isVisible,
-    );
-    const [joinPolicy, setJoinPolicy] =
-        useState<JoinPolicy>(project.joinPolicy);
+    const [description, setDescription] = useState(project.description ?? "");
+    const [isVisible, setIsVisible] = useState(project.isVisible);
+    const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>(project.joinPolicy);
 
     const [error, setError] = useState<string | null>(null);
-    const [message, setMessage] = useState<string | null>(
-        null,
-    );
+    const [message, setMessage] = useState<string | null>(null);
 
     const [isSaving, setIsSaving] = useState(false);
-    const [isUpdatingOrganization, setIsUpdatingOrganization] =
-        useState(false);
+    const [isUpdatingOrganization, setIsUpdatingOrganization] = useState(false);
 
-    const [showDeleteConfirmation, setShowDeleteConfirmation] =
-        useState(false);
-    const [deleteConfirmation, setDeleteConfirmation] =
-        useState("");
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+    const [deleteConfirmation, setDeleteConfirmation] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
     const isOwner = member.role === MemberRole.Owner;
@@ -132,8 +119,7 @@ export default function ProjectSettingsPage({
 
         const request: ProjectUpdateRequest = {
             name: trimmedName,
-            description:
-                trimmedDescription || undefined,
+            description: trimmedDescription || undefined,
             isVisible,
             joinPolicy,
         };
@@ -143,10 +129,7 @@ export default function ProjectSettingsPage({
             setError(null);
             setMessage(null);
 
-            await editProjectEndpoint(
-                project.id,
-                request,
-            );
+            await editProjectEndpoint(project.id, request);
 
             setMessage("Project changes saved.");
 
@@ -169,21 +152,13 @@ export default function ProjectSettingsPage({
             setMessage(null);
 
             if (isOrganizationProject) {
-                await projectLeaveOrgEndpoint(
-                    project.id,
-                );
+                await projectLeaveOrgEndpoint(project.id);
 
-                setMessage(
-                    "Project removed from the organization.",
-                );
+                setMessage("Project removed from the organization.");
             } else {
-                await projectToOrgEndpoint(
-                    project.id,
-                );
+                await projectToOrgEndpoint(project.id);
 
-                setMessage(
-                    "Project added to your organization.",
-                );
+                setMessage("Project added to your organization.");
             }
 
             await revalidator.revalidate();
@@ -199,10 +174,7 @@ export default function ProjectSettingsPage({
     }
 
     async function handleDeleteProject() {
-        if (
-            !isOwner ||
-            deleteConfirmation !== project.name
-        ) {
+        if (!isOwner || deleteConfirmation !== project.name) {
             return;
         }
 

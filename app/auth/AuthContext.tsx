@@ -89,7 +89,7 @@ export function AuthProvider({children}: Props){
             } catch (error){
                 console.error("Refresh failed", error);
                 if(!cancelled){
-                                setToken(null);
+                    setToken(null);
                     setAccessToken(null);
                     setUser(null);
                 }

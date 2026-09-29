@@ -3,13 +3,15 @@ import { Link } from "react-router";
 
 import type { Route } from "./+types/task";
 import { assignTodoEndpoint, getTodoByNoEndpoint, updateTodoEndpoint } from "../api/todos";
-import { TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
+import { TodoAssignRequest, TodoStatus, type TodoDto, type TodoUpdateRequest } from "../types/todo-types";
 
 import "./task.css";
 import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helpers";
 import { getMemberEndpoint } from "../api/projects";
 import { MemberOverviewDto } from "../types/membership-types";
 import AssignTaskModal from "../components/AssignModal";
+import axios from "axios";
+import { useAuth } from "../auth/AuthContext";
 
 export async function clientLoader({
     params,
@@ -58,6 +60,7 @@ export default function TaskPage({
     params,
 }: Route.ComponentProps) {
     const {todo, member} = loaderData;
+    const {user} = useAuth();
 
     const [task, setTask] = useState(todo);
     const [isEditing, setIsEditing] = useState(false);
@@ -69,8 +72,6 @@ export default function TaskPage({
         title: todo.title,
         description: todo.description ?? "",
         status: todo.status,
-        assigned: todo.assigned,
-        unassign: false
     });
 
     const canEditTask = canContribute(member?.role);
@@ -82,8 +83,6 @@ export default function TaskPage({
             title: todo.title,
             description: todo.description ?? "",
             status: todo.status,
-            assigned: undefined,
-            unassign: false
         });
         setIsEditing(false);
         setError(null);
@@ -91,11 +90,9 @@ export default function TaskPage({
 
     function beginEditing() {
         setDraft({
-            title: todo.title,
-            description: todo.description ?? "",
-            status: todo.status,
-            assigned: undefined,
-            unassign: false
+            title: task.title,
+            description: task.description ?? "",
+            status: task.status,
         });
 
         setError(null);
@@ -104,11 +101,9 @@ export default function TaskPage({
 
     function cancelEditing() {
         setDraft({
-            title: todo.title,
-            description: todo.description ?? "",
-            status: todo.status,
-            assigned: undefined,
-            unassign: false
+            title: task.title,
+            description: task.description ?? "",
+            status: task.status,
         });
 
         setError(null);
@@ -122,25 +117,52 @@ export default function TaskPage({
             description: current.description?.trim(),
         }))
 
-        // if (!title) {
-        //     setError("A task title is required.");
-        //     return;
-        // }
-
         try {
             setError(null);
             
-            const updatedTodo = await updateTodoEndpoint(
-                task.id,
-                draft,
-            );
-
-            setTask(updatedTodo);
+            const updatedTodo = await updateTodoEndpoint(task.id, draft);
             
-        } catch {
-            setError("The task could not be created.");
-        } finally {
+            setTask(updatedTodo);
             setIsEditing(false);
+        } catch (error){
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Task creation failed.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
+        }
+    }
+
+    async function handleSelfAssign(){
+        if(user === null || isEditing) return;
+        try{
+            const updatedTodo = await assignTodoEndpoint(task.id, ({unassign: (task.assigned == user.id), assignId: user.id}));
+            setTask(updatedTodo);
+        }catch{
+            return;
+        }
+    }
+
+    async function handleModalAssign(todoId:string, req: TodoAssignRequest){
+        try{
+            const updatedTodo = await assignTodoEndpoint(todoId, req);
+            setTask(updatedTodo);
+        }catch{
+            return;
+        }
+    }
+
+    async function handleStatusChange(){
+        if(selectedStatus == task.status || isEditing) return;
+        try{
+            const updatedTodo = await updateTodoEndpoint(task.id, ({title: task.title, description: task.description, status: selectedStatus}));
+            setTask(updatedTodo);
+        }catch{
+            setDraft(current => ({...current, status: task.status}));
         }
     }
 
@@ -163,12 +185,13 @@ export default function TaskPage({
             {showAssign && (
                 <AssignTaskModal
                     todoId={task.id}
+                    current={task.assigned}
                     projectSlug={params.slug}
                     onClose={() => setShowAssign(false)}
                     onAssign={async (member) => {
-                        await assignTodoEndpoint(
+                        await handleModalAssign(
                             task.id,
-                            member.userId
+                            ({unassign: (task.assigned == member.userId), assignId: member.userId})
                         );
                     }}
                 />
@@ -286,7 +309,6 @@ export default function TaskPage({
                                             setDraft((current) => ({
                                                 ...current,
                                                 status: TodoStatus.Completed,
-                                                unassign: true,
                                             }))
                                         }
                                     />
@@ -305,7 +327,6 @@ export default function TaskPage({
                                             setDraft((current) => ({
                                                 ...current,
                                                 status: TodoStatus.Archived,
-                                                unassign: true,
                                             }))
                                         }
                                     />
@@ -387,13 +408,17 @@ export default function TaskPage({
                             <h2>Actions</h2>
 
                             <div className="task-sidebar-actions">
-                                <button type="button">
-                                    Assign to Self
+                                <button 
+                                    type="button" 
+                                    disabled={isEditing}
+                                    onClick={handleSelfAssign}>
+                                    {task.assigned == user?.id ? "Unassign Self" : "Assign to Self"}
                                 </button>
 
                                 {canAssignToOthers && (
                                     <button
                                         type="button"
+                                        disabled={isEditing}
                                         onClick={() =>
                                             setShowAssign(true)
                                         }
@@ -465,8 +490,8 @@ export default function TaskPage({
                             <button
                                 type="button"
                                 className="primary-button"
-                                onClick={()=>console.log()}
-                                disabled={selectedStatus === task.status}
+                                onClick={handleStatusChange}
+                                disabled={selectedStatus === task.status || isEditing}
                             >
                                 Change Status
                             </button>

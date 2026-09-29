@@ -84,7 +84,7 @@ export async function clientLoader({
     const memberRequest: MemberOverviewRequest = {
         search: url.searchParams.get("search")?.trim() || undefined,
 
-        role: parseMemberRole(url.searchParams.get("role"),),
+        role: parseMemberRole(url.searchParams.get("role")),
         
         roleMin: url.searchParams.get("include") !== "false",
 
@@ -92,7 +92,8 @@ export async function clientLoader({
 
         descending: url.searchParams.get("descending") !== "false",
 
-        page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
+        page: 1,
+        
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
@@ -100,10 +101,7 @@ export async function clientLoader({
         const [project, me, members] = await Promise.all([
             getProjectEndpoint(params.slug),
             getMemberEndpoint(params.slug),
-            getMembersEndpoint(
-                params.slug,
-                memberRequest,
-            ),
+            getMembersEndpoint(params.slug,memberRequest),
         ]);
         return {
             project,
@@ -120,27 +118,34 @@ export async function clientLoader({
 
 export default function MembersPage({
     loaderData,
+    params,
 }: Route.ComponentProps) {
     const {
         project,
         me,
-        members,
-        memberRequest,
+        members: initialMembers,
+        memberRequest: initialMemberRequest,
     } = loaderData;
 
-    const [_, setSearchParams] =
-        useSearchParams();
+    const [members, setMembers] = useState(initialMembers);
+    const [memberRequest, setMemberRequest] = useState(initialMemberRequest,);
+    const [hasMore, setHasMore] = useState(initialMembers.length === initialMemberRequest.pageSize);
+    const [loadingMore, setLoadingMore] = useState(false);
 
-    const [searchInput, setSearchInput] = useState(
-        memberRequest.search ?? "",
-    );
+    const [_, setSearchParams] = useSearchParams();
 
-    const activeView = getActiveView(
-        memberRequest.role,
-    );
+    const [searchInput, setSearchInput] = useState(memberRequest.search ?? "");
+
+    const activeView = getActiveView(memberRequest.role);
 
     const canManageMembers = isAdmin(me?.role);
     const owns = me?.role == MemberRole.Owner;
+
+    useEffect(() => {
+        setMembers(initialMembers);
+        setMemberRequest(initialMemberRequest);
+        setHasMore(initialMembers.length === initialMemberRequest.pageSize);
+    }, [initialMembers, initialMemberRequest]);
 
     useEffect(() => {
         setSearchInput(memberRequest.search ?? "");
@@ -154,10 +159,7 @@ export default function MembersPage({
         setSearchParams((current) => {
             const next = new URLSearchParams(current);
 
-            if (
-                value === undefined ||
-                value === ""
-            ) {
+            if (value === undefined || value === "") {
                 next.delete(name);
             } else {
                 next.set(name, value);
@@ -238,13 +240,38 @@ export default function MembersPage({
             String(descending),
         );
     }
+    
+    async function loadMore() {
+        if (loadingMore || !hasMore) {
+            return;
+        }
 
-    function changePage(page: number) {
-        updateQueryParameter(
-            "page",
-            String(page),
-            false,
-        );
+        setLoadingMore(true);
+
+        try {
+            const nextPage = memberRequest.page + 1;
+
+            const response = await getMembersEndpoint(params.slug, {
+                ...memberRequest,
+                page: nextPage,
+            });
+
+            setMembers((current) => [
+                ...current,
+                ...response,
+            ]);
+
+            setMemberRequest((current) => ({
+                ...current,
+                page: nextPage,
+            }));
+
+            setHasMore(
+                response.length === memberRequest.pageSize,
+            );
+        } finally {
+            setLoadingMore(false);
+        }
     }
 
     const revalidator = useRevalidator();
@@ -256,7 +283,6 @@ export default function MembersPage({
         
         switch (action){
             case "admin":
-                //check if owner
                 await roleChangeEndpoint(member.projectId, {user: member.userId, role: MemberRole.Admin});
                 break;
             case "contributor":
@@ -278,7 +304,6 @@ export default function MembersPage({
                 break;
         }
 
-        console.log(action, member);
         await revalidator.revalidate();
     }
 
@@ -433,36 +458,21 @@ export default function MembersPage({
                                 : "No matching members found."}
                         </div>
                     )}
+                    {members.length > 0 && 
+                            <button
+                                type="button"
+                                className="list-load-more"
+                                disabled={loadingMore || !hasMore}
+                                onClick={loadMore}
+                            >
+                                {loadingMore
+                                    ? "Loading..."
+                                    : hasMore
+                                    ? "Load More"
+                                    : "No more members"}
+                            </button>
+                    }
                 </div>
-
-                <footer className="members-pagination">
-                    <button
-                        type="button"
-                        disabled={memberRequest.page <= 1}
-                        onClick={() =>
-                            changePage(memberRequest.page - 1)
-                        }
-                    >
-                        Previous
-                    </button>
-
-                    <span>
-                        Page {memberRequest.page}
-                    </span>
-
-                    <button
-                        type="button"
-                        disabled={
-                            members.length <
-                            memberRequest.pageSize
-                        }
-                        onClick={() =>
-                            changePage(memberRequest.page + 1)
-                        }
-                    >
-                        Next
-                    </button>
-                </footer>
             </div>
             <aside className="page-side"></aside>
         </main>
@@ -537,7 +547,7 @@ function MemberRow({
 
                         {canContribute(member.role) ? (
                             <Link
-                                to={`/projects/${project.slug}?assigned=${encodeURIComponent(member.username)}`}
+                                to={`/projects/${project.slug}?assigned=${encodeURIComponent(member.userId)}`}
                                 className="assigned-tasks-link"
                             >
                                 View assigned tasks

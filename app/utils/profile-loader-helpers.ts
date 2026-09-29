@@ -46,7 +46,7 @@ export function createMemberRequest(
         search: url.searchParams.get("search")?.trim() || undefined,
         role,
         roleMin: false,
-        sortBy: parseMemberSort(url.searchParams.get("sort") ?? "name",),
+        sortBy: parseMemberSort(url.searchParams.get("sort") ?? "name"),
         descending: url.searchParams.get("descending") !== "false",
         page: Math.max(1, Number(url.searchParams.get("page") ?? 1)),
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),

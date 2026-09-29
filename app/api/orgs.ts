@@ -3,11 +3,8 @@ import { ProjectDto } from "../types/project-types";
 import { UserDto } from "../types/user-types";
 import api from "./client";
 
-//endpoint actually returns CreatedAtAction
-export async function createOrgEndpoint(name: string): Promise<OrgDto>{
-  const response = await api.post<OrgDto>("/orgs", name);
-  console.log(response.headers);
-  return response.data;
+export async function createOrgEndpoint(name: string): Promise<void>{
+  await api.post<OrgDto>("/orgs", name);
 }
 
 export async function joinOrgEndpoint(orgId: string): Promise<void>{

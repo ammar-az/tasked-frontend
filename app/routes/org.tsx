@@ -1,20 +1,15 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useRevalidator, useSearchParams } from "react-router";
 
 import type { Route } from "./+types/org";
 
 import "./orgs.css";
 
-import {
-    getOrgByNameEndpoint,
-    getOrgProjectsEndpoint,
-    getOrgUsersEndpoint,
-    joinOrgEndpoint,
-    leaveOrgEndpoint,
-} from "../api/orgs";
+import { getOrgByNameEndpoint, getOrgProjectsEndpoint, getOrgUsersEndpoint, joinOrgEndpoint, leaveOrgEndpoint } from "../api/orgs";
 import { useAuth } from "../auth/AuthContext";
 import { OrgsRequest } from "../types/org-types";
 import { ProjectDto } from "../types/project-types";
 import { UserDto } from "../types/user-types";
+import { useEffect, useState } from "react";
 
 export async function clientLoader({
     params,
@@ -32,17 +27,8 @@ export async function clientLoader({
     const orgRequest: OrgsRequest = {
         search: url.searchParams.get("search")?.trim() || undefined,
         descending: url.searchParams.get("descending") === "true",
-        page: Math.max(
-            1,
-            Number(url.searchParams.get("page") ?? 1)
-        ),
-        pageSize: Math.min(
-            100,
-            Math.max(
-                1,
-                Number(url.searchParams.get("pageSize") ?? 20)
-            )
-        ),
+        page: Math.max(1,Number(url.searchParams.get("page") ?? 1)),
+        pageSize: Math.min(100,Math.max(1,Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
     var projects: Array<ProjectDto> = [];
@@ -73,25 +59,86 @@ export default function OrgPage({
     loaderData,
 }: Route.ComponentProps) {
     const { user, isAuthenticated } = useAuth();
-    const { org, projects, users, orgRequest } = loaderData;
+    const { 
+        org, 
+        projects: initialProjects, 
+        users: initialUsers, 
+        orgRequest: initialOrgRequest 
+    } = loaderData;
 
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] =
-        useSearchParams();
 
-    const view =
-        searchParams.get("view") ?? "projects";
+    const [orgRequest, setOrgRequest] = useState(initialOrgRequest);
+    const [projects, setProjects] = useState(initialProjects);
+    const [users, setUsers] = useState(initialUsers);
+    const [hasMore, setHasMore] = useState(initialProjects.length === initialOrgRequest.pageSize);
+    const [loadingMore, setLoadingMore] = useState(false);
+
+    const revalidator = useRevalidator();
+    
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchInput, setSearchInput] = useState(orgRequest.search ?? "");
+    const view = searchParams.get("view") ?? "projects";
 
     const isMember = user?.orgId == org.id;
 
+    useEffect(() => {
+        if(view == "users"){
+            setUsers(initialUsers);
+            setHasMore(initialUsers.length === initialOrgRequest.pageSize);
+        }else{
+            setProjects(initialProjects);
+            setHasMore(initialProjects.length === initialOrgRequest.pageSize);
+        }
+
+        setOrgRequest(initialOrgRequest);
+
+    }, [initialProjects, initialUsers, initialOrgRequest]);
+    
+    useEffect(() => {
+        if(searchInput === "") submitSearch();
+    }, [searchInput])
+
     async function handleJoin() {
         await joinOrgEndpoint(org.id);
-        navigate(0);
+        await revalidator.revalidate();
     }
 
     async function handleLeave() {
         await leaveOrgEndpoint(org.id);
-        navigate(0);
+        await revalidator.revalidate();
+    }
+
+    function updateQueryParameter(
+    name: string,
+    value: string | undefined,
+    ) {
+        setSearchParams((current) => {
+            const next = new URLSearchParams(current);
+
+            if (value === undefined || value === "") {
+                next.delete(name);
+            } else {
+                next.set(name, value);
+            }
+
+            return next;
+        });
+    }
+
+    function submitSearch() {
+        updateQueryParameter(
+            "search",
+            searchInput.trim() || undefined,
+        );
+    }
+
+    function changeDescending(
+        descending: boolean,
+    ) {
+        updateQueryParameter(
+            "descending",
+            String(descending),
+        );
     }
 
     function changeView(newView: "projects" | "users") {
@@ -104,35 +151,53 @@ export default function OrgPage({
         setSearchParams(params);
     }
 
-    function handleSearch(
-        event: React.ChangeEvent<HTMLInputElement>
-    ) {
-        const params = new URLSearchParams(searchParams);
+        async function loadMore() {
+            if (loadingMore || !hasMore) {
+                return;
+            }
+    
+            setLoadingMore(true);
+    
+            try {
+                const nextPage = orgRequest.page + 1;
+                var load = false;
+                if(view === "users"){
+                    const response = await getOrgUsersEndpoint(org.id, {
+                        ...orgRequest,
+                        page: nextPage,
+                    });
 
-        if (event.target.value.trim()) {
-            params.set("search", event.target.value);
-        } else {
-            params.delete("search");
+                    setUsers((current) => [
+                        ...current,
+                        ...response,
+                    ]);
+
+                    if(response.length === orgRequest.pageSize) load = true;
+                }else{
+                    const response = await getOrgProjectsEndpoint(org.id, {
+                        ...orgRequest,
+                        page: nextPage,
+                    });
+
+                    setProjects((current) => [
+                        ...current,
+                        ...response,
+                    ]);
+
+                    if(response.length === orgRequest.pageSize) load = true;
+                }
+    
+                setOrgRequest((current) => ({
+                    ...current,
+                    page: nextPage,
+                }));
+    
+                setHasMore(load);
+            } finally {
+                setLoadingMore(false);
+            }
         }
 
-        params.set("page", "1");
-
-        setSearchParams(params);
-    }
-
-    function handleSort() {
-        const params = new URLSearchParams(searchParams);
-
-        if(params.get("descending") === "true"){
-            params.set("descending", "false");
-        }else{
-            params.set("descending", "true");
-        }
-
-        params.set("page", "1");
-
-        setSearchParams(params);
-    }
 
     return (
         <main className="simple-layout">
@@ -206,7 +271,13 @@ export default function OrgPage({
                         </button>
                     </div>
 
-                    <div className="orgs-controls">
+                    <form 
+                        className="orgs-controls"
+                            onSubmit={(event) => {
+                            event.preventDefault();
+                            submitSearch();
+                        }}
+                    >
                         <input
                             type="search"
                             name="search"
@@ -216,7 +287,9 @@ export default function OrgPage({
                                     : "Search members..."
                             }
                             defaultValue={orgRequest.search ?? ""}
-                            onChange={handleSearch}
+                            onChange={(event) =>
+                                setSearchInput(event.target.value)
+                            }
                         />
 
                         <button
@@ -233,11 +306,13 @@ export default function OrgPage({
                                     ? "Sort ascending"
                                     : "Sort descending"
                             }
-                            onClick={handleSort}
+                            onClick={() =>
+                                changeDescending(!orgRequest.descending)
+                            }
                         >
                             {orgRequest.descending ? "↓" : "↑"}
                         </button>
-                    </div>
+                    </form>
 
                     {view === "projects" ? (
                         <div className="org-list">
@@ -291,6 +366,22 @@ export default function OrgPage({
                             )}
                         </div>
                     )}
+                    {(users.length > 0 && view == "users" || projects.length > 0 && view == "projects") && 
+                            <button
+                                type="button"
+                                className="org-list-item"
+                                disabled={loadingMore || !hasMore}
+                                onClick={loadMore}
+                            >
+                                {loadingMore
+                                    ? "Loading..."
+                                    : hasMore
+                                    ? "Load More"
+                                    : view === "projects"
+                                    ? "No more projects"
+                                    : "No more users"}
+                            </button>
+                    }
                 </section>
             </div>
         </main>

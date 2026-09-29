@@ -20,8 +20,7 @@ export default function InviteProjectModal({
 }: InviteProjectModalProps) {
     const [search, setSearch] = useState("");
     const [projects, setProjects] = useState<MemberOverviewDto[]>([]);
-    const [selectedProject, setSelectedProject] =
-        useState<MemberOverviewDto | null>(null);
+    const [selectedProject, setSelectedProject] = useState<MemberOverviewDto | null>(null);
 
     const [loading, setLoading] = useState(false);
     const [inviting, setInviting] = useState(false);
@@ -46,20 +45,14 @@ export default function InviteProjectModal({
                     pageSize: 20,
                 };
 
-                const result =
-                    await getUserProjectsEndpoint(
-                        user!.id,
-                        request,
-                    );
+                const result = await getUserProjectsEndpoint(user!.id,request);
 
                 if (!cancelled) {
                     setProjects(result);
                 }
             } catch {
                 if (!cancelled) {
-                    setError(
-                        "Unable to load your projects.",
-                    );
+                    setError("Unable to load your projects.");
                 }
             } finally {
                 if (!cancelled) {
@@ -88,9 +81,7 @@ export default function InviteProjectModal({
 
             onClose();
         } catch {
-            setError(
-                "Unable to send the project invite.",
-            );
+            setError("Unable to send the project invite.");
         } finally {
             setInviting(false);
         }

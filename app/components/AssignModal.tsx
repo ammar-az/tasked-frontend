@@ -14,6 +14,7 @@ import { getMemberRoleLabel } from "../utils/enum-helpers";
 interface AssignTaskModalProps {
     todoId: string;
     projectSlug: string;
+    current: string | undefined;
     onClose: () => void;
     onAssign: (member: MemberDto) => Promise<void>;
 }
@@ -21,6 +22,7 @@ interface AssignTaskModalProps {
 export default function AssignTaskModal({
     todoId,
     projectSlug,
+    current,
     onClose,
     onAssign,
 }: AssignTaskModalProps) {
@@ -52,19 +54,14 @@ export default function AssignTaskModal({
                     };
     
                     const result =
-                        await getMembersEndpoint(
-                            projectSlug,
-                            request,
-                        );
+                        await getMembersEndpoint(projectSlug, request);
     
                     if (!cancelled) {
                         setMembers(result);
                     }
                 } catch {
                     if (!cancelled) {
-                        setError(
-                            "Unable to load project members.",
-                        );
+                        setError("Unable to load project members.");
                     }
                 } finally {
                     if (!cancelled) {
@@ -93,9 +90,7 @@ export default function AssignTaskModal({
 
             onClose();
         } catch {
-            setError(
-                "Unable to assign the task",
-            );
+            setError("Unable to assign the task");
         } finally {
             setAssigning(false);
         }
@@ -179,9 +174,7 @@ export default function AssignTaskModal({
                                         </span>
     
                                         <span className="selection-modal-role">
-                                            {getMemberRoleLabel(
-                                                member.role,
-                                            )}
+                                            {current === member.userId ? "(Currently Assigned)" : getMemberRoleLabel(member.role)}
                                         </span>
                                     </button>
                                 );
@@ -213,7 +206,8 @@ export default function AssignTaskModal({
                         >
                             {assigning
                                 ? "assigning..."
-                                : "Assign"}
+                                : current === selectedMember?.userId 
+                                ? "Unassign": "Assign"}
                         </button>
                     </div>
                 </section>

@@ -27,6 +27,11 @@ export interface TodoDto{
     issueNo: number;
 }
 
+export interface TodoAssignRequest{
+    unassign: boolean;
+    assignId: string | undefined;
+}
+
 export interface TodoRequest{
     title: string;
     description: string | undefined;
@@ -35,11 +40,9 @@ export interface TodoRequest{
 }
 
 export interface TodoUpdateRequest{
-    title: string | undefined;
+    title: string;
     description: string | undefined;
-    status: TodoStatus | undefined;
-    assigned: string | undefined;
-    unassign: boolean;
+    status: TodoStatus;
 }
 
 export interface MultiTodoRequest{

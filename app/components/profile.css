@@ -1,6 +1,5 @@
 .profile-page {
     width: min(1200px, calc(100% - 2rem));
-    margin: 2rem auto;
 }
 
 /* Profile header */
@@ -10,7 +9,7 @@
     grid-template-columns: 120px minmax(0, 1fr) auto;
     gap: 2rem;
     align-items: center;
-    min-height: 260px;
+    min-height: 200px;
 }
 
 .profile-avatar {
@@ -53,6 +52,7 @@
     align-items: center;
     min-width: 180px;
     min-height: 60px;
+    margin: 2rem;
     padding: 0.75rem 1.25rem;
     border: 1px solid var(--border);
     background: none;
@@ -75,14 +75,30 @@
 /* Tabs / content */
 
 .profile-content {
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    height: min(650px, calc(100vh - 300px));
+    min-height: 0;
+    margin-bottom: 2rem;
 }
 
 .profile-tab-content {
-    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     border: 1px solid var(--border);
     border-top: none;
+    overflow: hidden;
 }
+
+.profile-tab-content .enclosed-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 
 /* List content */
 

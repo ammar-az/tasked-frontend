@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-    Link,
-    useNavigate,
-    useSearchParams,
-} from "react-router";
+import { Link, useRevalidator,useSearchParams } from "react-router";
 
 import type { Route } from "./+types/project";
 
@@ -42,14 +38,10 @@ export async function clientLoader({
         pageSize: Math.min(100, Math.max(1, Number(url.searchParams.get("pageSize") ?? 20))),
     };
 
-    try
-    {    const [project, todos, member] = await Promise.all([
+    try {    
+        const [project, todos, member] = await Promise.all([
             getProjectEndpoint(params.slug),
-
-            getProjectTodosEndpoint(
-                params.slug,
-                todoRequest,
-            ),
+            getProjectTodosEndpoint(params.slug, todoRequest),
             getMemberEndpoint(params.slug),
         ]);
 
@@ -59,7 +51,7 @@ export async function clientLoader({
             member,
             todoRequest,
         };
-    }catch{
+    } catch {
         throw new Response("This project doesn't exist or you don't have permission to view it.", {
             status: 404,
         });
@@ -78,34 +70,20 @@ export default function ProjectPage({
     } = loaderData;
 
     const [todos, setTodos] = useState(initialTodos);
-    const [todoRequest, setTodoRequest] = useState(
-        initialTodoRequest,
-    );
-    const [hasMore, setHasMore] = useState(
-        initialTodos.length === initialTodoRequest.pageSize,
-    );
+    const [todoRequest, setTodoRequest] = useState(initialTodoRequest);
+    const [hasMore, setHasMore] = useState(initialTodos.length === initialTodoRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
-
-    const navigate = useNavigate();
     
-    const [_, setSearchParams] =
-        useSearchParams();
+    const [_, setSearchParams] = useSearchParams();
 
-    const [searchInput, setSearchInput] = useState(
-        todoRequest.search ?? "",
-    );
+    const [searchInput, setSearchInput] = useState(todoRequest.search ?? "");
 
-    const [selectedTodoId, setSelectedTodoId] =
-        useState<string | null>(
-            todos[0]?.id ?? null,
-        );
+    const [selectedTodoId, setSelectedTodoId] = useState<string | null>(todos[0]?.id ?? null);
     
     useEffect(() => {
         setTodos(initialTodos);
         setTodoRequest(initialTodoRequest);
-        setHasMore(
-            initialTodos.length === initialTodoRequest.pageSize,
-        );
+        setHasMore(initialTodos.length === initialTodoRequest.pageSize);
     }, [initialTodos, initialTodoRequest]);
 
     useEffect(() => {
@@ -186,46 +164,48 @@ export default function ProjectPage({
     }
 
     async function loadMore() {
-    if (loadingMore || !hasMore) {
-        return;
+        if (loadingMore || !hasMore) {
+            return;
+        }
+
+        setLoadingMore(true);
+
+        try {
+            const nextPage = todoRequest.page + 1;
+
+            const response = await getProjectTodosEndpoint(params.slug, {
+                ...todoRequest,
+                page: nextPage,
+            });
+
+            setTodos((current) => [
+                ...current,
+                ...response,
+            ]);
+
+            setTodoRequest((current) => ({
+                ...current,
+                page: nextPage,
+            }));
+
+            setHasMore(
+                response.length === todoRequest.pageSize,
+            );
+        } finally {
+            setLoadingMore(false);
+        }
     }
 
-    setLoadingMore(true);
-
-    try {
-        const nextPage = todoRequest.page + 1;
-
-        const response = await getProjectTodosEndpoint(params.slug, {
-            ...todoRequest,
-            page: nextPage,
-        });
-
-        setTodos((current) => [
-            ...current,
-            ...response,
-        ]);
-
-        setTodoRequest((current) => ({
-            ...current,
-            page: nextPage,
-        }));
-
-        setHasMore(
-            response.length === todoRequest.pageSize,
-        );
-    } finally {
-        setLoadingMore(false);
-    }
-}
+    const revalidator = useRevalidator();
 
     async function handleJoin(){
         await joinEndpoint(project.id);
-        navigate(0); 
+        await revalidator.revalidate();
     }
 
     async function handleLeave(){
         await leaveEndpoint(project.id);
-        navigate(0); 
+        await revalidator.revalidate(); 
     }
 
     return (
@@ -459,18 +439,20 @@ export default function ProjectPage({
                             </div>
                         )}
 
-                        <button
-                            type="button"
-                            className="project-task-load-more"
-                            disabled={loadingMore || !hasMore}
-                            onClick={loadMore}
-                        >
-                            {loadingMore
-                                ? "Loading..."
-                                : hasMore
-                                ? "Load More"
-                                : "No more tasks"}
-                        </button>
+                        {todos.length > 0 && 
+                            <button
+                                type="button"
+                                className="list-load-more"
+                                disabled={loadingMore || !hasMore}
+                                onClick={loadMore}
+                            >
+                                {loadingMore
+                                    ? "Loading..."
+                                    : hasMore
+                                    ? "Load More"
+                                    : "No more tasks"}
+                            </button>
+                        }
                     </div>
                 </div>
 

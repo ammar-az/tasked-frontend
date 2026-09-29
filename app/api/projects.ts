@@ -3,9 +3,8 @@ import type { ProjectDto, ProjectRequest, ProjectUpdateRequest } from "../types/
 import type { MultiTodoRequest, TodoDto } from "../types/todo-types";
 import api from "./client";
 
-//endpoint actually returns CreatedAtAction
-export async function createProjectEndpoint(request: ProjectRequest): Promise<ProjectDto>{
-  const response = await api.post<ProjectDto>("/projects", request);
+export async function createProjectEndpoint(request: ProjectRequest): Promise<string>{
+  const response = await api.post<string>("/projects", request);
   return response.data;
 }
 
@@ -23,20 +22,16 @@ export async function deleteProjectEndpoint(projectId: string): Promise<void>{
   await api.delete(`/projects/${projectId}`);
 }
 
-//endpoint actually returns CreatedAtAction
-export async function joinEndpoint(projectId: string): Promise<MemberDto>{
-  const response = await api.post<MemberDto>(`/projects/${projectId}/join`);
-  return response.data;
+export async function joinEndpoint(projectId: string): Promise<void>{
+  await api.post(`/projects/${projectId}/join`);
 }
 
 export async function leaveEndpoint(projectId: string): Promise<void>{
   await api.delete(`/projects/${projectId}/leave`);
 }
 
-//endpoint actually returns CreatedAtAction
-export async function inviteEndpoint(projectId: string, userId: string): Promise<MemberDto>{
-  const response = await api.post<MemberDto>(`/projects/${projectId}/invite/${userId}`);
-  return response.data;
+export async function inviteEndpoint(projectId: string, userId: string): Promise<void>{
+  await api.post(`/projects/${projectId}/invite/${userId}`);
 }
 
 export async function rejectEndpoint(projectId: string): Promise<void>{
