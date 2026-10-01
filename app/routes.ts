@@ -67,5 +67,10 @@ export default [
         "routes/create.tsx",
     ),
 
+    route(
+        "demo",
+        "routes/demo.tsx",
+    ),
+
     route("*", "./routes/not-found.tsx")
 ] satisfies RouteConfig;

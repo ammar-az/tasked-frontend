@@ -315,7 +315,7 @@ export default function MembersPage({
                     className="back-button"
                 >
                     <span aria-hidden="true">←</span>
-                    Back to {project.slug}
+                    Back to {project.name}
                 </Link>
             </aside>
             <div className="members-page">

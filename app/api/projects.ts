@@ -8,6 +8,10 @@ export async function createProjectEndpoint(request: ProjectRequest): Promise<st
   return response.data;
 }
 
+export async function createDemoEndpoint(): Promise<void>{
+  await api.post<string>("/projects/demo");
+}
+
 export async function getProjectEndpoint(projectSlug: string): Promise<ProjectDto> {
   const response = await api.get<ProjectDto>(`/projects/${projectSlug}`);
   return response.data;

@@ -15,6 +15,7 @@ import {
 import "./project.css";
 import { getTodoStatusLabel, parseTodoStatus, isMember, isAdmin, canContribute, parseTodoSort } from "../utils/enum-helpers";
 import { JoinPolicy } from "../types/project-types";
+import { MemberRole } from "../types/membership-types";
 
 export async function clientLoader({
     params,
@@ -60,8 +61,21 @@ export async function clientLoader({
 
 export default function ProjectPage({
     loaderData,
-    params,
 }: Route.ComponentProps) {
+    return (
+        <ProjectView
+            loaderData={loaderData}
+        />
+    );
+}
+
+export type ProjectPageData = Route.ComponentProps["loaderData"];
+
+export function ProjectView({
+    loaderData,
+}: {
+    loaderData: ProjectPageData;
+}) {
     const {
         project,
         todos: initialTodos,
@@ -69,6 +83,7 @@ export default function ProjectPage({
         todoRequest: initialTodoRequest,
     } = loaderData;
 
+    const slug = loaderData.project.slug;
     const [todos, setTodos] = useState(initialTodos);
     const [todoRequest, setTodoRequest] = useState(initialTodoRequest);
     const [hasMore, setHasMore] = useState(initialTodos.length === initialTodoRequest.pageSize);
@@ -173,7 +188,7 @@ export default function ProjectPage({
         try {
             const nextPage = todoRequest.page + 1;
 
-            const response = await getProjectTodosEndpoint(params.slug, {
+            const response = await getProjectTodosEndpoint(slug, {
                 ...todoRequest,
                 page: nextPage,
             });
@@ -220,12 +235,12 @@ export default function ProjectPage({
                 </div>
 
                 <aside className="project-actions">
-                    <Link to={`/projects/${params.slug}/members`}>
+                    <Link to={`/projects/${slug}/members`}>
                         Member List
                     </Link>
 
                     {canContribute(role) && (
-                        <Link to={`/projects/${params.slug}/tasks/new`}>
+                        <Link to={`/projects/${slug}/tasks/new`}>
                             New Task
                         </Link>
                     )}
@@ -236,12 +251,12 @@ export default function ProjectPage({
                         </Link>
                     )}
 
-                    {isMember(role) ? (
+                    {isMember(role) && !(role == MemberRole.Owner) ? (
                         <button type="button" onClick={handleLeave}>
                             Leave Project
                         </button>
                     ) : (
-                        project.joinPolicy !== JoinPolicy.Closed && (
+                        project.joinPolicy !== JoinPolicy.Closed && !(role == MemberRole.Owner) && (
                             <button type="button" onClick={handleJoin}>
                                 Join Project
                             </button>
@@ -469,7 +484,7 @@ export default function ProjectPage({
                                 </div>
 
                                 <Link
-                                    to={`/projects/${params.slug}/tasks/${selectedTodo.issueNo}`}
+                                    to={`/projects/${slug}/tasks/${selectedTodo.issueNo}`}
                                 >
                                     Open Task
                                 </Link>

@@ -99,7 +99,8 @@ export function isMember(role: MemberRole | undefined): boolean{
     return(role !== undefined && role !== MemberRole.Banned && role !== MemberRole.Invited);
 }
 
-export function isAdmin(role: MemberRole): boolean{
+export function isAdmin(role: MemberRole | undefined): boolean{
+        if(role == undefined) return false;
         return(role === MemberRole.Owner || role === MemberRole.Admin);
 }
 

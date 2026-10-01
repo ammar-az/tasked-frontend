@@ -73,14 +73,6 @@ export default function CreateProjectPage() {
     return (
         <main className="page-layout">
             <div className = "page-side">
-                <button
-                        type="button"
-                        className="back-button"
-                        onClick={() => navigate(-1)}
-                        aria-label="Back to project"
-                    >
-                        ←
-                    </button>
             </div>
             <div className="page-main">
                 <form

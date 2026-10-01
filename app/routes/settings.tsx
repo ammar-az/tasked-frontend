@@ -201,7 +201,7 @@ export default function ProjectSettingsPage({
                     className="back-button"
                 >
                     <span aria-hidden="true">←</span>
-                    Back to {project.slug}
+                    Back to {project.name}
                 </Link>
             </div>
                 
