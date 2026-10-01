@@ -14,9 +14,7 @@ export async function getUserByNameEndpoint(username: string): Promise<UserDto> 
 }
 
 export async function deleteUserEndpoint(): Promise<void> {
-    const response = await api.delete("/users");
-    console.log(response.data);
-    return;
+    await api.delete("/users");
 }
 
 export async function updateUserEndpoint(request: UserUpdateRequest): Promise<UserDto> {

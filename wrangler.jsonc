@@ -8,6 +8,9 @@
 		"enabled": true
 	},
 	"upload_source_maps": true,
+	"vars": {
+    	"VITE_API_URL": "https://tasked-api-b5hxg2c6f4c3fybt.westus2-01.azurewebsites.net"
+	},
 	"assets": {
 		"directory": "./build/client",
 		"not_found_handling": "single-page-application"

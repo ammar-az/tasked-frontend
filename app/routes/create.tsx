@@ -54,8 +54,7 @@ export default function CreateProjectPage() {
         
             const slug = await createProjectEndpoint(request);
             navigate(`/projects/${slug}`);
-            
-            console.log("Create project:", request);
+                        
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 if (error.response) {

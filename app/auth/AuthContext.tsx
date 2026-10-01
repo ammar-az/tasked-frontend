@@ -51,7 +51,6 @@ export function AuthProvider({children}: Props){
         setToken(res.token);
         setAccessToken(res.token);
         setUser(res.user);
-        console.log(user);
     }
 
     async function register(username: string, password: string){
@@ -76,25 +75,20 @@ export function AuthProvider({children}: Props){
         let cancelled = false;
 
         async function restoreSession(){
-            console.log("Auth initialization started");
-
             try {
                 const res = await refreshSession();
                 if(!cancelled){
-                    console.log("Refresh succeeded", res);
                     setToken(res.token);
                     setAccessToken(res.token);
                     setUser(res.user);
                 }
             } catch (error){
-                console.error("Refresh failed", error);
                 if(!cancelled){
                     setToken(null);
                     setAccessToken(null);
                     setUser(null);
                 }
             } finally {
-                console.log("Auth initialization finished");
                 if(!cancelled) setInitialized(true);
             }
         }
