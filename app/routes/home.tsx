@@ -80,7 +80,7 @@ const showcaseProjects = [
             "A guided project designed to help new users discover the features available in Tasked.",
         taskCount: 10,
         memberCount: 1,
-        link: "/projects/explore-tasked",
+        link: "/demo",
     },
 ];
 

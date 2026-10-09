@@ -10,6 +10,7 @@ import { OrgsRequest } from "../types/org-types";
 import { ProjectDto } from "../types/project-types";
 import { UserDto } from "../types/user-types";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export async function clientLoader({
     params,
@@ -72,6 +73,8 @@ export default function OrgPage({
     const [users, setUsers] = useState(initialUsers);
     const [hasMore, setHasMore] = useState(initialProjects.length === initialOrgRequest.pageSize);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isMember, setIsMember] = useState<boolean>(user?.orgId == org.id)
 
     const revalidator = useRevalidator();
     
@@ -79,7 +82,6 @@ export default function OrgPage({
     const [searchInput, setSearchInput] = useState(orgRequest.search ?? "");
     const view = searchParams.get("view") ?? "projects";
 
-    const isMember = user?.orgId == org.id;
 
     useEffect(() => {
         if(view == "users"){
@@ -99,13 +101,41 @@ export default function OrgPage({
     }, [searchInput])
 
     async function handleJoin() {
-        await joinOrgEndpoint(org.id);
-        await revalidator.revalidate();
+        try{
+            await joinOrgEndpoint(org.id);
+            await revalidator.revalidate();
+            setIsMember(!isMember);
+            setError(null);
+        }catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Could not join organization.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
+        }
     }
 
     async function handleLeave() {
-        await leaveOrgEndpoint(org.id);
-        await revalidator.revalidate();
+        try{
+            await leaveOrgEndpoint(org.id);
+            await revalidator.revalidate();
+            setIsMember(!isMember);
+            setError(null);
+        }catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    setError(error.response.data ?? "Could not leave organization.");
+                } else {
+                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
+        }
     }
 
     function updateQueryParameter(
@@ -214,9 +244,9 @@ export default function OrgPage({
                         <h1>{org.name}</h1>
 
                         <p>
-                            Organization information can go here
-                            later. For now just the GUID: {org.id}
+                            A real-world application would likely restrict who could join organizations, but for demo purposes all users can freely join or leave organizations. 
                         </p>
+                        {error && (<p className="error">{error}</p>)} 
                     </div>
 
                     {isAuthenticated && (
@@ -236,6 +266,7 @@ export default function OrgPage({
                                     Join Organization
                                 </button>
                             )}
+                            
                         </div>
                     )}
                 </section>
