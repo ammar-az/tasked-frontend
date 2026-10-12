@@ -90,7 +90,7 @@ export async function clientLoader({
 
         sortBy: parseMemberSort(url.searchParams.get("sort")) ?? MemberSort.Role,
 
-        descending: url.searchParams.get("descending") !== "true",
+        descending: url.searchParams.get("descending") === "true",
 
         page: 1,
         

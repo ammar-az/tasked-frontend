@@ -67,7 +67,7 @@ const showcaseProjects = [
         name: "Tasked Development",
         description:
             "Project chronicling ",
-        taskCount: 47,
+        taskCount: 78,
         memberCount: 1,
         link: "/projects/tasked-development",
     },
@@ -75,8 +75,8 @@ const showcaseProjects = [
         name: "Collaborative Development",
         description:
             "A sample collaborative project demonstrating tasks, assignments, project roles, and organization membership.",
-        taskCount: 32,
-        memberCount: 8,
+        taskCount: 8,
+        memberCount: 5,
         link: "/projects/teamwork-demo",
     },
     {
@@ -84,7 +84,7 @@ const showcaseProjects = [
         description:
             "A guided project designed to help new users discover the features available in Tasked.",
         taskCount: 10,
-        memberCount: 1,
+        memberCount: 2,
         link: "/demo",
     },
 ];
