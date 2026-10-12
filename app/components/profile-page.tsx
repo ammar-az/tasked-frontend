@@ -270,7 +270,7 @@ export default function ProfilePage({
                                                 to={`/projects/${task.projectSlug}/tasks/${task.issueNo}`}
                                                 className="enclosed-list-name"
                                             >
-                                                {task.title}
+                                                {task.title} | {task.projectName}
                                             </Link>
 
                                             <span className="profile-list-label">

@@ -32,6 +32,7 @@ export default function Navbar() {
 
             <Link to="/" className="navbar-title">
                 Tasked
+                <img src="/tasked-ico.svg" alt="" className="navbar-logo" />
             </Link>
 
             <div className="navbar-right">
