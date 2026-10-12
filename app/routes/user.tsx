@@ -52,6 +52,12 @@ export async function clientLoader({
     };
 }
 
+export function meta({ loaderData }: Route.MetaArgs) {
+    return [
+        { title: `${loaderData.user.username} - Tasked` }
+    ];
+}
+
 export default function UserPage({
     loaderData,
 }: Route.ComponentProps) {

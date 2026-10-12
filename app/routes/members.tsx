@@ -116,6 +116,12 @@ export async function clientLoader({
     }
 }
 
+export function meta({ loaderData }: Route.MetaArgs) {
+    return [
+        { title: `${loaderData.project.name} Members - Tasked` }
+    ];
+}
+
 export default function MembersPage({
     loaderData,
     params,

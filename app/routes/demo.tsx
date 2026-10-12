@@ -65,6 +65,12 @@ export async function clientLoader({
     }
 }
 
+export function meta() {
+    return [
+        { title: "Demo - Tasked" }
+    ];
+}
+
 interface DemoEntryPageProps {
     onStart: () => void;
 }

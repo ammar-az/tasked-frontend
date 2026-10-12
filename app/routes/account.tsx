@@ -91,6 +91,12 @@ export async function clientLoader({
     }
 }
 
+export function meta() {
+    return [
+        { title: "Account Home - Tasked" }
+    ];
+}
+
 export default function AccountPage({
     loaderData,
 }: Route.ComponentProps) {

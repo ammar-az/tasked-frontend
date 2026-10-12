@@ -1,5 +1,13 @@
+import { ErrorPage } from "../root";
+
+export function meta() {
+    return [
+        { title: "404 Not Found - Tasked" }
+    ];
+}
+
 export default function NotFoundPage(){
     return (
-    <h1>404 Not Found</h1>
+    <ErrorPage title="404" message="This page was not found"></ErrorPage>
     )
 }

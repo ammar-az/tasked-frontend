@@ -4,6 +4,12 @@ import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+export function meta() {
+    return [
+        { title: "Login - Tasked" }
+    ];
+}
+
 export default function LoginPage({}: Route.ComponentProps) {
     const {login, isAuthenticated} = useAuth();
     const [username, setUsername] = useState('');

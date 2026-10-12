@@ -38,7 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ErrorPage({
+export function ErrorPage({
     title,
     message,
 }: {

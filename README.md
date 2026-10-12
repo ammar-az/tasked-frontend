@@ -1,81 +1,146 @@
-# React + Vite Cloudflare Workers
+# Tasked — Frontend
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/vite-react-template)
+The frontend for **Tasked**, a full-stack project management application for organizing projects, managing tasks, and collaborating with other users.
 
-This template provides a minimal setup for building a React application with TypeScript and Vite, designed to run on Cloudflare Workers. It features hot module replacement, ESLint integration, and the flexibility of Workers deployments.
+Built with React and TypeScript using React Router Framework Mode, the application provides a responsive interface that communicates with the Tasked backend API for authentication, project management, and task operations.
 
-![React + TypeScript + Vite + Cloudflare Workers](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/fc7b4b62-442b-4769-641b-ad4422d74300/public)
+## Tech Stack
 
-<!-- dash-content-start -->
+- **Language:** TypeScript
+- **UI Library:** React
+- **Routing:** React Router Framework Mode
+- **Build Tool:** Vite
+- **HTTP Client:** Axios
+- **Styling:** CSS
+- **Deployment:** Cloudflare Workers
+- **Development Tools:** ESLint, Wrangler
 
-🚀 Supercharge your web development with this powerful stack:
+## Features
 
-- [**React**](https://react.dev/) - A modern UI library for building interactive interfaces
-- [**Vite**](https://vite.dev/) - Lightning-fast build tooling and development server
-- [**Cloudflare Workers**](https://developers.cloudflare.com/workers/) - Edge computing platform for global deployment
+- **Project Management:** Browse and manage projects, including project settings and membership.
+- **Task Management:** Create, update, organize, assign, and track tasks.
+- **Authentication:** Integrate with the backend's custom authentication system.
+- **Session Management:** Restore authenticated sessions using refresh tokens.
+- **Collaboration:** Support project membership, roles, and shared project workflows.
+- **Search and Filtering:** Find and organize projects and tasks using available filtering and sorting options.
+- **API Integration:** Communicate with the backend through typed API requests using Axios.
 
-### ✨ Key Features
+## Architecture
 
-- 🔥 Hot Module Replacement (HMR) for rapid development
-- 📦 TypeScript support out of the box
-- 🛠️ ESLint configuration included
-- ⚡ Zero-config deployment to Cloudflare's global network
-- 🔄 Full-stack development setup
-- 🔎 Built-in Observability to monitor your Worker
+The frontend is a client-side application built with React and React Router Framework Mode. It communicates with the Tasked backend through HTTP requests and relies on the API for application data, authentication, and authorization.
 
-Get started in minutes with local development or deploy directly via the Cloudflare dashboard. Perfect for building modern, performant web applications at the edge.
+Server-side rendering is disabled; the application is deployed as a client-side experience on Cloudflare Workers.
 
-<!-- dash-content-end -->
+```text
+Browser
+   |
+   | React + TypeScript
+   v
+Tasked Frontend
+   |
+   | HTTPS / REST API
+   | JWT + Refresh Cookie
+   v
+ASP.NET Core Backend API
+```
+
+The frontend and backend are deployed independently. The frontend is hosted on Cloudflare Workers, while the backend API and SQL Server database are hosted on Azure.
 
 ## Getting Started
 
-To start a new project with this template, run:
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) and npm
+- Access to a running Tasked backend API
+
+### 1. Clone the Repository
 
 ```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template
+git clone <https://github.com/ammar-az/tasked-frontend>
+cd <frontend-repository-directory>
 ```
 
-A live deployment of this template is available at:
-[https://react-vite-template.templates.workers.dev](https://react-vite-template.templates.workers.dev)
-
-## Development
-
-Install dependencies:
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-Start the development server with:
+### 3. Configure the Environment
+
+The repository includes a .env.production file configured for the deployed API. For local development, create a .env.development file in the project root:
+
+VITE_API_URL=http://localhost:8080/api
+
+Replace the example URL with the address of your local backend API.
+
+Ensure the backend is running and configured to allow requests from the frontend's development origin.
+
+The frontend and backend are maintained in separate repositories and can be developed, built, and deployed independently.
+
+### 4. Start the Development Server
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at [http://localhost:5173](http://localhost:5173).
+Vite starts the development server and displays the local URL in the terminal.
 
-## Production
+## Available Scripts
 
-Build your project for production:
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the Vite development server. |
+| `npm run build` | Build the production application using React Router. |
+| `npm run preview` | Build the application and preview the production build locally. |
+| `npm run typecheck` | Generate React Router types and run TypeScript checks. |
+| `npm run lint` | Run ESLint across the project. |
+| `npm run check` | Run type checks, build the application, and validate the Cloudflare deployment with a Wrangler dry run. |
+| `npm run cf-typegen` | Generate Cloudflare Worker types using Wrangler. |
+| `npm run deploy` | Deploy the application using Wrangler. |
+
+## Authentication
+
+The frontend integrates with Tasked's custom authentication system implemented in the backend API.
+
+- **Access tokens:** Held in memory and attached to protected API requests using Axios.
+- **Refresh tokens:** Managed through an HTTP-only cookie issued by the backend.
+- **Session restoration:** Uses the refresh endpoint to restore authenticated sessions when the application initializes.
+- **Credentialed requests:** Axios is configured to include cookies when communicating with the API.
+
+The backend remains responsible for issuing and validating tokens, managing refresh-token rotation, and enforcing authorization.
+
+## Deployment
+
+The production frontend is deployed to **Cloudflare Workers** using Wrangler.
+
+To create a production build:
 
 ```bash
 npm run build
 ```
 
-Preview your build locally:
+To validate the deployment configuration without deploying:
 
 ```bash
-npm run preview
+npx wrangler deploy --dry-run
 ```
 
-Deploy your project to Cloudflare Workers:
+To deploy the application:
 
 ```bash
-npm run build && npm run deploy
+npm run deploy
 ```
 
-Monitor your workers:
+The deployment requires the appropriate Cloudflare account access and Wrangler configuration. The frontend's production API URL is configured through `.env.production` and is incorporated into the production build.
 
-```bash
-npx wrangler tail
-```
+## Related Project
+
+Tasked's backend is built with C#, ASP.NET Core, Entity Framework Core, and SQL Server.
+
+- **Backend Repository:** [Backend API](https://github.com/ammar-az/Tasked)
+- **Live Application:** [Tasked](https://tasked.ammarz.com)
+
+---
+
+This project demonstrates frontend development with React and TypeScript, client-side routing, API integration, authentication flows, and cloud deployment.

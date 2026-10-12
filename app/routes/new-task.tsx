@@ -8,6 +8,12 @@ import { createTodoEndpoint } from "../api/todos";
 import "./task.css";
 import axios from "axios";
 
+export function meta() {
+    return [
+        { title: "New Task - Tasked" }
+    ];
+}
+
 export default function NewTaskPage({
     params,
 }: Route.ComponentProps) {

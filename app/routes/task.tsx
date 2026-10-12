@@ -55,6 +55,12 @@ export async function clientLoader({
     }
 }
 
+export function meta({ loaderData }: Route.MetaArgs) {
+    return [
+        { title: `${loaderData.todo.projectName}/${loaderData.todo.issueNo} - Tasked` }
+    ];
+}
+
 export default function TaskPage({
     loaderData,
     params,

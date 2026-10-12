@@ -56,6 +56,12 @@ export async function clientLoader({
     }
 }
 
+export function meta({ loaderData }: Route.MetaArgs) {
+    return [
+        { title: `${loaderData.org.name} - Tasked` }
+    ];
+}
+
 export default function OrgPage({
     loaderData,
 }: Route.ComponentProps) {

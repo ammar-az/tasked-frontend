@@ -7,6 +7,12 @@ import { useAuth } from "../auth/AuthContext";
 import "./create.css";
 import axios from "axios";
 
+export function meta() {
+    return [
+        { title: "Create Project - Tasked" }
+    ];
+}
+
 export default function CreateProjectPage() {
     const navigate = useNavigate();
 

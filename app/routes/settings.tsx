@@ -68,6 +68,12 @@ export async function clientLoader({
     }
 }
 
+export function meta({ loaderData }: Route.MetaArgs) {
+    return [
+        { title: `${loaderData.project.name} Settings - Tasked` }
+    ];
+}
+
 export default function ProjectSettingsPage({
     loaderData,
 }: Route.ComponentProps) {

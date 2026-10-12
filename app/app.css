@@ -477,6 +477,20 @@ svg {
     border-color: var(--danger);
 }
 
+.error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    font-size: 2rem;
+
+    margin-top: auto;
+    margin-bottom: auto;
+
+    justify-items: center;
+    justify-content: center;
+}
+
 /* Accessibility / motion */
 
 @media (prefers-reduced-motion: reduce) {
