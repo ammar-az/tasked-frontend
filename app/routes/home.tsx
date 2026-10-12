@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import type { Route } from "./+types/home";
 import "./home.css";
 import { useEffect, useState } from "react";
+import ArchitecturePanel from "../components/ArchitecturePanel";
 
 export function meta({}: Route.MetaArgs) {
     return [
@@ -9,7 +10,7 @@ export function meta({}: Route.MetaArgs) {
         {
             name: "description",
             content:
-                "Task management and collaboration built around your projects.",
+                "Task management and collaboration built around projects.",
         },
     ];
 }
@@ -18,30 +19,30 @@ const features = [
     {
         title: "Projects",
         description:
-            "pretty important stuff should let em know. Let's see how longer descriptions look. pretty important stuff should let em know. Let's see how longer descriptions look pretty important stuff should let em know. Let's see how longer descriptions look pretty important stuff should let em know. Let's see how longer descriptions look",
-        link: "/projects",
-        linkText: "Explore Projects",
+            "From a personal to-do list to a collaborative workspace, start with a project. Join an existing project to get to work, or create your own to organize work, configure project settings, and manage project members.",
+        link: "/create",
+        linkText: "Create a project",
     },
     {
         title: "Tasks",
         description:
-            "Track individual pieces of work, assign them to team members, and move them through their lifecycle.",
-        link: "/projects",
-        linkText: "View Tasks",
+            "Break projects into manageable tasks. Create and edit tasks, assign responsibilities, track progress through status updates, and easily search for tasks within each project.",
+        link: "",
+        linkText: "",
+    },
+    {
+        title: "Collaboration",
+        description:
+            "Tasked simplifies collaboration with project invitations, configurable visibility and join policies, and project-specific roles. Bring project members together while maintaining control over how each project is accessed and managed.",
+        link: "",
+        linkText: "",
     },
     {
         title: "Accounts",
         description:
-            "Nah no way this page makes the cut lmao",
+            "Keep track of your projects and assigned tasks from the account page, and explore other users' profiles. Refresh-token authentication keeps sessions active without requiring frequent sign-ins.",
         link: "/myaccount",
         linkText: "View your account",
-    },
-    {
-        title: "Organizations",
-        description:
-            "Well it's a proof of concept but you know how it is :P",
-        link: "/orgs",
-        linkText: "Explore Organizations",
     },
 ];
 
@@ -54,6 +55,10 @@ const slides = [
         type: "feature" as const,
         ...feature,
     })),
+    {
+        type: "Architecture" as const,
+        title: "Architecture",
+    },
 ];
 
 
@@ -181,7 +186,11 @@ export default function HomePage() {
                                     <span aria-hidden="true">↓</span>
                                 </button>
                             </>
-                        ) : (
+                        ) : slides[currentSlide].type === "Architecture" ? 
+                            <>
+                            <ArchitecturePanel></ArchitecturePanel>
+                            </>
+                        : (
                             <>
                                 <div className="home-feature-title">
                                     <h3>{slides[currentSlide].title}</h3>
@@ -190,9 +199,9 @@ export default function HomePage() {
                                 <div className="home-feature-description">
                                     <p>{slides[currentSlide].description}</p>
 
-                                    <Link to={slides[currentSlide].link}>
+                                    {(slides[currentSlide].link !== "" && <Link to={slides[currentSlide].link}>
                                         {slides[currentSlide].linkText} →
-                                    </Link>
+                                    </Link>)}
                                 </div>
                             </>
                         )}
@@ -269,13 +278,13 @@ export default function HomePage() {
                         </article>
                     ))}
                 </div>
-
+{/* 
                 <Link
                     to="/projects"
                     className="home-showcase-link"
                 >
                     Browse Public Projects →
-                </Link>
+                </Link> */}
             </section>
         </main>
     );

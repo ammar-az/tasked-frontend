@@ -1,0 +1,238 @@
+
+
+.architecture-panel {
+    --architecture-border: var(--border);
+    --architecture-text: var(--text);
+    --architecture-muted: var(--muted-text);
+    --architecture-accent: var(--link);
+
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+
+    color: var(--architecture-text);
+    font-family: inherit;
+    box-sizing: border-box;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+.architecture-panel *,
+.architecture-panel *::before,
+.architecture-panel *::after {
+    box-sizing: border-box;
+}
+
+.architecture-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+
+    min-width: 0;
+    min-height: 0;
+    padding: 0.65rem 0.85rem;
+    gap: 0.6rem;
+
+    background: transparent;
+    border: 0;
+}
+
+.architecture-column-title {
+    margin: 0;
+    padding: 0 0 0.45rem;
+
+    color: var(--architecture-text);
+    font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+    font-weight: 650;
+    line-height: 1.2;
+    text-align: center;
+
+    border-bottom: 1px solid var(--architecture-border);
+}
+
+.architecture-technology-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+
+    min-height: calc(5 * 2.05rem + 4 * 0.4rem);
+    min-width: 0;
+}
+
+.architecture-technology {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+
+    width: 70%;
+    padding: 0.35rem 0.4rem;
+
+    color: var(--architecture-text);
+    background: var(--surface);
+    border: 1px solid var(--architecture-border);
+    border-radius: 0.4rem;
+
+    font-size: clamp(0.65rem, 1.05vw, 0.82rem);
+    line-height: 1.25;
+    text-align: center;
+}
+
+.architecture-technology-logo,
+.architecture-technology-fallback {
+    display: block;
+    flex: 0 0 auto;
+
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.architecture-technology-logo {
+    object-fit: contain;
+}
+
+.architecture-technology-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--architecture-accent);
+    font-size: 0.55rem;
+    font-weight: 700;
+}
+
+.architecture-technology-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.architecture-hosting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+
+    margin-top: auto;
+    padding-top: 0.5rem;
+
+    border-top: 1px solid var(--architecture-border);
+}
+
+.architecture-section-label {
+    color: var(--architecture-muted);
+    font-size: 0.6rem;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+}
+
+.architecture-hosting-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+
+    width: 100%;
+}
+
+.architecture-connection {
+    position: absolute;
+    top: 51%;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+
+    padding: 0.1rem 0.3rem;
+
+    color: var(--architecture-accent);
+    background: var(--background);
+    border-radius: 0.25rem;
+
+    font-size: clamp(0.55rem, 0.9vw, 0.7rem);
+    font-weight: 650;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.architecture-connection-http {
+    left: 33.3333%;
+    transform: translate(-50%, -50%);
+}
+
+.architecture-connection-sql {
+    left: 66.6667%;
+    transform: translate(-50%, -50%);
+}
+
+.architecture-description {
+    margin: 0.15rem 0 0;
+    margin-inline: auto;
+    width: 70%;
+    color: var(--muted-text);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.architecture-extra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+
+    margin-top: auto;
+    padding-top: 0.4rem;
+}
+
+.architecture-extra-label {
+    color: var(--muted-text);
+    font-size: 0.65rem;
+    line-height: 1.3;
+    text-align: center;
+}
+
+@media (max-width: 520px) {
+    .architecture-column {
+        padding: 0.5rem 0.35rem;
+        gap: 0.45rem;
+    }
+
+    .architecture-technology-list {
+        gap: 0.35rem;
+    }
+
+    .architecture-technology {
+        flex-direction: column;
+        gap: 0.2rem;
+        padding: 0.3rem 0.2rem;
+        font-size: 0.65rem;
+    }
+
+    .architecture-technology-name {
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
+    .architecture-hosting {
+        gap: 0.3rem;
+    }
+
+    .architecture-connection {
+        padding: 0.1rem 0.15rem;
+        font-size: 0.55rem;
+    }
+}
