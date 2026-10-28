@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import "./selection-modal.css";
 import { updateUserEndpoint } from "../api/users";
-import axios from "axios";
+import { getApiErrorMessage } from "../api/errors";
 
 
 interface ChangeUsernameModalProps {
@@ -38,15 +38,7 @@ export default function ChangeUsernameModal({
 
             onClose();
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Name change failed.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Name change failed."));
         } finally {
             setSubmitting(false);
         }

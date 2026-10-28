@@ -5,7 +5,7 @@ import { createProjectEndpoint } from "../api/projects";
 import { useAuth } from "../auth/AuthContext";
 
 import "./create.css";
-import axios from "axios";
+import { getApiErrorMessage } from "../api/errors";
 
 export function meta() {
     return [
@@ -25,13 +25,13 @@ export default function CreateProjectPage() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const {user, isAuthenticated} = useAuth();
+    const {user, isAuthenticated, isSessionReady} = useAuth();
 
     useEffect(() => {
-        if(!isAuthenticated){
+        if(isSessionReady && !isAuthenticated){
             navigate("/login");
         }
-    });
+    }, [isSessionReady, isAuthenticated, navigate]);
 
     const canCreateOrganizationProject = user?.orgId != null;
 
@@ -62,15 +62,7 @@ export default function CreateProjectPage() {
             navigate(`/projects/${slug}`);
                         
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Project creation failed.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Project creation failed."));
         } finally {
             setIsSubmitting(false);
         }

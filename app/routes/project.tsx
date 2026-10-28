@@ -1,3 +1,4 @@
+import { isApiUnavailable } from "../api/errors";
 import { useEffect, useState } from "react";
 import { Link, useRevalidator,useSearchParams } from "react-router";
 
@@ -52,7 +53,8 @@ export async function clientLoader({
             member,
             todoRequest,
         };
-    } catch {
+    } catch (error) {
+        if (isApiUnavailable(error)) throw error;
         throw new Response("This project doesn't exist or you don't have permission to view it.", {
             status: 404,
         });
@@ -61,7 +63,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.project.name} - Tasked` }
+        { title: `${loaderData?.project.name ?? "Project"} - Tasked` }
     ];
 }
 

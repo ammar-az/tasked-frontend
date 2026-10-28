@@ -2,23 +2,25 @@ import {
     createContext,
     useContext,
     useEffect,
-    useState,
+    useSyncExternalStore,
     type ReactNode,
 } from "react";
 
-import { loginUser, logoutUser, registerUser, refreshSession } from "../api/auth";
-import { setAccessToken } from "./tokenStore";
-import { UserDto } from "../types/user-types";
+import { loginUser, logoutUser, registerUser } from "../api/auth";
+import { getSession, getServerSession, restoreSession, setSession, subscribeToSession } from "./session";
+import type { UserDto } from "../types/user-types";
 
 type AuthContextType = {
     token: string | null;
     isAuthenticated: boolean;
+    isRestoringSession: boolean;
+    isSessionReady: boolean;
 
     user: UserDto | null;
     
-    register: (username:string, password: string) => void;
-    login: (username: string, password: string) => void;
-    logout: () => void;
+    register: (username:string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -40,74 +42,38 @@ export function useAuth() {
 }
 
 export function AuthProvider({children}: Props){
-    const [token, setToken] = useState<string | null>(null);
-    const [initialized, setInitialized] = useState<boolean>(false);
-
-    const [user, setUser] = useState<UserDto | null>(null);
+    const session = useSyncExternalStore(subscribeToSession, getSession, getServerSession);
 
     async function login(username: string, password: string) {
         const res = await loginUser({username, password});
 
-        setToken(res.token);
-        setAccessToken(res.token);
-        setUser(res.user);
+        setSession(res);
     }
 
     async function register(username: string, password: string){
         const res = await registerUser({username, password});
 
-        setToken(res.token);
-        setAccessToken(res.token);
-        setUser(res.user);
+        setSession(res);
     }
 
     async function logout() {
-        try {
-            await logoutUser();
-        } finally {
-            setToken(null);
-            setAccessToken(null);
-            setUser(null);
-        }
+        await logoutUser();
+        setSession(null);
     }
 
     useEffect(() => {
-        let cancelled = false;
-
-        async function restoreSession(){
-            try {
-                const res = await refreshSession();
-                if(!cancelled){
-                    setToken(res.token);
-                    setAccessToken(res.token);
-                    setUser(res.user);
-                }
-            } catch (error){
-                if(!cancelled){
-                    setToken(null);
-                    setAccessToken(null);
-                    setUser(null);
-                }
-            } finally {
-                if(!cancelled) setInitialized(true);
-            }
-        }
-
-        restoreSession();
-
-        return () => {
-            cancelled = true;
-        };
+        // Restore in the background; the app and navigation stay visible.
+        void restoreSession().catch(() => { /* The connection monitor handles recovery. */ });
     }, [])
 
-    if(!initialized) return <div>Loading...</div>;
-    
     return(
         <AuthContext.Provider
             value ={{
-                token,
-                isAuthenticated: token !== null,
-                user,
+                token: session.token,
+                isAuthenticated: session.token !== null,
+                isRestoringSession: session.status === "restoring",
+                isSessionReady: session.status === "authenticated" || session.status === "anonymous",
+                user: session.user,
                 register,
                 login,
                 logout

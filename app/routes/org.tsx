@@ -10,7 +10,7 @@ import { OrgsRequest } from "../types/org-types";
 import { ProjectDto } from "../types/project-types";
 import { UserDto } from "../types/user-types";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getApiErrorMessage, isApiUnavailable } from "../api/errors";
 
 export async function clientLoader({
     params,
@@ -49,7 +49,8 @@ export async function clientLoader({
             users,
             orgRequest
         };
-    } catch {
+    } catch (error) {
+        if (isApiUnavailable(error)) throw error;
         throw new Response("Could not fetch organization data", {
             status: 404,
         });
@@ -58,7 +59,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.org.name} - Tasked` }
+        { title: `${loaderData?.org.name ?? "Organization"} - Tasked` }
     ];
 }
 
@@ -113,15 +114,7 @@ export default function OrgPage({
             setIsMember(!isMember);
             setError(null);
         }catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Could not join organization.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Could not join organization."));
         }
     }
 
@@ -132,15 +125,7 @@ export default function OrgPage({
             setIsMember(!isMember);
             setError(null);
         }catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Could not leave organization.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Could not leave organization."));
         }
     }
 

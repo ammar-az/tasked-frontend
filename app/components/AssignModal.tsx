@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from "../api/errors";
 import { useEffect, useState } from "react";
 import { getMembersEndpoint } from "../api/projects";
 import {
@@ -59,9 +60,9 @@ export default function AssignTaskModal({
                     if (!cancelled) {
                         setMembers(result);
                     }
-                } catch {
+                } catch (error) {
                     if (!cancelled) {
-                        setError("Unable to load project members.");
+                        setError(getApiErrorMessage(error, "Unable to load project members."));
                     }
                 } finally {
                     if (!cancelled) {
@@ -89,8 +90,8 @@ export default function AssignTaskModal({
             await onAssign(selectedMember);
 
             onClose();
-        } catch {
-            setError("Unable to assign the task");
+        } catch (error) {
+            setError(getApiErrorMessage(error, "Unable to assign the task"));
         } finally {
             setAssigning(false);
         }

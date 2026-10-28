@@ -10,7 +10,7 @@ import { canContribute, getTodoStatusLabel, isAdmin } from "../utils/enum-helper
 import { getMemberEndpoint } from "../api/projects";
 import { MemberOverviewDto } from "../types/membership-types";
 import AssignTaskModal from "../components/AssignModal";
-import axios from "axios";
+import { getApiErrorMessage, isApiUnavailable } from "../api/errors";
 import { useAuth } from "../auth/AuthContext";
 
 export async function clientLoader({
@@ -48,7 +48,8 @@ export async function clientLoader({
             todo,
             member
         }
-    }catch{
+    } catch (error) {
+        if (isApiUnavailable(error)) throw error;
         throw new Response("This task doesn't exist or you don't have permission to view it.", {
             status: 404,
         });
@@ -57,7 +58,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.todo.projectName}/${loaderData.todo.issueNo} - Tasked` }
+        { title: loaderData ? `${loaderData.todo.projectName}/${loaderData.todo.issueNo} - Tasked` : "Task - Tasked" }
     ];
 }
 
@@ -131,44 +132,36 @@ export default function TaskPage({
             setTask(updatedTodo);
             setIsEditing(false);
         } catch (error){
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Task creation failed.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Could not update task."));
         }
     }
 
     async function handleSelfAssign(){
         if(user === null || isEditing) return;
         try{
+            setError(null);
             const updatedTodo = await assignTodoEndpoint(task.id, ({unassign: (task.assigned == user.id), assignId: user.id}));
             setTask(updatedTodo);
-        }catch{
-            return;
+        } catch (error) {
+            setError(getApiErrorMessage(error, "Could not assign the task."));
         }
     }
 
     async function handleModalAssign(todoId:string, req: TodoAssignRequest){
-        try{
-            const updatedTodo = await assignTodoEndpoint(todoId, req);
-            setTask(updatedTodo);
-        }catch{
-            return;
-        }
+        // Let the modal display failures instead of closing as if assignment succeeded.
+        const updatedTodo = await assignTodoEndpoint(todoId, req);
+        setTask(updatedTodo);
     }
 
     async function handleStatusChange(){
         if(selectedStatus == task.status || isEditing) return;
         try{
+            setError(null);
             const updatedTodo = await updateTodoEndpoint(task.id, ({title: task.title, description: task.description, status: selectedStatus}));
             setTask(updatedTodo);
-        }catch{
-            setDraft(current => ({...current, status: task.status}));
+        } catch (error) {
+            setSelectedStatus(task.status);
+            setError(getApiErrorMessage(error, "Could not update task status."));
         }
     }
 

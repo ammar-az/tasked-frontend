@@ -2,7 +2,8 @@ import { Link, useNavigate } from "react-router";
 import type { Route } from "./+types/login";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { DATABASE_WAKE_MESSAGE, getApiErrorMessage } from "../api/errors";
+import { useConnectionMessage } from "../auth/useConnectionMessage";
 
 export function meta() {
     return [
@@ -15,10 +16,16 @@ export default function LoginPage({}: Route.ComponentProps) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const connectionMessage = useConnectionMessage();
+    const displayedError = error === DATABASE_WAKE_MESSAGE ? connectionMessage : error ?? connectionMessage;
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (submitting) return;
+        setError(null);
+        setSubmitting(true);
         try{
             if(username == "" || password == ""){
                 setError("Username and password are required.");
@@ -28,15 +35,9 @@ export default function LoginPage({}: Route.ComponentProps) {
             await login(username, password);
             navigate("/");
         }catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Login failed.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Login failed."));
+        } finally {
+            setSubmitting(false);
         }
     }
 
@@ -52,7 +53,7 @@ export default function LoginPage({}: Route.ComponentProps) {
         >
             <div className = "page-main-narrow">
                 <form onSubmit={handleSubmit}
-                    className = "form"
+                    className = "form" aria-busy={submitting}
                 >
                     <h1>Login</h1>
 
@@ -69,9 +70,10 @@ export default function LoginPage({}: Route.ComponentProps) {
                         autoComplete="current-password"
                         onChange={(e) => setPassword(e.target.value)} 
                     />
-                    {error && (<p className="error">{error}</p>)} 
+                    {displayedError && (<p className="error" role="alert">{displayedError}</p>)}
                     
-                    <button type="submit">Login</button>
+                    <button type="submit" disabled={submitting}>{submitting ? "Signing in…" : "Login"}</button>
+                    {submitting && <p role="status">Connecting. If the database is waking up, the app will reconnect automatically.</p>}
 
                     <p>
                         Don't have an account?{" "}

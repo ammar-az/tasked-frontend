@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from "../api/errors";
 import { useEffect, useState } from "react";
 
 import { MemberRole, MemberSort, type MemberOverviewDto, type MemberOverviewRequest } from "../types/membership-types";
@@ -50,9 +51,9 @@ export default function InviteProjectModal({
                 if (!cancelled) {
                     setProjects(result);
                 }
-            } catch {
+            } catch (error) {
                 if (!cancelled) {
-                    setError("Unable to load your projects.");
+                    setError(getApiErrorMessage(error, "Unable to load your projects."));
                 }
             } finally {
                 if (!cancelled) {
@@ -80,8 +81,8 @@ export default function InviteProjectModal({
             await onInvite(selectedProject);
 
             onClose();
-        } catch {
-            setError("Unable to send the project invite.");
+        } catch (error) {
+            setError(getApiErrorMessage(error, "Unable to send the project invite."));
         } finally {
             setInviting(false);
         }

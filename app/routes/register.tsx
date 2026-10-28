@@ -2,7 +2,8 @@ import { Link, useNavigate } from "react-router";
 import type { Route } from "./+types/register";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { DATABASE_WAKE_MESSAGE, getApiErrorMessage } from "../api/errors";
+import { useConnectionMessage } from "../auth/useConnectionMessage";
 
 export function meta() {
     return [
@@ -16,10 +17,16 @@ export default function RegisterPage({}: Route.ComponentProps) {
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
 
+    const [submitting, setSubmitting] = useState(false);
+    const connectionMessage = useConnectionMessage();
+    const displayedError = error === DATABASE_WAKE_MESSAGE ? connectionMessage : error ?? connectionMessage;
     const navigate = useNavigate();
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (submitting) return;
+        setError(null);
+        setSubmitting(true);
         try{
             if(username == "" || password == ""){
                 setError("Username and password are required.");
@@ -29,15 +36,9 @@ export default function RegisterPage({}: Route.ComponentProps) {
             await register(username, password);
             navigate("/");
         }catch (error) {
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setError(error.response.data ?? "Registration failed.");
-                } else {
-                    setError("Could not reach the api. Ensure you are connected to the internet and try again.");
-                }
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            setError(getApiErrorMessage(error, "Registration failed."));
+        } finally {
+            setSubmitting(false);
         }
     }
 
@@ -50,7 +51,7 @@ export default function RegisterPage({}: Route.ComponentProps) {
     return (
         <main className = "simple-layout">
             <div className = "page-main-narrow">
-                <form onSubmit={handleSubmit} className = "form">
+                <form onSubmit={handleSubmit} className = "form" aria-busy={submitting}>
                     <h1>Register</h1>
 
                     <input
@@ -67,9 +68,10 @@ export default function RegisterPage({}: Route.ComponentProps) {
                         onChange={(e) => setPassword(e.target.value)} 
                     />
 
-                    {error && (<p className="error">{error}</p>)} 
+                    {displayedError && (<p className="error" role="alert">{displayedError}</p>)}
 
-                    <button type="submit">Register</button>
+                    <button type="submit" disabled={submitting}>{submitting ? "Creating account…" : "Register"}</button>
+                    {submitting && <p role="status">Connecting. If the database is waking up, the app will reconnect automatically.</p>}
 
                     <p>
                         Already have an account?{" "}

@@ -9,6 +9,9 @@ import { getMe } from "../api/auth";
 import { useNavigate, useRevalidator } from "react-router";
 
 import "./demo.css";
+import axios from "axios";
+import { getApiErrorMessage, isUnauthorized } from "../api/errors";
+import { useState } from "react";
 
 export async function clientLoader({
     request,
@@ -16,7 +19,8 @@ export async function clientLoader({
     var user;
     try{
         user = await getMe();
-    }catch{
+    } catch (error) {
+        if (!isUnauthorized(error)) throw error;
         user = null;
     }
     const slug = user == null
@@ -42,27 +46,17 @@ export async function clientLoader({
     
     try{
         project = await getProjectEndpoint(slug);
-    } catch {
-        return null;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+        throw error;
     }
 
-    try {
-        const [todos, member] = await Promise.all([
-            getProjectTodosEndpoint(slug, todoRequest),
-            getMemberEndpoint(slug),
-        ]);
+    const [todos, member] = await Promise.all([
+        getProjectTodosEndpoint(slug, todoRequest),
+        getMemberEndpoint(slug),
+    ]);
 
-        return {
-            project,
-            todos,
-            member,
-            todoRequest,
-        };
-    } catch {
-        throw new Response("Demo could not be loaded.", {
-            status: 404,
-        });
-    }
+    return { project, todos, member, todoRequest };
 }
 
 export function meta() {
@@ -104,15 +98,24 @@ export default function DemoPage({
     loaderData: ProjectPageData | null;
 }) {    
     const revalidator = useRevalidator();
+    const [error, setError] = useState<string | null>(null);
 
     async function handleStartDemo(){
-        await createDemoEndpoint();
-        revalidator.revalidate();
+        try {
+            setError(null);
+            await createDemoEndpoint();
+            await revalidator.revalidate();
+        } catch (error) {
+            setError(getApiErrorMessage(error, "Could not start the demo."));
+        }
     }
 
     if(loaderData === null)
         return (
-            <DemoEntryPage onStart={(handleStartDemo)} />
+            <>
+                {error && <p className="error" role="alert">{error}</p>}
+                <DemoEntryPage onStart={handleStartDemo} />
+            </>
         );
 
     else 

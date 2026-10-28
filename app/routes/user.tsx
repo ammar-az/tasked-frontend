@@ -54,7 +54,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.user.username} - Tasked` }
+        { title: `${loaderData?.user.username ?? "User"} - Tasked` }
     ];
 }
 

@@ -1,3 +1,4 @@
+import { getApiErrorMessage, isApiUnavailable } from "../api/errors";
 import {
     useEffect,
     useState,
@@ -61,7 +62,8 @@ export async function clientLoader({
             project,
             member,
         };
-    }catch{
+    } catch (error) {
+        if (isApiUnavailable(error)) throw error;
         throw new Response("This project doesn't exist or you don't have permission to view it.", {
             status: 404,
         });
@@ -70,7 +72,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.project.name} Settings - Tasked` }
+        { title: `${loaderData?.project.name ?? "Project"} Settings - Tasked` }
     ];
 }
 
@@ -140,8 +142,8 @@ export default function ProjectSettingsPage({
             setMessage("Project changes saved.");
 
             await revalidator.revalidate();
-        } catch {
-            setError("The project could not be updated.");
+        } catch (error) {
+            setError(getApiErrorMessage(error, "The project could not be updated."));
         } finally {
             setIsSaving(false);
         }
@@ -168,12 +170,12 @@ export default function ProjectSettingsPage({
             }
 
             await revalidator.revalidate();
-        } catch {
-            setError(
+        } catch (error) {
+            setError(getApiErrorMessage(error,
                 isOrganizationProject
                     ? "The project could not be removed from the organization."
                     : "The project could not be added to your organization.",
-            );
+            ));
         } finally {
             setIsUpdatingOrganization(false);
         }
@@ -193,8 +195,8 @@ export default function ProjectSettingsPage({
             navigate("/myaccount?view=owned", {
                 replace: true,
             });
-        } catch {
-            setError("The project could not be deleted.");
+        } catch (error) {
+            setError(getApiErrorMessage(error, "The project could not be deleted."));
             setIsDeleting(false);
         }
     }

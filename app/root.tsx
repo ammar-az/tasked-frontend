@@ -12,12 +12,17 @@ import { isRouteErrorResponse } from "react-router";
 import type { Route } from "./+types/root";
 
 import Navbar from "./components/Navbar";
+import ConnectionNotice from "./components/ConnectionNotice";
+import PageSkeleton from "./components/PageSkeleton";
+import { DATABASE_WAKE_MESSAGE, isApiUnavailable } from "./api/errors";
 import "./app.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
@@ -25,8 +30,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <AuthProvider>
           <Navbar />
+          <ConnectionNotice />
 
-          <main>
+          <main className="app-content">
             {children}
           </main>
         </AuthProvider>
@@ -58,6 +64,10 @@ export function ErrorPage({
 export function ErrorBoundary({
     error,
 }: Route.ErrorBoundaryProps) {
+    if (isApiUnavailable(error)) {
+        return <ErrorPage title="Connecting to the database. " message={DATABASE_WAKE_MESSAGE} />;
+    }
+
     if (isRouteErrorResponse(error)) {
         switch (error.status) {
             case 401:
@@ -121,7 +131,7 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function HydrateFallback() {
-  return <div>Loading...</div>;
+  return <PageSkeleton />;
 }
 
 export default function App() {

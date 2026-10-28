@@ -1,3 +1,4 @@
+import { isApiUnavailable } from "../api/errors";
 import {
     useEffect,
     useState,
@@ -109,7 +110,8 @@ export async function clientLoader({
             members,
             memberRequest,
         };
-    }catch{
+    } catch (error) {
+        if (isApiUnavailable(error)) throw error;
         throw new Response("This project doesn't exist or you don't have permission to view it.", {
             status: 404,
         });
@@ -118,7 +120,7 @@ export async function clientLoader({
 
 export function meta({ loaderData }: Route.MetaArgs) {
     return [
-        { title: `${loaderData.project.name} Members - Tasked` }
+        { title: `${loaderData?.project.name ?? "Project"} Members - Tasked` }
     ];
 }
 
